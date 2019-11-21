@@ -17,7 +17,7 @@ class userClass
         $data=$queryUser->fetch();
         if($data)
         {
-          $queryPermission = $this->db->prepare("SELECT p.`name`,p.`module`,GROUP_CONCAT(p.`function`) AS funcionts FROM `permission_role` pr INNER JOIN `permissions` p ON pr.`id_permission`=p.`id_permission` WHERE pr.`id_rol`=:idRol GROUP BY p.`module`, p.`name`");
+          $queryPermission = $this->db->prepare("SELECT p.`name`,p.`module`,GROUP_CONCAT(p.`function`) AS funcionts FROM `permission_role` pr INNER JOIN `permissions` p ON pr.`id_permission`=p.`id_permission` WHERE pr.`id_rol`=:idRol GROUP BY p.`module`");
           $queryPermission->bindParam(':idRol',$data['id_rol']);
           $queryPermission->execute();
           $dataMenu=$queryPermission->fetchAll();
@@ -32,7 +32,7 @@ class userClass
         }
     }
     public function GenerateMenus($Menu){
-      require_once(VIEW_PATH."Manager/Layout/menu.php");
+        require_once(VIEW_PATH."Manager/Layout/menu.php");
     }
     public function ListUsers(){
       try{
@@ -42,7 +42,7 @@ class userClass
         return $dataUser;
       }
       catch(Exception $e) {
-      echo '{"error":{"text":'. $e->getMessage() .'}}';
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
       }
     }
     public function ListRols(){

@@ -3,7 +3,7 @@
 # CATALOGUES SUNAT
 DROP DATABASE ose;
 CREATE DATABASE ose;
-use ose;
+USE ose;
 
 # Catalogue 01
 CREATE TABLE document_type_code(
@@ -158,6 +158,7 @@ CREATE TABLE business(
     email VARCHAR(64),
     phone VARCHAR(32),
     web_site VARCHAR(64),
+    is_production TINYINT,
     logo VARCHAR(255),
     UNIQUE KEY uk_company (web_site,email),
     CONSTRAINT pk_company PRIMARY KEY (business_id)
@@ -401,6 +402,69 @@ CREATE TABLE detail_sale_note (
     CONSTRAINT fk_detail_sale_note_sale_note FOREIGN KEY (sale_note_id) REFERENCES sale_note (sale_note_id)
         ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
+CREATE TABLE sale_note_referral_guide(
+    sale_note_referral_guide_id INT AUTO_INCREMENT NOT NULL,
+    sale_note_id INT NOT NULL,
+    document_code VARCHAR(2) NOT NULL,
+    whit_guide BOOLEAN,
+
+    transfer_code VARCHAR(2),
+    transport_code VARCHAR(2),
+    transfer_start_date DATE,
+    total_gross_weight FLOAT,
+
+    carrier_document_code VARCHAR(1),
+    carrier_document_number VARCHAR(24),
+    carrier_denomination VARCHAR(255),
+    carrier_plate_number VARCHAR(64),
+
+    driver_document_code VARCHAR(1),
+    driver_document_number VARCHAR(24),
+    driver_full_name VARCHAR(255),
+
+    location_starting_code VARCHAR(6),
+    address_starting_point VARCHAR(128),
+
+    location_arrival_code VARCHAR(6),
+    address_arrival_point VARCHAR(128),
+    CONSTRAINT pk_sale_note_referral_guide PRIMARY KEY (sale_note_referral_guide_id),
+    CONSTRAINT uk_sale_note_referral_guide UNIQUE KEY (sale_note_id),
+    CONSTRAINT fk_sale_note_referral_guide_sale_note FOREIGN KEY (sale_note_id) REFERENCES sale_note (sale_note_id)
+    ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_sale_note_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES geographical_location_code (code)
+    ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_sale_note_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES geographical_location_code (code)
+    ON UPDATE RESTRICT ON DELETE RESTRICT
+)ENGINE = InnoDB;
+CREATE TABLE sale_note_detraction(
+    sale_note_detraction_id INT AUTO_INCREMENT NOT NULL,
+    sale_note_id INT NOT NULL,
+
+    whit_detraction BOOLEAN,
+    detraction_code VARCHAR(3),
+    percentage FLOAT,
+    amount FLOAT,
+
+    referral_value VARCHAR(1),
+    effective_load VARCHAR(24),
+    useful_load VARCHAR(255),
+    travel_detail VARCHAR(255),
+    location_starting_code VARCHAR(6),
+    address_starting_point VARCHAR(128),
+    location_arrival_code VARCHAR(6),
+    address_arrival_point VARCHAR(128),
+
+    boat_registration VARCHAR(32),
+    boat_name VARCHAR(32),
+    species_kind VARCHAR(32),
+    delivery_address VARCHAR(64),
+    delivery_date DATETIME,
+    quantity FLOAT,
+
+    CONSTRAINT pk_sale_note_detraction PRIMARY KEY (sale_note_detraction_id),
+    CONSTRAINT uk_sale_note_detraction UNIQUE KEY (sale_note_id),
+    CONSTRAINT fk_sale_note_detraction_sale_note FOREIGN KEY (sale_note_id) REFERENCES sale_note (sale_note_id)
+);
 
 CREATE TABLE sale(
     sale_id INT AUTO_INCREMENT NOT NULL,
@@ -481,7 +545,6 @@ CREATE TABLE sale(
      ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 ALTER TABLE sale ADD INDEX in_sale_indexes (serie,correlative,local_id);
-
 CREATE TABLE detail_sale(
     detail_sale_id INT AUTO_INCREMENT NOT NULL,
     sale_id INT NOT NULL,
@@ -523,7 +586,6 @@ CREATE TABLE detail_sale(
     CONSTRAINT fk_detail_sale_sale FOREIGN KEY (sale_id) REFERENCES sale (sale_id)
         ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
-
 CREATE TABLE sale_referral_guide(
     referral_guide_id INT AUTO_INCREMENT NOT NULL,
     sale_id INT NOT NULL,
@@ -558,7 +620,6 @@ CREATE TABLE sale_referral_guide(
     CONSTRAINT fk_sale_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES geographical_location_code (code)
         ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
-
 CREATE TABLE sale_detraction(
     sale_detraction_id INT AUTO_INCREMENT NOT NULL,
     sale_id INT NOT NULL,

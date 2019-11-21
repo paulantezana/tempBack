@@ -63,6 +63,13 @@
             </ul>
             <div class="nav-var-right my-2 my-lg-0">
                 <ul class="navbar-nav">
+                    <li class="nav-item">:
+                        <?php if (isset($_SESSION[ENVIRONMENT]) && $_SESSION[ENVIRONMENT]): ?>
+                            <button class="btn btn-sm btn-success">PRODUCCION</button>
+                        <?php else: ?>
+                            <button class="btn btn-sm btn-danger">AMBIENTE DE PRUEBAS</button>
+                        <?php endif; ?>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Configuración

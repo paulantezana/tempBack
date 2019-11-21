@@ -30,13 +30,13 @@ class BillingManager
     {
         $res = new Result();
         try {
-            if ($invoice['invoiceTypeCode'] != '01') {
+            /*if ($invoice['invoiceTypeCode'] != '01') {
                 throw new Exception('Wrong invoice Type!');
             }
 
             if (!(count($invoice['itemList']) > 0)) {
                 throw new Exception('There is no items.');
-            }
+            }*/
 
             $folderPath = $this->FolderPathValidation($invoice['supplierRuc']);
             $fileName = $invoice['supplierRuc'] . '-' . $invoice['invoiceTypeCode'] . '-' . $invoice['serie'] . '-' . $invoice['number'] .'.xml';
@@ -691,7 +691,7 @@ class BillingManager
 
             if ($invoice['itinerantSuplier'] == 1) {
                 $captionTemplate = XmlTemplate::InvoiceCaption();
-                
+
                 $captionVariableList = array();
                 $captionVariableList['captionCode'] = '2005';
                 $captionVariableList['captionDescription'] = 'Venta realizada por emisor itinerante';
@@ -700,7 +700,7 @@ class BillingManager
                 {
                     $captionTemplate = str_replace('{{'.$key.'}}', $value, $captionTemplate);
                 }
-                
+
                 $captionXml = new DOMDocument();
                 $captionXml->preserveWhiteSpace = false;
                 $captionXml->loadXML($captionTemplate);
@@ -721,7 +721,7 @@ class BillingManager
                 {
                     $deliveryTemplate = str_replace('{{'.$key.'}}', $value, $deliveryTemplate);
                 }
-                
+
                 $deliveryXml = new DOMDocument();
                 $deliveryXml->preserveWhiteSpace = false;
                 $deliveryXml->loadXML($deliveryTemplate);
@@ -729,7 +729,7 @@ class BillingManager
                 $node = $xml->importNode($node, true);
                 $invoiceNode->insertBefore($node, $TaxTotal);
             }
-            
+
             if (strlen($invoice['orderReference']) > 0) {
                 $captionTemplate = XmlTemplate::InvoiceOrderReference();
 
@@ -1102,7 +1102,7 @@ class BillingManager
                 $node = $xml->importNode($node, true);
                 $TaxTotal->appendChild($node);
             }
-            
+
             if ($invoice['globalDiscountAmount'] > 0) {
                 $igvTaxSubTotalTemplate = XmlTemplate::TotalDiscount();
                 $igvVariableList = array();
@@ -1110,12 +1110,12 @@ class BillingManager
                 $igvVariableList['globalDiscountAmount'] = $invoice['globalDiscountAmount'];
                 $igvVariableList['totalBaseAmount'] = $invoice['totalBaseAmount'];
                 $igvVariableList['codigoMoneda'] = $invoice['codigoMoneda'];
-                
+
                 foreach($igvVariableList as $key => $value)
                 {
                     $igvTaxSubTotalTemplate = str_replace('{{'.$key.'}}', $value, $igvTaxSubTotalTemplate);
                 }
-                
+
                 $xmligvTax = new DOMDocument();
                 $xmligvTax->preserveWhiteSpace = false;
                 $xmligvTax->loadXML($igvTaxSubTotalTemplate);
@@ -1303,7 +1303,7 @@ class BillingManager
                     $node = $xmlItem->importNode($node, true);
                     $invoiceLineNode->insertBefore($node, $itemTaxTotalNode);
                 }
-                
+
                 $node = $xmlItem->getElementsByTagName('InvoiceLine')->item(0);
                 $node = $xml->importNode($node, true);
                 $invoiceNode->appendChild($node);

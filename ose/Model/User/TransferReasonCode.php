@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/BaseModel.php';
+require_once MODEL_PATH . '/Helper/BaseModel.php';
 
 class TransferReasonCode extends BaseModel
 {

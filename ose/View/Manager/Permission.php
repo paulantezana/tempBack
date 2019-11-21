@@ -4,7 +4,7 @@
     </div>
     <div class="col-md-3">
 
-       
+
     </div>
     <div class="col-md-4">
         <table class="table table-hover table-sm table-bordered" id="TableRoles">
@@ -15,7 +15,7 @@
             <th scope="col">Acciones</th>
             </tr>
         </thead>
-        <tbody>         
+        <tbody>
             <?php foreach ($parameter[0] as $key => $User): ?>
                 <tr id='Rol<?php echo $User["id_rol"] ?>'>
                 <td><?php echo $User["name"] ?></td>

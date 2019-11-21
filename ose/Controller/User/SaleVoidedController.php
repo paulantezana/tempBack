@@ -88,7 +88,7 @@ class SaleVoidedController
         $invoice['reason'] = htmlspecialchars($voided['reason']);
 
         $documentManager = new DocumentManager();
-        $resPdf = $documentManager->Voided($invoice,'A4',false);
+        $resPdf = $documentManager->Voided($invoice,'A4',$_SESSION[ENVIRONMENT]);
 
         if ($resPdf->success){
             $this->saleVoidedModel->UpdateById($voided['sale_voided_id'],[

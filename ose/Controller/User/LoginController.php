@@ -42,6 +42,8 @@ class LoginController
             $business = $businessModel->GetByUserId($_SESSION[SESS]);
             $businessLocal = $businessLocalModel->GetAllByBusinessId($business['business_id']);
 
+            $_SESSION[ENVIRONMENT] = $business['environment'];
+
             setcookie('BusinessLocal', json_encode($businessLocal), time() + (86400 * 1), "/");
             setcookie('CurrentBusinessLocal', $businessLocal[0]['business_local_id'] . '', time() + (86400 * 1), "/");
         } catch (Exception $e){

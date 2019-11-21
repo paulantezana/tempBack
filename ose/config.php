@@ -11,6 +11,7 @@
 	define('CONTROLLER_GROUP',"ControllerGroup");
 	define('USER_TYPE',"SkySessType");
 	define('REQUEST_METHOD', $_SERVER['REQUEST_METHOD']);
+	define('ENVIRONMENT','SkyEnvironment');
 
 	/*  Valores de rutas   */
 	define('FOLDER_NAME', '/OSE-skynet/ose');
@@ -24,8 +25,8 @@
 	define('DEFAULT_CONTROLLER', 'Home');
 	define('DEFAULT_METHOD', 'Exec');
 
-//	define('DEFAULT_URL', 'http://localhost/');
-	define('DEFAULT_URL', 'http://corporacionskynet.com/');
+	define('DEFAULT_URL', 'http://localhost/');
+//	define('DEFAULT_URL', 'http://corporacionskynet.com/');
 	define('SUNAT_SERVICE_URL', 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService?wsdl');
     define('SUNAT_GUIDE_SERVICE_URL', 'https://e-beta.sunat.gob.pe/ol-ti-itemision-guia-gem-beta/billService?wsdl');
 ?>

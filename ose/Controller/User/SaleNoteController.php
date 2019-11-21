@@ -186,7 +186,7 @@ class SaleNoteController
         }
 
         $documentManager = new DocumentManager();
-        $resPdf = $documentManager->InvoiceNCND($invoice,$sale['pdf_format'] !== '' ? $sale['pdf_format'] : 'A4',false);
+        $resPdf = $documentManager->InvoiceNCND($invoice,$sale['pdf_format'] !== '' ? $sale['pdf_format'] : 'A4',$_SESSION[ENVIRONMENT]);
 
         if ($resPdf->success){
             $this->saleNoteModel->UpdateById($sale['sale_note_id'],[
@@ -259,6 +259,10 @@ class SaleNoteController
         $invoice['number'] = $saleNote['correlative'];
         $invoice['issueDate'] = $saleNote['date_of_issue'];
         $invoice['issueTime'] = $saleNote['time_of_issue'];
+
+        $invoice['invoiceTypeCode'] = $saleNote['document_code']; //---------------- TEMP
+        $invoice['operationTypeCode'] = $saleNote['operation_code'];	//---------------- TEMP
+
         $invoice['amounInWord'] = NumberFunction::StringFormat((int)$saleNote['total'] ?? 0);
         if ($saleNote['document_code'] === '07'){
             $invoice['creditNoteTypeCode'] = $saleNote['reason_update_code'];
@@ -574,11 +578,11 @@ class SaleNoteController
                 $invoice['percentage_igv'] = 18.00;
                 $invoice['total_value'] = $invoice['total_unaffected'] + $invoice['total_taxed'] + $invoice['total_exonerated'];
 
-                $validateInput = $this->ValidateInput($invoice);
-                $error = $validateInput->error;
-                if (!$validateInput->success){
-                    throw new Exception($validateInput->errorMessage);
-                }
+//                $validateInput = $this->ValidateInput($invoice);
+//                $error = $validateInput->error;
+//                if (!$validateInput->success){
+//                    throw new Exception($validateInput->errorMessage);
+//                }
 
                 $saleNoteId = $this->saleNoteModel->Insert($invoice);
 
@@ -713,11 +717,11 @@ class SaleNoteController
                 $invoice['percentage_igv'] = 18.00;
                 $invoice['total_value'] = $invoice['total_unaffected'] + $invoice['total_taxed'] + $invoice['total_exonerated'];
 
-                $validateInput = $this->ValidateInput($invoice);
-                $error = $validateInput->error;
-                if (!$validateInput->success){
-                    throw new Exception($validateInput->errorMessage);
-                }
+//                $validateInput = $this->ValidateInput($invoice);
+//                $error = $validateInput->error;
+//                if (!$validateInput->success){
+//                    throw new Exception($validateInput->errorMessage);
+//                }
 
                 $saleNoteId = $this->saleNoteModel->Insert($invoice);
 

@@ -173,7 +173,7 @@ class ReferralGuideController
         }
 
         $documentManager = new DocumentManager();
-        $resPdf = $documentManager->Guide($invoice,'A4',false);
+        $resPdf = $documentManager->Guide($invoice,'A4',$_SESSION[ENVIRONMENT]);
 
         if ($resPdf->success){
             $this->referralGuideModel->UpdateById($referralGuide['referral_guide_id'],[

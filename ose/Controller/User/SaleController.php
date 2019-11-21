@@ -216,7 +216,7 @@ class SaleController
         }
 
         $documentManager = new DocumentManager();
-        $resPdf = $documentManager->Invoice($invoice,$sale['pdf_format'] !== '' ? $sale['pdf_format'] : 'A4',false);
+        $resPdf = $documentManager->Invoice($invoice,$sale['pdf_format'] !== '' ? $sale['pdf_format'] : 'A4',$_SESSION[ENVIRONMENT]);
 
         if ($resPdf->success){
             $this->saleModel->UpdateById($sale['sale_id'],[
@@ -474,7 +474,7 @@ class SaleController
         $res = new Result();
         $res->digestValue = '';
 
-        if ($sale['document_code'] === '01'){
+//        if ($sale['document_code'] === '01'){
             $resInvoice = $billingManager->SendInvoice($sale['sale_id'], $invoice, $_SESSION[SESS]);
             if ($resInvoice->success){
                 $this->saleModel->UpdateById($sale['sale_id'],[
@@ -508,21 +508,21 @@ class SaleController
                 $res->errorMessage .= $resInvoice->readerError;
                 $res->success = false;
             }
-        }elseif ($sale['document_code'] === '03'){
-            $resInvoice = $billingManager->SaveTicketInvoice($sale['sale_id'], $invoice, $_SESSION[SESS]);
-
-            if ($resInvoice->success){
-                $this->saleModel->UpdateById($sale['sale_id'],[
-                    'xml_url' => $directoryXmlPath . $fileName,
-                    'sunat_state' => 2,
-                ]);
-                $res->digestValue = $resInvoice->digestValue;
-                $res->success = true;
-            }else{
-                $res->errorMessage .= $resInvoice->errorMessage;
-                $res->success = false;
-            }
-        }
+//        }elseif ($sale['document_code'] === '03'){
+//            $resInvoice = $billingManager->SaveTicketInvoice($sale['sale_id'], $invoice, $_SESSION[SESS]);
+//
+//            if ($resInvoice->success){
+//                $this->saleModel->UpdateById($sale['sale_id'],[
+//                    'xml_url' => $directoryXmlPath . $fileName,
+//                    'sunat_state' => 2,
+//                ]);
+//                $res->digestValue = $resInvoice->digestValue;
+//                $res->success = true;
+//            }else{
+//                $res->errorMessage .= $resInvoice->errorMessage;
+//                $res->success = false;
+//            }
+//        }
 
         return $res;
     }
@@ -674,11 +674,11 @@ class SaleController
                     $invoice['legend'] = $legend;
                     $invoice['total_value'] = $invoice['total_unaffected'] + $invoice['total_taxed'] + $invoice['total_exonerated'];
 
-                    $validateInput = $this->ValidateInput($invoice);
-                    $error = $validateInput->error;
-                    if (!$validateInput->success){
-                        throw new Exception($validateInput->errorMessage);
-                    }
+//                    $validateInput = $this->ValidateInput($invoice);
+//                    $error = $validateInput->error;
+//                    if (!$validateInput->success){
+//                        throw new Exception($validateInput->errorMessage);
+//                    }
                     $saleId = $this->saleModel->Insert($invoice);
 
                    $resRunDoc = $this->BuildDocument($saleId);

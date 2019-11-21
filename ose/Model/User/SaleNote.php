@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/BaseModel.php';
+require_once MODEL_PATH . '/Helper/BaseModel.php';
 
 class SaleNote extends BaseModel
 {
@@ -108,13 +108,27 @@ class SaleNote extends BaseModel
                             operation_type_code.description as operation_type_code_description, 
                             customer.social_reason as customer_social_reason, customer.document_number as customer_document_number, 
                             currency_type_code.symbol as currency_type_code_symbol,
-                            currency_type_code.description as currency_type_code_description
+                            currency_type_code.description as currency_type_code_description,
+       
+                            srg.whit_guide, srg.transfer_code, srg.total_gross_weight, srg.transport_code, srg.carrier_document_code, srg.carrier_document_number,
+                            srg.carrier_denomination, srg.carrier_plate_number, srg.driver_document_code, srg.driver_document_number, srg.driver_full_name, srg.location_arrival_code,
+                            srg.address_arrival_point, srg.location_starting_code, srg.address_starting_point,
+       
+                            sd.referral_value as detraction_referral_value, sd.effective_load as detraction_effective_load, sd.useful_load as detraction_useful_load, sd.travel_detail as detraction_travel_detail,
+                            sd.location_starting_code as detraction_location_starting_code, sd.address_starting_point as detraction_address_starting_point, 
+                            sd.location_arrival_code as detraction_location_arrival_code, sd.address_arrival_point as detraction_address_arrival_point,
+                            sd.whit_detraction, sd.detraction_code as detraction_code, sd.percentage as detraction_percentage, sd.amount as detraction_amount,
+       
+                            sd.boat_registration as detraction_boat_registration, sd.boat_name as detraction_boat_name, sd.species_kind as detraction_species_kind,
+                            sd.delivery_address as detraction_delivery_address, sd.delivery_date as detraction_delivery_date, sd.quantity as detraction_quantity
                     FROM sale_note
                     INNER JOIN sale ON sale_note.sale_id = sale.sale_id
                     INNER JOIN customer ON sale_note.customer_id = customer.customer_id
                     INNER JOIN document_type_code ON sale_note.document_code = document_type_code.code
                     INNER JOIN currency_type_code ON sale_note.currency_code = currency_type_code.code
                     INNER JOIN operation_type_code ON sale_note.operation_code = operation_type_code.code
+                    LEFT JOIN sale_referral_guide srg ON sale.sale_id = srg.sale_id
+                    LEFT JOIN sale_detraction sd on sale.sale_id = sd.sale_id
                     WHERE sale_note.sale_note_id = :sale_note_id LIMIT 1';
 
             $stmt = $this->db->prepare($sql);
@@ -266,6 +280,85 @@ class SaleNote extends BaseModel
                     ':total' => (float)($row['total'] ?? 0),
                 ]);
             }
+
+            // Insert Detraction
+            if (isset($invoice['detraction_percentage']) && isset($invoice['detraction_enabled']) ){
+                $sql = "INSERT INTO sale_note_detraction(sale_note_id, referral_value, effective_load, useful_load, travel_detail, 
+                                                        whit_detraction, detraction_code, percentage, amount,
+                                                        location_starting_code, address_starting_point, location_arrival_code, address_arrival_point,
+                                                        boat_registration, boat_name, species_kind, delivery_address, delivery_date, quantity
+                                                )  
+                                                    VALUES (:sale_note_id, :referral_value, :effective_load, :useful_load, :travel_detail,
+                                                        :whit_detraction, :detraction_code, :percentage, :amount,
+                                                        :location_starting_code, :address_starting_point, :location_arrival_code, :address_arrival_point,
+                                                        :boat_registration, :boat_name, :species_kind, :delivery_address, :delivery_date, :quantity
+                                                    )";
+                $stmt = $this->db->prepare($sql);
+                $detractionEnabled = $invoice['detraction_enabled'] == 'on' ? 1 : 0;
+
+                if (!$stmt->execute([
+                    ':sale_note_id' => $saleNoteId,
+                    ':referral_value' => $invoice['detraction_referral_value'],
+                    ':effective_load' => $invoice['detraction_effective_load'],
+                    ':useful_load' => $invoice['detraction_useful_load'],
+                    ':travel_detail' => $invoice['detraction_travel_detail'],
+
+                    ':whit_detraction' => $detractionEnabled,
+                    ':detraction_code' => $invoice['subject_detraction_code'],
+                    ':percentage' => $invoice['detraction_percentage'],
+                    ':amount' => $invoice['total'] * ($invoice['detraction_percentage'] / 100),
+                    ':location_starting_code' => $invoice['detraction_location_starting_code'],
+                    ':address_starting_point' => $invoice['detraction_address_starting_point'],
+                    ':location_arrival_code' => $invoice['detraction_location_arrival_code'],
+                    ':address_arrival_point' => $invoice['detraction_address_arrival_point'],
+
+                    ':boat_registration' => $invoice['detraction_boat_registration'],
+                    ':boat_name' => $invoice['detraction_boat_name'],
+                    ':species_kind' => $invoice['detraction_species_kind'],
+                    ':delivery_address' => $invoice['detraction_delivery_address'],
+                    ':delivery_date' => $invoice['detraction_delivery_date'],
+                    ':quantity' => $invoice['detraction_quantity'],
+                ])){
+                    throw new Exception('No se pudo insertar el registro');
+                }
+            }
+
+            // Insert invoice guide
+            if (isset($invoice['referral_guide_enabled'])){
+                $referralGuide = $invoice['referral_guide'];
+                $sql = "INSERT INTO sale_note_referral_guide(sale_note_id, whit_guide, document_code, transfer_code, transport_code, transfer_start_date, total_gross_weight,
+                                                        carrier_document_code, carrier_document_number, carrier_denomination, driver_document_code,
+                                                        driver_document_number, driver_full_name, location_starting_code, address_starting_point,
+                                                        location_arrival_code, address_arrival_point)  
+                                                    VALUES (:sale_note_id, :whit_guide, :document_code, :transfer_code, :transport_code, :transfer_start_date, :total_gross_weight,
+                                                        :carrier_document_code, :carrier_document_number, :carrier_denomination, :driver_document_code,
+                                                        :driver_document_number, :driver_full_name, :location_starting_code, :address_starting_point,
+                                                        :location_arrival_code, :address_arrival_point)";
+                $stmt = $this->db->prepare($sql);
+                $referralGuideEnabled = $invoice['referral_guide_enabled'] == 'on' ? 1 : 0;
+                if (!$stmt->execute([
+                    ':sale_note_id' => $saleNoteId,
+                    ':whit_guide' => $referralGuideEnabled,
+                    ':document_code' => '09',
+                    ':transfer_code' => $referralGuide['transfer_code'],
+                    ':transport_code' => $referralGuide['transport_code'],
+                    ':transfer_start_date' => $referralGuide['transfer_start_date'],
+                    ':total_gross_weight' => $referralGuide['total_gross_weight'],
+                    ':carrier_document_code' => $referralGuide['carrier_document_code'],
+                    ':carrier_document_number' => $referralGuide['carrier_document_number'],
+                    ':carrier_denomination' => $referralGuide['carrier_denomination'],
+                    ':driver_document_code' => $referralGuide['driver_document_code'],
+                    ':driver_document_number' => $referralGuide['driver_document_number'],
+                    ':driver_full_name' => $referralGuide['driver_full_name'],
+                    ':location_starting_code' => $referralGuide['location_starting_code'],
+                    ':address_starting_point' => $referralGuide['address_starting_point'],
+                    ':location_arrival_code' => $referralGuide['location_arrival_code'],
+                    ':address_arrival_point' => $referralGuide['address_arrival_point'],
+                ])){
+                    throw new Exception('No se pudo insertar el registro');
+                }
+            }
+
             $this->db->commit();
             return $saleNoteId;
         } catch (Exception $e) {
@@ -273,6 +366,7 @@ class SaleNote extends BaseModel
             throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
         }
     }
+
     public function GetByIdDocumentDescription(int $id)
     {
         try{
