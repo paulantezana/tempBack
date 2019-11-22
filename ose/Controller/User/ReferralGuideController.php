@@ -1,13 +1,13 @@
 <?php
 
 require_once MODEL_PATH . 'User/Customer.php';
-require_once MODEL_PATH . 'User/DocumentTypeCode.php';
-require_once MODEL_PATH . 'User/TransferReasonCode.php';
-require_once MODEL_PATH . 'User/TransportModeCode.php';
-require_once MODEL_PATH . 'User/IdentityDocumentTypeCode.php';
+require_once MODEL_PATH . 'User/CatDocumentTypeCode.php';
+require_once MODEL_PATH . 'User/CatTransferReasonCode.php';
+require_once MODEL_PATH . 'User/CatTransportModeCode.php';
+require_once MODEL_PATH . 'User/CatIdentityDocumentTypeCode.php';
 require_once MODEL_PATH . 'User/ReferralGuide.php';
 require_once MODEL_PATH . 'User/DetailReferralGuide.php';
-require_once MODEL_PATH . 'User/GeographicalLocationCode.php';
+require_once MODEL_PATH . 'User/CatGeographicalLocationCode.php';
 require_once MODEL_PATH . 'User/Product.php';
 require_once MODEL_PATH . 'User/Sale.php';
 require_once MODEL_PATH . 'User/DetailSale.php';
@@ -407,7 +407,7 @@ class ReferralGuideController
                     ];
                 }
 
-                $customerModel = new GeographicalLocationCode($this->connection);
+                $customerModel = new CatGeographicalLocationCode($this->connection);
                 if ((int)$guide['location_starting_code']){
                     $locationStarting = $customerModel->GetBy('code',$guide['location_starting_code']);
                     $guide['location_starting'] = [
@@ -425,10 +425,10 @@ class ReferralGuideController
                 }
             }
 
-            $documentTypeCodeModel = new DocumentTypeCode($this->connection);
-            $identityDocumentTypeCodeModel = new IdentityDocumentTypeCode($this->connection);
-            $transferReasonCodeModel = new TransferReasonCode($this->connection);
-            $transportModeCodeModel = new TransportModeCode($this->connection);
+            $documentTypeCodeModel = new CatDocumentTypeCode($this->connection);
+            $identityDocumentTypeCodeModel = new CatIdentityDocumentTypeCode($this->connection);
+            $transferReasonCodeModel = new CatTransferReasonCode($this->connection);
+            $transportModeCodeModel = new CatTransportModeCode($this->connection);
 
             $parameter['documentTypeCode'] = $documentTypeCodeModel->GetBy('code','09');
             $parameter['identityDocumentTypeCode'] = $identityDocumentTypeCodeModel->getAll();
@@ -462,7 +462,7 @@ class ReferralGuideController
         }
 
         $referralGuideModel = new ReferralGuide($this->connection);
-        $identityDocumentTypeCodeModel = new IdentityDocumentTypeCode($this->connection);
+        $identityDocumentTypeCodeModel = new CatIdentityDocumentTypeCode($this->connection);
 
         $parameter['guide'] = $referralGuideModel->GetById($referralGuideId);
         $parameter['identityDocumentTypeCode'] = $identityDocumentTypeCodeModel->GetAll();

@@ -1,25 +1,25 @@
 <?php
 
-//require_once MODEL_PATH . 'User/AdditionalLegendCode.php';
-require_once MODEL_PATH . 'User/AffectationIgvTypeCode.php';
-require_once MODEL_PATH . 'User/SubjectDetractionCode.php';
-require_once MODEL_PATH . 'User/TransferReasonCode.php';
-require_once MODEL_PATH . 'User/TransportModeCode.php';
-require_once MODEL_PATH . 'User/CurrencyTypeCode.php';
-require_once MODEL_PATH . 'User/DocumentTypeCode.php';
-require_once MODEL_PATH . 'User/IdentityDocumentTypeCode.php';
-require_once MODEL_PATH . 'User/OperationTypeCode.php';
+//require_once MODEL_PATH . 'User/CatAdditionalLegendCode.php';
+require_once MODEL_PATH . 'User/CatAffectationIgvTypeCode.php';
+require_once MODEL_PATH . 'User/CatSubjectDetractionCode.php';
+require_once MODEL_PATH . 'User/CatTransferReasonCode.php';
+require_once MODEL_PATH . 'User/CatTransportModeCode.php';
+require_once MODEL_PATH . 'User/CatCurrencyTypeCode.php';
+require_once MODEL_PATH . 'User/CatDocumentTypeCode.php';
+require_once MODEL_PATH . 'User/CatIdentityDocumentTypeCode.php';
+require_once MODEL_PATH . 'User/CatOperationTypeCode.php';
 require_once MODEL_PATH . 'User/Sale.php';
 require_once MODEL_PATH . 'User/Customer.php';
 require_once MODEL_PATH . 'User/DetailSale.php';
 require_once MODEL_PATH . 'User/Product.php';
-require_once MODEL_PATH . 'User/CreditNoteTypeCode.php';
-require_once MODEL_PATH . 'User/DebitNoteTypeCode.php';
+require_once MODEL_PATH . 'User/CatCreditNoteTypeCode.php';
+require_once MODEL_PATH . 'User/CatDebitNoteTypeCode.php';
 require_once MODEL_PATH . 'User/Business.php';
-require_once MODEL_PATH . 'User/SystemIscTypeCode.php';
+require_once MODEL_PATH . 'User/CatSystemIscTypeCode.php';
 require_once MODEL_PATH . 'User/BusinessSerie.php';
-require_once MODEL_PATH . 'User/PerceptionTypeCode.php';
-require_once MODEL_PATH . 'User/GeographicalLocationCode.php';
+require_once MODEL_PATH . 'User/CatPerceptionTypeCode.php';
+require_once MODEL_PATH . 'User/CatGeographicalLocationCode.php';
 
 require_once CONTROLLER_PATH . 'Helper/DocumentManager.php';
 require_once CONTROLLER_PATH . 'Helper/InvoiceTemplate.php';
@@ -60,7 +60,7 @@ class SaleController
             $filterEndDate = $_GET['filter']['endDate'] ?? '';
             $filterSaleSearch = $_GET['filter']['saleSearch'] ?? 0;
 
-            $documentTypeCodeModel = new DocumentTypeCode($this->connection);
+            $documentTypeCodeModel = new CatDocumentTypeCode($this->connection);
             $documentTypeCode = $documentTypeCodeModel->ByInCodes(['01','03']);
 
             // Filter
@@ -537,7 +537,7 @@ class SaleController
             $detailSale = $this->detailSaleModel->BySaleIdXML($saleId);
             $customer = $this->customerModel->GetById($sale['customer_id']);
 
-            $perceptionTypeCodeModel = new PerceptionTypeCode($this->connection);
+            $perceptionTypeCodeModel = new CatPerceptionTypeCode($this->connection);
             $perceptionTypeCode = $perceptionTypeCodeModel->GetAll();
 
             if ($sale['sunat_state'] == '3'){
@@ -567,7 +567,7 @@ class SaleController
 
             // Itinerant
             if ($sale['itinerant_enable']){
-                $geographicalLocationCodeModel = new GeographicalLocationCode($this->connection);
+                $geographicalLocationCodeModel = new CatGeographicalLocationCode($this->connection);
                 $itinerantLocation = $geographicalLocationCodeModel->GetBy('code',$sale['itinerant_location']);
                 $itinerantProvince = $itinerantLocation['province'];
                 $itinerantDepartment = $itinerantLocation['department'];
@@ -702,16 +702,16 @@ class SaleController
                 }
             }
 
-            $affectationIgvTypeCodeModel = new AffectationIgvTypeCode($this->connection);
-            $systemIscTypeCodeModel = new SystemIscTypeCode($this->connection);
-            $currencyTypeCodeModel = new CurrencyTypeCode($this->connection);
-            $documentTypeCodeModel = new DocumentTypeCode($this->connection);
-            $identityDocumentTypeCodeModel = new IdentityDocumentTypeCode($this->connection);
-            $operationTypeCodeModel = new OperationTypeCode($this->connection);
-            $perceptionTypeCodeModel = new PerceptionTypeCode($this->connection);
-            $transferReasonCodeModel = new TransferReasonCode($this->connection);
-            $transportModeCodeModel = new TransportModeCode($this->connection);
-            $subjectDetractionCode = new SubjectDetractionCode($this->connection);
+            $affectationIgvTypeCodeModel = new CatAffectationIgvTypeCode($this->connection);
+            $systemIscTypeCodeModel = new CatSystemIscTypeCode($this->connection);
+            $currencyTypeCodeModel = new CatCurrencyTypeCode($this->connection);
+            $documentTypeCodeModel = new CatDocumentTypeCode($this->connection);
+            $identityDocumentTypeCodeModel = new CatIdentityDocumentTypeCode($this->connection);
+            $operationTypeCodeModel = new CatOperationTypeCode($this->connection);
+            $perceptionTypeCodeModel = new CatPerceptionTypeCode($this->connection);
+            $transferReasonCodeModel = new CatTransferReasonCode($this->connection);
+            $transportModeCodeModel = new CatTransportModeCode($this->connection);
+            $subjectDetractionCode = new CatSubjectDetractionCode($this->connection);
 
             $parameter['affectationIgvTypeCode'] = $affectationIgvTypeCodeModel->GetAll();
             $parameter['systemIscTypeCode'] = $systemIscTypeCodeModel->getAll();
@@ -809,13 +809,13 @@ class SaleController
                 }
             }
 
-            $affectationIgvTypeCodeModel = new AffectationIgvTypeCode($this->connection);
-            $systemIscTypeCodeModel = new SystemIscTypeCode($this->connection);
-            $currencyTypeCodeModel = new CurrencyTypeCode($this->connection);
-            $documentTypeCodeModel = new DocumentTypeCode($this->connection);
-            $identityDocumentTypeCodeModel = new IdentityDocumentTypeCode($this->connection);
-            $operationTypeCodeModel = new OperationTypeCode($this->connection);
-            $perceptionTypeCodeModel = new PerceptionTypeCode($this->connection);
+            $affectationIgvTypeCodeModel = new CatAffectationIgvTypeCode($this->connection);
+            $systemIscTypeCodeModel = new CatSystemIscTypeCode($this->connection);
+            $currencyTypeCodeModel = new CatCurrencyTypeCode($this->connection);
+            $documentTypeCodeModel = new CatDocumentTypeCode($this->connection);
+            $identityDocumentTypeCodeModel = new CatIdentityDocumentTypeCode($this->connection);
+            $operationTypeCodeModel = new CatOperationTypeCode($this->connection);
+            $perceptionTypeCodeModel = new CatPerceptionTypeCode($this->connection);
 
             $parameter['affectationIgvTypeCode'] = $affectationIgvTypeCodeModel->GetAll();
             $parameter['systemIscTypeCode'] = $systemIscTypeCodeModel->getAll();

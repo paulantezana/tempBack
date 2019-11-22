@@ -2,11 +2,11 @@
 
 require_once MODEL_PATH . 'User/Product.php';
 require_once MODEL_PATH . 'User/Business.php';
-require_once MODEL_PATH . 'User/ProductCode.php';
-require_once MODEL_PATH . 'User/AffectationIgvTypeCode.php';
-require_once MODEL_PATH . 'User/CurrencyTypeCode.php';
-require_once MODEL_PATH . 'User/UnitMeasureTypeCode.php';
-require_once MODEL_PATH . 'User/SystemIscTypeCode.php';
+require_once MODEL_PATH . 'User/CatProductCode.php';
+require_once MODEL_PATH . 'User/CatAffectationIgvTypeCode.php';
+require_once MODEL_PATH . 'User/CatCurrencyTypeCode.php';
+require_once MODEL_PATH . 'User/CatUnitMeasureTypeCode.php';
+require_once MODEL_PATH . 'User/CatSystemIscTypeCode.php';
 
 class ProductController
 {
@@ -29,9 +29,9 @@ class ProductController
             }
 
             $productModel = new Product($this->connection);
-            $affectationIgvTypeCodeModel = new AffectationIgvTypeCode($this->connection);
-            $currencyTypeCodeModel = new CurrencyTypeCode($this->connection);
-            $systemIscTypeCodeModel = new SystemIscTypeCode($this->connection);
+            $affectationIgvTypeCodeModel = new CatAffectationIgvTypeCode($this->connection);
+            $currencyTypeCodeModel = new CatCurrencyTypeCode($this->connection);
+            $systemIscTypeCodeModel = new CatSystemIscTypeCode($this->connection);
 
             $businessId = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
             $parameter['products'] = $productModel->paginate($page,10, $businessId);
@@ -110,9 +110,9 @@ class ProductController
         $productId = $body['product_id'];
 
         $productModel = new Product($this->connection);
-        $productCodeModel = new ProductCode($this->connection);
-        $unitMeasureTypeCodeModel =  new UnitMeasureTypeCode($this->connection);
-        $affectationIgvTypeModel = new AffectationIgvTypeCode($this->connection);
+        $productCodeModel = new CatProductCode($this->connection);
+        $unitMeasureTypeCodeModel =  new CatUnitMeasureTypeCode($this->connection);
+        $affectationIgvTypeModel = new CatAffectationIgvTypeCode($this->connection);
 
         $product = $productModel->GetById($productId);
         $unitMeasureTypeCode = $unitMeasureTypeCodeModel->GetBy('code',$product['unit_measure_code']);

@@ -37,7 +37,7 @@ CREATE TABLE `additional_legend_code` (
 -- Volcado de datos para la tabla `additional_legend_code`
 --
 
-INSERT INTO `additional_legend_code` (`code`, `description`) VALUES
+INSERT INTO cat_additional_legend_code (`code`, `description`) VALUES
 ('1000', 'Monto en Letras'),
 ('1002', 'Leyenda \"TRANSFERENCIA GRATUITA DE UN BIEN Y/O SERVICIO PRESTADO GRATUITAMENTE\"'),
 ('2000', 'Leyenda “COMPROBANTE DE PERCEPCIÓN”'),
@@ -98,7 +98,7 @@ CREATE TABLE `affectation_igv_type_code` (
 -- Volcado de datos para la tabla `affectation_igv_type_code`
 --
 
-INSERT INTO `affectation_igv_type_code` (`code`, `description`, `tribute_code`, `onerous`) VALUES
+INSERT INTO cat_affectation_igv_type_code (`code`, `description`, `tribute_code`, `onerous`) VALUES
 ('10', 'Gravado - Operación Onerosa', '1000', 1),
 ('11', '[Gratuita] Gravado – Retiro por premio', '9996', 2),
 ('12', '[Gratuita] Gravado – Retiro por donación', '9996', 2),
@@ -182,7 +182,7 @@ CREATE TABLE `credit_note_type_code` (
 -- Volcado de datos para la tabla `credit_note_type_code`
 --
 
-INSERT INTO `credit_note_type_code` (`code`, `description`) VALUES
+INSERT INTO cat_credit_note_type_code (`code`, `description`) VALUES
 ('01', 'Anulación de la operación'),
 ('02', 'Anulación por error en el RUC'),
 ('03', 'Corrección por error en la descripción'),
@@ -211,7 +211,7 @@ CREATE TABLE `currency_type_code` (
 -- Volcado de datos para la tabla `currency_type_code`
 --
 
-INSERT INTO `currency_type_code` (`code`, `description`, `entity`, `symbol`) VALUES
+INSERT INTO cat_currency_type_code (`code`, `description`, `entity`, `symbol`) VALUES
 ('PEN', 'SOLES (S/)', 'PERU', 'S/'),
 ('USD', 'DÓLARES AMERICANOS ($)', 'AMERICAN SAMOA', '$');
 
@@ -261,7 +261,7 @@ CREATE TABLE `debit_note_type_code` (
 -- Volcado de datos para la tabla `debit_note_type_code`
 --
 
-INSERT INTO `debit_note_type_code` (`code`, `description`) VALUES
+INSERT INTO cat_debit_note_type_code (`code`, `description`) VALUES
 ('01', 'Intereses por mora'),
 ('02', 'Aumento en el valor'),
 ('03', 'Penalidades/ otros conceptos');
@@ -409,7 +409,7 @@ CREATE TABLE `document_type_code` (
 -- Volcado de datos para la tabla `document_type_code`
 --
 
-INSERT INTO `document_type_code` (`code`, `description`) VALUES
+INSERT INTO cat_document_type_code (`code`, `description`) VALUES
 ('01', 'FACTURA'),
 ('03', 'BOLETA DE VENTA'),
 ('07', 'NOTA DE CREDITO'),
@@ -444,7 +444,7 @@ CREATE TABLE `identity_document_type_code` (
 -- Volcado de datos para la tabla `identity_document_type_code`
 --
 
-INSERT INTO `identity_document_type_code` (`code`, `description`) VALUES
+INSERT INTO cat_identity_document_type_code (`code`, `description`) VALUES
 ('-', '- VARIOS - VENTAS MENORES A S/.700.00 Y OTROS'),
 ('0', '0 NO DOMICILIADO, SIN RUC (EXPORTACIÓN)'),
 ('1', '1 DNI - DOC. NACIONAL DE IDENTIDAD'),
@@ -506,7 +506,7 @@ CREATE TABLE `operation_type_code` (
 -- Volcado de datos para la tabla `operation_type_code`
 --
 
-INSERT INTO `operation_type_code` (`code`, `description`) VALUES
+INSERT INTO cat_operation_type_code (`code`, `description`) VALUES
 ('0101', 'Venta lnterna'),
 ('0102', 'Exportación'),
 ('0104', 'Venta Interna – Anticipos'),
@@ -617,7 +617,7 @@ CREATE TABLE `product_code` (
 -- Volcado de datos para la tabla `product_code`
 --
 
-INSERT INTO `product_code` (`code`, `description`) VALUES
+INSERT INTO cat_product_code (`code`, `description`) VALUES
 ('10000000', 'MATERIAL VIVO VEGETAL Y ANIMAL, ACCESORIOS Y SUMINISTROS'),
 ('11000000', 'MATERIAL MINERAL, TEXTIL Y  VEGETAL Y ANIMAL NO COMESTIBLE'),
 ('12000000', 'MATERIAL QUÍMICO INCLUYENDO BIOQUÍMICOS Y MATERIALES DE GAS'),
@@ -1009,7 +1009,7 @@ CREATE TABLE `summary_state_code` (
 -- Volcado de datos para la tabla `summary_state_code`
 --
 
-INSERT INTO `summary_state_code` (`code`, `description`) VALUES
+INSERT INTO cat_summary_state_code (`code`, `description`) VALUES
 ('1', 'Adicionar'),
 ('2', 'Modificar'),
 ('3', 'Anulado');
@@ -1181,7 +1181,7 @@ CREATE TABLE `system_isc_type_code` (
 -- Volcado de datos para la tabla `system_isc_type_code`
 --
 
-INSERT INTO `system_isc_type_code` (`code`, `description`) VALUES
+INSERT INTO cat_system_isc_type_code (`code`, `description`) VALUES
 ('01', 'Sistema al valor (Apéndice IV, lit. A – T.U.O IGV e ISC)'),
 ('02', 'Aplicación del Monto Fijo ( Sistema específico, bienes en el apéndice III, Apéndice IV, lit. B – T.U.O IGV e ISC)'),
 ('03', 'Sistema de Precios de Venta al Público (Apéndice IV, lit. C – T.U.O IGV e ISC)');
@@ -1246,7 +1246,7 @@ CREATE TABLE `transfer_reason_code` (
 -- Volcado de datos para la tabla `transfer_reason_code`
 --
 
-INSERT INTO `transfer_reason_code` (`code`, `description`) VALUES
+INSERT INTO cat_transfer_reason_code (`code`, `description`) VALUES
 ('01', 'Venta'),
 ('02', 'Compra'),
 ('04', 'Traslado entre establecimientos de la misma empresa'),
@@ -1272,7 +1272,7 @@ CREATE TABLE `transport_mode_code` (
 -- Volcado de datos para la tabla `transport_mode_code`
 --
 
-INSERT INTO `transport_mode_code` (`code`, `description`) VALUES
+INSERT INTO cat_transport_mode_code (`code`, `description`) VALUES
 ('01', 'Transporte público'),
 ('02', 'Transporte privado');
 
@@ -1293,7 +1293,7 @@ CREATE TABLE `tribute_type_code` (
 -- Volcado de datos para la tabla `tribute_type_code`
 --
 
-INSERT INTO `tribute_type_code` (`code`, `description`, `international_code`, `name`) VALUES
+INSERT INTO cat_tribute_type_code (`code`, `description`, `international_code`, `name`) VALUES
 ('1000', 'IGV Impuesto General a las Ventas', 'VAT', 'IGV'),
 ('1016', 'Impuesto a la Venta Arroz Pilado', 'VAT', 'IVAP'),
 ('2000', 'ISC Impuesto Selectivo al Consumo', 'EXC', 'ISC'),
@@ -1320,7 +1320,7 @@ CREATE TABLE `unit_measure_type_code` (
 -- Volcado de datos para la tabla `unit_measure_type_code`
 --
 
-INSERT INTO `unit_measure_type_code` (`code`, `description`, `extend`) VALUES
+INSERT INTO cat_unit_measure_type_code (`code`, `description`, `extend`) VALUES
 ('4A', 'BOBINAS', 0),
 ('BE', 'FARDO', 0),
 ('BG', 'BOLSA', 0),
@@ -1421,13 +1421,13 @@ INSERT INTO `users` (`id_user`, `id_rol`, `names`, `email`, `phone`, `ruc`, `add
 --
 -- Indices de la tabla `additional_legend_code`
 --
-ALTER TABLE `additional_legend_code`
+ALTER TABLE cat_additional_legend_code
   ADD PRIMARY KEY (`code`);
 
 --
 -- Indices de la tabla `affectation_igv_type_code`
 --
-ALTER TABLE `affectation_igv_type_code`
+ALTER TABLE cat_affectation_igv_type_code
   ADD PRIMARY KEY (`code`),
   ADD KEY `fk_affectation_igv_type_code_tribute_type_code` (`tribute_code`);
 
@@ -1448,13 +1448,13 @@ ALTER TABLE `business_user`
 --
 -- Indices de la tabla `credit_note_type_code`
 --
-ALTER TABLE `credit_note_type_code`
+ALTER TABLE cat_credit_note_type_code
   ADD PRIMARY KEY (`code`);
 
 --
 -- Indices de la tabla `currency_type_code`
 --
-ALTER TABLE `currency_type_code`
+ALTER TABLE cat_currency_type_code
   ADD PRIMARY KEY (`code`);
 
 --
@@ -1466,7 +1466,7 @@ ALTER TABLE `customer`
 --
 -- Indices de la tabla `debit_note_type_code`
 --
-ALTER TABLE `debit_note_type_code`
+ALTER TABLE cat_debit_note_type_code
   ADD PRIMARY KEY (`code`);
 
 --
@@ -1520,19 +1520,19 @@ ALTER TABLE `document_correlative`
 --
 -- Indices de la tabla `document_type_code`
 --
-ALTER TABLE `document_type_code`
+ALTER TABLE cat_document_type_code
   ADD PRIMARY KEY (`code`);
 
 --
 -- Indices de la tabla `geographical_location_code`
 --
-ALTER TABLE `geographical_location_code`
+ALTER TABLE cat_geographical_location_code
   ADD PRIMARY KEY (`code`);
 
 --
 -- Indices de la tabla `identity_document_type_code`
 --
-ALTER TABLE `identity_document_type_code`
+ALTER TABLE cat_identity_document_type_code
   ADD PRIMARY KEY (`code`);
 
 --
@@ -1550,7 +1550,7 @@ ALTER TABLE `module`
 --
 -- Indices de la tabla `operation_type_code`
 --
-ALTER TABLE `operation_type_code`
+ALTER TABLE cat_operation_type_code
   ADD PRIMARY KEY (`code`);
 
 --
@@ -1570,7 +1570,7 @@ ALTER TABLE `product`
 --
 -- Indices de la tabla `product_code`
 --
-ALTER TABLE `product_code`
+ALTER TABLE cat_product_code
   ADD PRIMARY KEY (`code`);
 
 --
@@ -1640,7 +1640,7 @@ ALTER TABLE `sale_voided`
 --
 -- Indices de la tabla `summary_state_code`
 --
-ALTER TABLE `summary_state_code`
+ALTER TABLE cat_summary_state_code
   ADD PRIMARY KEY (`code`);
 
 --
@@ -1676,7 +1676,7 @@ ALTER TABLE `sunat_xml_type`
 --
 -- Indices de la tabla `system_isc_type_code`
 --
-ALTER TABLE `system_isc_type_code`
+ALTER TABLE cat_system_isc_type_code
   ADD PRIMARY KEY (`code`);
 
 --
@@ -1688,25 +1688,25 @@ ALTER TABLE `ticket_summary`
 --
 -- Indices de la tabla `transfer_reason_code`
 --
-ALTER TABLE `transfer_reason_code`
+ALTER TABLE cat_transfer_reason_code
   ADD PRIMARY KEY (`code`);
 
 --
 -- Indices de la tabla `transport_mode_code`
 --
-ALTER TABLE `transport_mode_code`
+ALTER TABLE cat_transport_mode_code
   ADD PRIMARY KEY (`code`);
 
 --
 -- Indices de la tabla `tribute_type_code`
 --
-ALTER TABLE `tribute_type_code`
+ALTER TABLE cat_tribute_type_code
   ADD PRIMARY KEY (`code`);
 
 --
 -- Indices de la tabla `unit_measure_type_code`
 --
-ALTER TABLE `unit_measure_type_code`
+ALTER TABLE cat_unit_measure_type_code
   ADD PRIMARY KEY (`code`);
 
 --
@@ -1888,8 +1888,8 @@ ALTER TABLE `users`
 --
 -- Filtros para la tabla `affectation_igv_type_code`
 --
-ALTER TABLE `affectation_igv_type_code`
-  ADD CONSTRAINT `fk_affectation_igv_type_code_tribute_type_code` FOREIGN KEY (`tribute_code`) REFERENCES `tribute_type_code` (`code`);
+ALTER TABLE cat_affectation_igv_type_code
+  ADD CONSTRAINT `fk_affectation_igv_type_code_tribute_type_code` FOREIGN KEY (`tribute_code`) REFERENCES cat_tribute_type_code (`code`);
 
 --
 -- Filtros para la tabla `business_user`
@@ -1930,47 +1930,47 @@ ALTER TABLE `detail_sale_note_summary`
 --
 ALTER TABLE `detail_ticket_summary`
   ADD CONSTRAINT `fk_detail_ticket_summary_sale` FOREIGN KEY (`sale_id`) REFERENCES `sale` (`sale_id`),
-  ADD CONSTRAINT `fk_detail_ticket_summary_summary_state_code` FOREIGN KEY (`summary_state_code`) REFERENCES `summary_state_code` (`code`),
+  ADD CONSTRAINT `fk_detail_ticket_summary_summary_state_code` FOREIGN KEY (`summary_state_code`) REFERENCES cat_summary_state_code (`code`),
   ADD CONSTRAINT `fk_detail_ticket_summary_ticket_summary` FOREIGN KEY (`ticket_summary_id`) REFERENCES `ticket_summary` (`ticket_summary_id`);
 
 --
 -- Filtros para la tabla `document_correlative`
 --
 ALTER TABLE `document_correlative`
-  ADD CONSTRAINT `fk_document_correlative_document_code` FOREIGN KEY (`document_code`) REFERENCES `document_type_code` (`code`);
+  ADD CONSTRAINT `fk_document_correlative_document_code` FOREIGN KEY (`document_code`) REFERENCES cat_document_type_code (`code`);
 
 --
 -- Filtros para la tabla `product`
 --
 ALTER TABLE `product`
-  ADD CONSTRAINT `fk_product_product_code` FOREIGN KEY (`product_code`) REFERENCES `product_code` (`code`),
-  ADD CONSTRAINT `fk_product_unit_measure_code` FOREIGN KEY (`unit_measure_code`) REFERENCES `unit_measure_type_code` (`code`);
+  ADD CONSTRAINT `fk_product_product_code` FOREIGN KEY (`product_code`) REFERENCES cat_product_code (`code`),
+  ADD CONSTRAINT `fk_product_unit_measure_code` FOREIGN KEY (`unit_measure_code`) REFERENCES cat_unit_measure_type_code (`code`);
 
 --
 -- Filtros para la tabla `referral_guide`
 --
 ALTER TABLE `referral_guide`
   ADD CONSTRAINT `fk_referral_guide_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`),
-  ADD CONSTRAINT `fk_referral_guide_location_arrival_code` FOREIGN KEY (`location_arrival_code`) REFERENCES `geographical_location_code` (`code`),
-  ADD CONSTRAINT `fk_referral_guide_location_starting_code` FOREIGN KEY (`location_starting_code`) REFERENCES `geographical_location_code` (`code`);
+  ADD CONSTRAINT `fk_referral_guide_location_arrival_code` FOREIGN KEY (`location_arrival_code`) REFERENCES cat_geographical_location_code (`code`),
+  ADD CONSTRAINT `fk_referral_guide_location_starting_code` FOREIGN KEY (`location_starting_code`) REFERENCES cat_geographical_location_code (`code`);
 
 --
 -- Filtros para la tabla `sale`
 --
 ALTER TABLE `sale`
-  ADD CONSTRAINT `fk_sale_currency_type_code` FOREIGN KEY (`currency_code`) REFERENCES `currency_type_code` (`code`),
+  ADD CONSTRAINT `fk_sale_currency_type_code` FOREIGN KEY (`currency_code`) REFERENCES cat_currency_type_code (`code`),
   ADD CONSTRAINT `fk_sale_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`),
-  ADD CONSTRAINT `fk_sale_document_type_code` FOREIGN KEY (`document_code`) REFERENCES `document_type_code` (`code`),
-  ADD CONSTRAINT `fk_sale_operation_type_code` FOREIGN KEY (`operation_code`) REFERENCES `operation_type_code` (`code`);
+  ADD CONSTRAINT `fk_sale_document_type_code` FOREIGN KEY (`document_code`) REFERENCES cat_document_type_code (`code`),
+  ADD CONSTRAINT `fk_sale_operation_type_code` FOREIGN KEY (`operation_code`) REFERENCES cat_operation_type_code (`code`);
 
 --
 -- Filtros para la tabla `sale_note`
 --
 ALTER TABLE `sale_note`
-  ADD CONSTRAINT `fk_sale_note_currency_type_code` FOREIGN KEY (`currency_code`) REFERENCES `currency_type_code` (`code`),
+  ADD CONSTRAINT `fk_sale_note_currency_type_code` FOREIGN KEY (`currency_code`) REFERENCES cat_currency_type_code (`code`),
   ADD CONSTRAINT `fk_sale_note_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`),
-  ADD CONSTRAINT `fk_sale_note_document_type_code` FOREIGN KEY (`document_code`) REFERENCES `document_type_code` (`code`),
-  ADD CONSTRAINT `fk_sale_note_operation_type_code` FOREIGN KEY (`operation_code`) REFERENCES `operation_type_code` (`code`);
+  ADD CONSTRAINT `fk_sale_note_document_type_code` FOREIGN KEY (`document_code`) REFERENCES cat_document_type_code (`code`),
+  ADD CONSTRAINT `fk_sale_note_operation_type_code` FOREIGN KEY (`operation_code`) REFERENCES cat_operation_type_code (`code`);
 
 --
 -- Filtros para la tabla `sale_note_voided`

@@ -16,8 +16,8 @@ class Customer extends BaseModel
             $totalRows = $this->db->query("SELECT COUNT(*) FROM customer WHERE business_id = '$businessId'")->fetchColumn();
             $totalPages = ceil($totalRows / $limit);
 
-            $sql = "SELECT customer.*, identity_document_type_code.description as identity_document_type_code_description FROM customer
-                    INNER JOIN identity_document_type_code ON customer.identity_document_code = identity_document_type_code.code
+            $sql = "SELECT customer.*, cat_identity_document_type_code.description as identity_document_type_code_description FROM customer
+                    INNER JOIN cat_identity_document_type_code ON customer.identity_document_code = cat_identity_document_type_code.code
                     WHERE customer.business_id = :business_id
                     ORDER BY customer_id DESC LIMIT $offset, $limit";
             $stmt = $this->db->prepare($sql);

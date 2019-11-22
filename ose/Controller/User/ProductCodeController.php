@@ -1,6 +1,6 @@
 <?php
 
-require_once MODEL_PATH . 'User/ProductCode.php';
+require_once MODEL_PATH . 'User/CatProductCode.php';
 
 class ProductCodeController
 {
@@ -17,7 +17,7 @@ class ProductCodeController
         header('Content-Type: application/json; charset=UTF-8');
 
         $search = $_POST['q'] ?? '';
-        $productCode = new ProductCode($this->connection);
+        $productCode = new CatProductCode($this->connection);
         $data = $productCode->Search($search);
 
         echo json_encode([

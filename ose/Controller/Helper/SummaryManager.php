@@ -4,7 +4,7 @@
     require_once MODEL_PATH . 'User/Sale.php';
     require_once MODEL_PATH . 'User/Business.php';
     require_once MODEL_PATH . 'User/Customer.php';
-    require_once MODEL_PATH . 'User/PerceptionTypeCode.php';
+    require_once MODEL_PATH . 'User/CatPerceptionTypeCode.php';
 
     require_once CONTROLLER_PATH . 'Helper/DocumentManager.php';
     require_once CONTROLLER_PATH . 'Helper/BillingManager.php';
@@ -29,7 +29,7 @@
 
             $this->customerModel = new Customer($connection);
             $this->businessModel = new Business($connection);
-            $this->perceptionTypeCodeModel = new PerceptionTypeCode($connection);
+            $this->perceptionTypeCodeModel = new CatPerceptionTypeCode($connection);
         }
 
         public function ByAllInvoice($dateOfIssue = null, $interval = 500){

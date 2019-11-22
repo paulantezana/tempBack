@@ -14,11 +14,11 @@ class DetailTicketSummary
         try{
             $sql = 'SELECT detail_ticket_summary .*,
                        sale.date_of_issue as sale_date_of_issue, sale.serie as sale_serie, sale.correlative as sale_correlative, sale.total as sale_total, 
-                       document_type_code.description as document_type_code_description,
+                       cat_document_type_code.description as document_type_code_description,
                        sale.currency_code as sale_currency_code,
                        customer.social_reason as customer_social_reason FROM detail_ticket_summary 
                 INNER JOIN sale ON detail_ticket_summary.sale_id = sale.sale_id
-                INNER JOIN document_type_code ON sale.document_code = document_type_code.code
+                INNER JOIN cat_document_type_code ON sale.document_code = cat_document_type_code.code
                 INNER JOIN customer ON sale.customer_id = customer.customer_id
                 WHERE detail_ticket_summary.ticket_summary_id = :ticket_summary_id';
 

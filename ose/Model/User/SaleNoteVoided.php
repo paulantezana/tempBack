@@ -34,7 +34,7 @@ class SaleNoteVoided extends BaseModel
                         dtc.description as sale_document_code_description
                         FROM sale_note_voided
                         INNER JOIN sale_note ON sale_note_voided.sale_note_id = sale_note.sale_note_id
-                        INNER JOIN document_type_code dtc on sale_note.document_code = dtc.code";
+                        INNER JOIN cat_document_type_code dtc on sale_note.document_code = dtc.code";
             $sql .= $sqlFilter;
             $sql .= " ORDER BY sale_note_voided.sale_note_voided_id DESC LIMIT $offset, $limit";
 

@@ -2,7 +2,7 @@
 
 require_once MODEL_PATH . 'User/Customer.php';
 require_once MODEL_PATH . 'User/Business.php';
-require_once MODEL_PATH . 'User/IdentityDocumentTypeCode.php';
+require_once MODEL_PATH . 'User/CatIdentityDocumentTypeCode.php';
 
 require_once CONTROLLER_PATH . 'Helper/Services/JneDNI.php';
 require_once CONTROLLER_PATH . 'Helper/Services/SunatRUC.php';
@@ -29,7 +29,7 @@ class CustomerController
                 $page = 1;
             }
 
-            $identityDocumentTypeCodeModel = new IdentityDocumentTypeCode($this->connection);
+            $identityDocumentTypeCodeModel = new CatIdentityDocumentTypeCode($this->connection);
             $businessId = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
             $parameter['customers'] = $this->customerModel->Paginate($page,10,$businessId);
             $parameter['identityDocumentTypeCode'] = $identityDocumentTypeCodeModel->GetAll();

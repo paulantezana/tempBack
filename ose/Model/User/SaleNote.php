@@ -44,15 +44,15 @@ class SaleNote extends BaseModel
             $total_rows = $this->db->query("SELECT COUNT(*) FROM sale_note {$sqlFilter}")->fetchColumn();
             $total_pages = ceil($total_rows / $limit);
 
-            $sql = "SELECT sale_note.*,  document_type_code.description as document_type_code_description, operation_type_code.description as operation_type_code_description,
-                            customer.social_reason, customer.document_number, currency_type_code.symbol as currency_symbol,
+            $sql = "SELECT sale_note.*,  cat_document_type_code.description as document_type_code_description, cat_operation_type_code.description as operation_type_code_description,
+                            customer.social_reason, customer.document_number, cat_currency_type_code.symbol as currency_symbol,
                             sale.document_code as sale_document_code,
                             sunat_comunicate.sunat_response_description, sunat_response_code, creation_date as sunat_creation_date
                         FROM sale_note
                         INNER JOIN customer ON sale_note.customer_id = customer.customer_id
-                        INNER JOIN document_type_code ON sale_note.document_code = document_type_code.code
-                        INNER JOIN currency_type_code ON sale_note.currency_code = currency_type_code.code
-                        INNER JOIN operation_type_code ON sale_note.operation_code = operation_type_code.code
+                        INNER JOIN cat_document_type_code ON sale_note.document_code = cat_document_type_code.code
+                        INNER JOIN cat_currency_type_code ON sale_note.currency_code = cat_currency_type_code.code
+                        INNER JOIN cat_operation_type_code ON sale_note.operation_code = cat_operation_type_code.code
                         LEFT JOIN sale ON sale_note.sale_id = sale.sale_id
                         LEFT JOIN (
                             SELECT sunat_communication.reference_id, sunat_response.sunat_response_description, sunat_response.sunat_response_code, sunat_communication.creation_date FROM sunat_communication
@@ -104,11 +104,11 @@ class SaleNote extends BaseModel
             $sql = 'SELECT sale_note.*,
                             (sale_note.total_igv + sale_note.total_isc + sale_note.total_other_taxed) as total_tax,
                             sale.serie as sale_serie, sale.correlative as sale_correlative, sale.document_code as sale_document_code, 
-                            document_type_code.description as document_type_code_description, 
-                            operation_type_code.description as operation_type_code_description, 
+                            cat_document_type_code.description as document_type_code_description, 
+                            cat_operation_type_code.description as operation_type_code_description, 
                             customer.social_reason as customer_social_reason, customer.document_number as customer_document_number, 
-                            currency_type_code.symbol as currency_type_code_symbol,
-                            currency_type_code.description as currency_type_code_description,
+                            cat_currency_type_code.symbol as currency_type_code_symbol,
+                            cat_currency_type_code.description as currency_type_code_description,
        
                             srg.whit_guide, srg.transfer_code, srg.total_gross_weight, srg.transport_code, srg.carrier_document_code, srg.carrier_document_number,
                             srg.carrier_denomination, srg.carrier_plate_number, srg.driver_document_code, srg.driver_document_number, srg.driver_full_name, srg.location_arrival_code,
@@ -124,9 +124,9 @@ class SaleNote extends BaseModel
                     FROM sale_note
                     INNER JOIN sale ON sale_note.sale_id = sale.sale_id
                     INNER JOIN customer ON sale_note.customer_id = customer.customer_id
-                    INNER JOIN document_type_code ON sale_note.document_code = document_type_code.code
-                    INNER JOIN currency_type_code ON sale_note.currency_code = currency_type_code.code
-                    INNER JOIN operation_type_code ON sale_note.operation_code = operation_type_code.code
+                    INNER JOIN cat_document_type_code ON sale_note.document_code = cat_document_type_code.code
+                    INNER JOIN cat_currency_type_code ON sale_note.currency_code = cat_currency_type_code.code
+                    INNER JOIN cat_operation_type_code ON sale_note.operation_code = cat_operation_type_code.code
                     LEFT JOIN sale_referral_guide srg ON sale.sale_id = srg.sale_id
                     LEFT JOIN sale_detraction sd on sale.sale_id = sd.sale_id
                     WHERE sale_note.sale_note_id = :sale_note_id LIMIT 1';
@@ -141,9 +141,9 @@ class SaleNote extends BaseModel
 
     public function SearchBySerieCorrelative(string $search) {
         try{
-            $sql = 'SELECT  sale_note.sale_note_id, sale_note.serie, sale_note.correlative, sale_note.total, sale_note.date_of_issue, document_type_code.description as document_type_code_description 
+            $sql = 'SELECT  sale_note.sale_note_id, sale_note.serie, sale_note.correlative, sale_note.total, sale_note.date_of_issue, cat_document_type_code.description as document_type_code_description 
                     FROM sale_note
-                    INNER JOIN document_type_code ON sale_note.document_code = document_type_code.code
+                    INNER JOIN cat_document_type_code ON sale_note.document_code = cat_document_type_code.code
                     WHERE serie LIKE :serie OR correlative LIKE :correlative  LIMIT 8';
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
@@ -372,7 +372,7 @@ class SaleNote extends BaseModel
         try{
             $sql = "SELECT sale_note.sale_note_id, CONCAT(sale_note.serie,'-',sale_note.correlative,' (',dtc.description,') ',sale_note.date_of_issue) as description
                     FROM sale_note
-                    INNER JOIN document_type_code dtc on sale_note.document_code = dtc.code
+                    INNER JOIN cat_document_type_code dtc on sale_note.document_code = dtc.code
                     WHERE sale_note.sale_note_id = :sale_note_id ";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([

@@ -1,6 +1,6 @@
 <?php
 
-require_once MODEL_PATH . 'User/UnitMeasureTypeCode.php';
+require_once MODEL_PATH . 'User/CatUnitMeasureTypeCode.php';
 
 class UnitMeasureTypeCodeController
 {
@@ -17,7 +17,7 @@ class UnitMeasureTypeCodeController
         header('Content-Type: application/json; charset=UTF-8');
         $search = $_POST['q'] ?? '';
 
-        $unitMeasureModel = new UnitMeasureTypeCode($this->connection);
+        $unitMeasureModel = new CatUnitMeasureTypeCode($this->connection);
         $data = $unitMeasureModel->SearchBy('description',$search);
         echo json_encode([
             'data' => $data,

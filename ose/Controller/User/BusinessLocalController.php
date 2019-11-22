@@ -3,7 +3,7 @@
 require_once MODEL_PATH . 'User/Business.php';
 require_once MODEL_PATH . 'User/BusinessLocal.php';
 require_once MODEL_PATH . 'User/BusinessSerie.php';
-require_once MODEL_PATH . 'User/DocumentTypeCode.php';
+require_once MODEL_PATH . 'User/CatDocumentTypeCode.php';
 
 class BusinessLocalController
 {
@@ -18,7 +18,7 @@ class BusinessLocalController
         $this->connection = $connection;
         $this->businessModel = new Business($this->connection);
         $this->businessLocalModel = new BusinessLocal($this->connection);
-        $this->documentTypeCodeModel = new DocumentTypeCode($this->connection);
+        $this->documentTypeCodeModel = new CatDocumentTypeCode($this->connection);
         $this->businessSerieModel = new BusinessSerie($this->connection);
     }
 

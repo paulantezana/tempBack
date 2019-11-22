@@ -1,6 +1,7 @@
 <?php
 
 require_once MODEL_PATH . 'Manager/Business.php';
+require_once MODEL_PATH . 'Manager/user.php';
 
 class BusinessController
 {
@@ -52,13 +53,27 @@ class BusinessController
     public function Create(){
         $res = new Result();
         try {
-            $validate = $this->validateInput($_POST);
+            $business = $_POST;
+            $validate = $this->validateInput($business);
             if (!$validate->success) {
                 $res->error = $validate->error;
                 throw new Exception($validate->message);
             }
 
-            $res->result = $this->businessModel->Insert($_POST);
+            $userClassModel = new userClass($this->connection);
+            $userClassModel->userRegistration([
+                'id_rol' => 1,
+                'names' => $business['userName'],
+                'email' => $business['email'],
+                'phone' => $business['phone'],
+                'ruc' => $business['ruc'],
+                'address' => '',
+                'id_document_type' => 6,
+                'password' => $business['userPassword'],
+                'state' => 1,
+            ]);
+
+            $res->result = $this->businessModel->Insert($business);
             $res->success = true;
             $res->successMessage = 'El registro se inserto exitosamente';
         } catch (Exception $e) {

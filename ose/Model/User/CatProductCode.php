@@ -2,15 +2,15 @@
 
 require_once MODEL_PATH . '/Helper/BaseModel.php';
 
-class ProductCode extends BaseModel
+class CatProductCode extends BaseModel
 {
     public function __construct(PDO $db)
     {
-        parent::__construct("product_code","code",$db);
+        parent::__construct("cat_product_code","code",$db);
     }
     public function Search($search){
         try{
-            $sql = "SELECT * FROM product_code WHERE description LIKE :description OR code LIKE :code LIMIT 8";
+            $sql = "SELECT * FROM cat_product_code WHERE description LIKE :description OR code LIKE :code LIMIT 8";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ":description" => '%' . $search . '%',

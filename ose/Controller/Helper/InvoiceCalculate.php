@@ -1,8 +1,8 @@
 <?php
 
 
-require_once MODEL_PATH . 'User/AdditionalLegendCode.php';
-require_once MODEL_PATH . 'User/PerceptionTypeCode.php';
+require_once MODEL_PATH . 'User/CatAdditionalLegendCode.php';
+require_once MODEL_PATH . 'User/CatPerceptionTypeCode.php';
 require_once MODEL_PATH . 'User/Business.php';
 require_once MODEL_PATH . 'User/Sale.php';
 
@@ -30,7 +30,7 @@ class InvoiceCalculate
             $this->invoice['time_of_issue'] = date('h:i:s', time());
             $this->invoice['sunat_state'] = 1;
 
-            $additionalLegendCodeModel = new AdditionalLegendCode($this->connection);
+            $additionalLegendCodeModel = new CatAdditionalLegendCode($this->connection);
 
             $jungleProduct = ($this->invoice['jungle_product'] ?? 0) === 'on' ? true : false;
             $jungleService = ($this->invoice['jungle_service'] ?? 0) === 'on' ? true : false;

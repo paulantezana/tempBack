@@ -2,10 +2,10 @@
 
 require_once MODEL_PATH . '/Helper/BaseModel.php';
 
-class SubjectDetractionCode extends BaseModel
+class CatSystemIscTypeCode extends BaseModel
 {
     public function __construct(PDO $db)
     {
-        parent::__construct("subject_detraction_code","code",$db);
+        parent::__construct("cat_system_isc_type_code","code",$db);
     }
 }

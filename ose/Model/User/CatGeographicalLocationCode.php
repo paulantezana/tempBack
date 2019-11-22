@@ -2,16 +2,16 @@
 
 require_once MODEL_PATH . '/Helper/BaseModel.php';
 
-class GeographicalLocationCode extends BaseModel
+class CatGeographicalLocationCode extends BaseModel
 {
     public function __construct(PDO $db)
     {
-        parent::__construct("geographical_location_code","code",$db);
+        parent::__construct("cat_geographical_location_code","code",$db);
     }
 
     public function Search(string $search) {
         try{
-            $sql = "SELECT * FROM geographical_location_code WHERE district LIKE :district OR province LIKE :province LIMIT 8";
+            $sql = "SELECT * FROM cat_geographical_location_code WHERE district LIKE :district OR province LIKE :province LIMIT 8";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':district' => '%' . $search . '%',

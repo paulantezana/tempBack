@@ -46,8 +46,8 @@ class DetailSaleNote
                                affectation.international_code as affectation_international_code, affectation.name as affectation_name
                             FROM detail_sale_note
                             LEFT JOIN (
-                                SELECT affectation_igv_type_code.*, tribute_type_code.international_code, tribute_type_code.name  FROM affectation_igv_type_code
-                                    INNER JOIN tribute_type_code ON affectation_igv_type_code.tribute_code = tribute_type_code.code
+                                SELECT cat_affectation_igv_type_code.*, cat_tribute_type_code.international_code, cat_tribute_type_code.name  FROM cat_affectation_igv_type_code
+                                    INNER JOIN cat_tribute_type_code ON cat_affectation_igv_type_code.tribute_code = cat_tribute_type_code.code
                             ) as affectation ON affectation.code = detail_sale_note.affectation_code
                     WHERE detail_sale_note.sale_note_id = :sale_note_id';
             $stmt = $this->db->prepare($sql);

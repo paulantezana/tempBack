@@ -1,20 +1,20 @@
 <?php
 
-require_once MODEL_PATH . 'User/AffectationIgvTypeCode.php';
-require_once MODEL_PATH . 'User/CurrencyTypeCode.php';
-require_once MODEL_PATH . 'User/DocumentTypeCode.php';
-require_once MODEL_PATH . 'User/IdentityDocumentTypeCode.php';
-require_once MODEL_PATH . 'User/OperationTypeCode.php';
+require_once MODEL_PATH . 'User/CatAffectationIgvTypeCode.php';
+require_once MODEL_PATH . 'User/CatCurrencyTypeCode.php';
+require_once MODEL_PATH . 'User/CatDocumentTypeCode.php';
+require_once MODEL_PATH . 'User/CatIdentityDocumentTypeCode.php';
+require_once MODEL_PATH . 'User/CatOperationTypeCode.php';
 require_once MODEL_PATH . 'User/Sale.php';
 require_once MODEL_PATH . 'User/SaleNote.php';
 require_once MODEL_PATH . 'User/Customer.php';
 require_once MODEL_PATH . 'User/DetailSale.php';
 require_once MODEL_PATH . 'User/DetailSaleNote.php';
 require_once MODEL_PATH . 'User/Product.php';
-require_once MODEL_PATH . 'User/CreditNoteTypeCode.php';
-require_once MODEL_PATH . 'User/DebitNoteTypeCode.php';
+require_once MODEL_PATH . 'User/CatCreditNoteTypeCode.php';
+require_once MODEL_PATH . 'User/CatDebitNoteTypeCode.php';
 require_once MODEL_PATH . 'User/Business.php';
-require_once MODEL_PATH . 'User/SystemIscTypeCode.php';
+require_once MODEL_PATH . 'User/CatSystemIscTypeCode.php';
 require_once MODEL_PATH . 'User/BusinessSerie.php';
 
 require_once CONTROLLER_PATH . 'Helper/DocumentManager.php';
@@ -45,8 +45,8 @@ class SaleNoteController
         $this->customerModel = new Customer($this->connection);
         $this->businessModel = new Business($this->connection);
 
-        $this->creditNoteTypeCodeModel = new CreditNoteTypeCode($this->connection);
-        $this->debitNoteTypeCodeModel = new DebitNoteTypeCode($this->connection);
+        $this->creditNoteTypeCodeModel = new CatCreditNoteTypeCode($this->connection);
+        $this->debitNoteTypeCodeModel = new CatDebitNoteTypeCode($this->connection);
     }
 
     public function Exec(){
@@ -63,7 +63,7 @@ class SaleNoteController
             $filterSaleNoteSearch = $_GET['filter']['saleNoteSearch'] ?? 0;
 
             $saleNoteModel = new SaleNote($this->connection);
-            $documentTypeCodeModel = new DocumentTypeCode($this->connection);
+            $documentTypeCodeModel = new CatDocumentTypeCode($this->connection);
             $customerModel = new Customer($this->connection);
 
             $documentTypeCode = $documentTypeCodeModel->ByInCodes(['07','08']);
@@ -614,13 +614,13 @@ class SaleNoteController
             }
         }
 
-        $affectationIgvTypeCodeModel = new AffectationIgvTypeCode($this->connection);
-        $systemIscTypeCodeModel = new SystemIscTypeCode($this->connection);
-        $currencyTypeCodeModel = new CurrencyTypeCode($this->connection);
-        $documentTypeCodeModel = new DocumentTypeCode($this->connection);
-        $identityDocumentTypeCodeModel = new IdentityDocumentTypeCode($this->connection);
-        $operationTypeCodeModel = new OperationTypeCode($this->connection);
-        $creditNoteTypeModel = new CreditNoteTypeCode($this->connection);
+        $affectationIgvTypeCodeModel = new CatAffectationIgvTypeCode($this->connection);
+        $systemIscTypeCodeModel = new CatSystemIscTypeCode($this->connection);
+        $currencyTypeCodeModel = new CatCurrencyTypeCode($this->connection);
+        $documentTypeCodeModel = new CatDocumentTypeCode($this->connection);
+        $identityDocumentTypeCodeModel = new CatIdentityDocumentTypeCode($this->connection);
+        $operationTypeCodeModel = new CatOperationTypeCode($this->connection);
+        $creditNoteTypeModel = new CatCreditNoteTypeCode($this->connection);
         $businessModel = new Business($this->connection);
 
         $parameter['affectationIgvTypeCode'] = $affectationIgvTypeCodeModel->GetAll();
@@ -754,13 +754,13 @@ class SaleNoteController
             }
         }
 
-        $affectationIgvTypeCodeModel = new AffectationIgvTypeCode($this->connection);
-        $systemIscTypeCodeModel = new SystemIscTypeCode($this->connection);
-        $currencyTypeCodeModel = new CurrencyTypeCode($this->connection);
-        $documentTypeCodeModel = new DocumentTypeCode($this->connection);
-        $identityDocumentTypeCodeModel = new IdentityDocumentTypeCode($this->connection);
-        $operationTypeCodeModel = new OperationTypeCode($this->connection);
-        $debitNoteTypeCodeModel = new DebitNoteTypeCode($this->connection);
+        $affectationIgvTypeCodeModel = new CatAffectationIgvTypeCode($this->connection);
+        $systemIscTypeCodeModel = new CatSystemIscTypeCode($this->connection);
+        $currencyTypeCodeModel = new CatCurrencyTypeCode($this->connection);
+        $documentTypeCodeModel = new CatDocumentTypeCode($this->connection);
+        $identityDocumentTypeCodeModel = new CatIdentityDocumentTypeCode($this->connection);
+        $operationTypeCodeModel = new CatOperationTypeCode($this->connection);
+        $debitNoteTypeCodeModel = new CatDebitNoteTypeCode($this->connection);
         $businessModel = new Business($this->connection);
 
         $parameter['affectationIgvTypeCode'] = $affectationIgvTypeCodeModel->GetAll();

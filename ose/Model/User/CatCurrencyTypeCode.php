@@ -2,10 +2,10 @@
 
 require_once MODEL_PATH . '/Helper/BaseModel.php';
 
-class SystemIscTypeCode extends BaseModel
+class CatCurrencyTypeCode extends BaseModel
 {
     public function __construct(PDO $db)
     {
-        parent::__construct("system_isc_type_code","code",$db);
+        parent::__construct("cat_currency_type_code","code",$db);
     }
 }

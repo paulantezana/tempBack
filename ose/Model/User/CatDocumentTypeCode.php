@@ -2,17 +2,17 @@
 
 require_once MODEL_PATH . '/Helper/BaseModel.php';
 
-class DocumentTypeCode extends BaseModel
+class CatDocumentTypeCode extends BaseModel
 {
     public function __construct(PDO $db)
     {
-        parent::__construct("document_type_code","code",$db);
+        parent::__construct("cat_document_type_code","code",$db);
     }
 
     public function ByInCodes(array $codes) {
         try{
             $in =  "'" . implode('\',\'',$codes) . "'";
-            $sql = "SELECT * FROM document_type_code WHERE code IN ($in)";
+            $sql = "SELECT * FROM cat_document_type_code WHERE code IN ($in)";
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
             return $stmt->fetchAll();

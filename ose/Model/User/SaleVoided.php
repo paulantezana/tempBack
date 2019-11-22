@@ -34,7 +34,7 @@ class SaleVoided extends BaseModel
                         dtc.description as sale_document_code_description
                         FROM sale_voided
                         INNER JOIN sale ON sale_voided.sale_id = sale.sale_id
-                        INNER JOIN document_type_code dtc on sale.document_code = dtc.code";
+                        INNER JOIN cat_document_type_code dtc on sale.document_code = dtc.code";
             $sql .= $sqlFilter;
             $sql .= " ORDER BY sale_voided.sale_voided_id DESC LIMIT $offset, $limit";
 

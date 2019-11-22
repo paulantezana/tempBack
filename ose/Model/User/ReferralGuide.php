@@ -12,14 +12,14 @@ class ReferralGuide extends BaseModel
     public function GetByIdXML(int $id) : array
     {
         try{
-            $sql = "SELECT referral_guide.*, document_type_code.description as document_type_code_description, 
+            $sql = "SELECT referral_guide.*, cat_document_type_code.description as document_type_code_description, 
                         c.document_number as customer_document_number, c.identity_document_code as customer_identity_document_code,
                         c.social_reason as customer_social_reason,
                         trc.description as transfer_reason_description
                         FROM referral_guide
-                        INNER JOIN document_type_code ON referral_guide.document_code = document_type_code.code
+                        INNER JOIN cat_document_type_code ON referral_guide.document_code = cat_document_type_code.code
                         INNER JOIN customer c on referral_guide.customer_id = c.customer_id
-                        INNER JOIN transfer_reason_code trc on document_type_code.code = trc.code
+                        INNER JOIN cat_transfer_reason_code trc on cat_document_type_code.code = trc.code
                         WHERE referral_guide_id = :referral_guide_id";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([":referral_guide_id"=>$id]);

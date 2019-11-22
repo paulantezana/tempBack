@@ -2,7 +2,7 @@
 
 require_once MODEL_PATH . 'User/BusinessBankAccount.php';
 require_once MODEL_PATH . 'User/Business.php';
-require_once MODEL_PATH . 'User/CurrencyTypeCode.php';
+require_once MODEL_PATH . 'User/CatCurrencyTypeCode.php';
 
 class BankAccountController
 {
@@ -16,7 +16,7 @@ class BankAccountController
     {
         $this->connection = $connection;
         $this->param = $param;
-        $this->currencyTypeCodeModel = new CurrencyTypeCode($this->connection);
+        $this->currencyTypeCodeModel = new CatCurrencyTypeCode($this->connection);
         $this->businessBankAccountModel = new BusinessBankAccount($this->connection);
         $this->businessModel = new Business($this->connection);
     }

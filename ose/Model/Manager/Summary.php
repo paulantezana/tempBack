@@ -50,8 +50,8 @@ class Summary
     public function SearchByUserReferenceId($search, int $referenceUserId){
         $res = new Result();
         try{
-            $sql = 'SELECT  sale.sale_id, sale.serie, sale.correlative, sale.total, sale.date_of_issue, document_type_code.description as document_type_code_description FROM sale
-                    INNER JOIN document_type_code ON sale.document_code = document_type_code.code
+            $sql = 'SELECT  sale.sale_id, sale.serie, sale.correlative, sale.total, sale.date_of_issue, cat_document_type_code.description as document_type_code_description FROM sale
+                    INNER JOIN cat_document_type_code ON sale.document_code = cat_document_type_code.code
                     WHERE (serie LIKE :serie OR correlative LIKE :correlative) AND sale.user_id = :user_id  LIMIT 8';
             $stmt = $this->db->prepare($sql);
             $stmt->execute([

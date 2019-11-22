@@ -6,13 +6,13 @@ CREATE DATABASE ose;
 USE ose;
 
 # Catalogue 01
-CREATE TABLE document_type_code(
+CREATE TABLE cat_document_type_code(
   code VARCHAR(2) NOT NULL,
   description VARCHAR(255) NOT NULL,
   CONSTRAINT pk_document_type_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 02
-CREATE TABLE currency_type_code(
+CREATE TABLE cat_currency_type_code(
   code VARCHAR(6) NOT NULL,
   description VARCHAR(255) NOT NULL,
   entity VARCHAR(510),
@@ -20,7 +20,7 @@ CREATE TABLE currency_type_code(
   CONSTRAINT pk_currency_type_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 03
-CREATE TABLE unit_measure_type_code(
+CREATE TABLE cat_unit_measure_type_code(
     code VARCHAR(12) NOT NULL,
     description VARCHAR(255) NOT NULL,
     extend BOOLEAN, # Unit measure extended code
@@ -28,7 +28,7 @@ CREATE TABLE unit_measure_type_code(
 )ENGINE = InnoDB;
 # Catalogue 04
 # Catalogue 05
-CREATE TABLE tribute_type_code(
+CREATE TABLE cat_tribute_type_code(
     code VARCHAR(4) NOT NULL,
     description VARCHAR(255) NOT NULL,
     international_code VARCHAR(3),
@@ -36,35 +36,35 @@ CREATE TABLE tribute_type_code(
     CONSTRAINT pk_unit_measure_type_code PRIMARY KEY (code)
 ) ENGINE = InnoDB;
 # Catalogue 06
-CREATE TABLE identity_document_type_code(
+CREATE TABLE cat_identity_document_type_code(
     code VARCHAR(1) NOT NULL,
     description VARCHAR(255) NOT NULL,
     CONSTRAINT pk_identity_document_type_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 07
-CREATE  TABLE affectation_igv_type_code(
+CREATE  TABLE cat_affectation_igv_type_code(
     code VARCHAR(2) NOT NULL,
     description VARCHAR(255) NOT NULL,
     tribute_code VARCHAR(4),
     onerous BOOLEAN,
     CONSTRAINT pk_affectation_igv_type_code PRIMARY KEY (code),
-    CONSTRAINT fk_affectation_igv_type_code_tribute_type_code FOREIGN KEY (tribute_code) REFERENCES tribute_type_code (code)
+    CONSTRAINT fk_affectation_igv_type_code_tribute_type_code FOREIGN KEY (tribute_code) REFERENCES cat_tribute_type_code (code)
         ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 # Catalogue 08
-CREATE TABLE system_isc_type_code(
+CREATE TABLE cat_system_isc_type_code(
     code VARCHAR(2) NOT NULL,
     description VARCHAR(255) NOT NULL,
     CONSTRAINT pk_system_isc_type_code PRIMARY KEY (code)
 ) ENGINE = InnoDB;
 # Catalogue 09
-CREATE TABLE credit_note_type_code(
+CREATE TABLE cat_credit_note_type_code(
     code VARCHAR(2) NOT NULL,
     description VARCHAR(255) NOT NULL,
     CONSTRAINT pk_credit_note_type_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 10
-CREATE TABLE debit_note_type_code(
+CREATE TABLE cat_debit_note_type_code(
     code VARCHAR(2) NOT NULL,
     description VARCHAR(255) NOT NULL,
     CONSTRAINT pk_debit_note_type_code PRIMARY KEY (code)
@@ -72,7 +72,7 @@ CREATE TABLE debit_note_type_code(
 # Catalogue 11
 # Catalogue 12
 # Catalogue 13
-CREATE TABLE geographical_location_code (
+CREATE TABLE cat_geographical_location_code (
     code VARCHAR(6) NOT NULL,
     district varchar(64) NOT NULL,
     province varchar(64) NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE geographical_location_code (
 )ENGINE = InnoDB;
 # Catalogue 14
 # Catalogue 15
-CREATE TABLE additional_legend_code(
+CREATE TABLE cat_additional_legend_code(
     code VARCHAR(4) NOT NULL,
     description VARCHAR(255) NOT NULL,
     CONSTRAINT pk_additional_legend_code PRIMARY KEY (code)
@@ -89,26 +89,26 @@ CREATE TABLE additional_legend_code(
 # Catalogue 16
 # Catalogue 17
 # Catalogue 18
-CREATE TABLE transport_mode_code(
+CREATE TABLE cat_transport_mode_code(
     code VARCHAR(2) NOT NULL,
     description VARCHAR(255) NOT NULL,
     CONSTRAINT pk_transport_mode_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 19
-CREATE TABLE summary_state_code(
+CREATE TABLE cat_summary_state_code(
     code ENUM('1','2','3') NOT NULL,
     description VARCHAR(255) NOT NULL,
     CONSTRAINT pk_transport_mode_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 20
-CREATE TABLE transfer_reason_code(
+CREATE TABLE cat_transfer_reason_code(
     code VARCHAR(2) NOT NULL,
     description VARCHAR(255) NOT NULL,
     CONSTRAINT pk_transfer_reason_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 21
 # Catalogue 22
-CREATE TABLE perception_type_code(
+CREATE TABLE cat_perception_type_code(
     code VARCHAR(2) NOT NULL,
     description VARCHAR(255) NOT NULL,
     percentage FLOAT NOT NULL,
@@ -117,7 +117,7 @@ CREATE TABLE perception_type_code(
 # Catalogue 23
 # Catalogue 24
 # Catalogue 25
-CREATE TABLE product_code(
+CREATE TABLE cat_product_code(
     code VARCHAR(8) NOT NULL,
     description VARCHAR(510) NOT NULL,
     CONSTRAINT pk_product_code PRIMARY KEY (code)
@@ -129,13 +129,13 @@ CREATE TABLE product_code(
 # Catalogue 30
 # ...
 # Catalogue 51
-CREATE  TABLE  operation_type_code(
+CREATE  TABLE cat_operation_type_code(
     code VARCHAR(4) NOT NULL,
     description VARCHAR(255) NOT NULL,
     CONSTRAINT pk_operation_type_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 54
-CREATE TABLE subject_detraction_code(
+CREATE TABLE cat_subject_detraction_code(
     code VARCHAR(3) NOT NULL,
     description VARCHAR(255) NOT NULL,
     CONSTRAINT subject_detraction_code PRIMARY KEY (code)
@@ -199,7 +199,7 @@ CREATE TABLE business_serie(
     detraction_bank_account VARCHAR(64),
     hidden BOOLEAN,
     CONSTRAINT pk_business_serie PRIMARY KEY (business_serie_id),
-    CONSTRAINT fk_business_serie_document_code FOREIGN KEY (document_code) REFERENCES document_type_code (code)
+    CONSTRAINT fk_business_serie_document_code FOREIGN KEY (document_code) REFERENCES cat_document_type_code (code)
      ON UPDATE RESTRICT ON DELETE RESTRICT,
     CONSTRAINT fk_business_serie_business_local FOREIGN KEY (business_local_id) REFERENCES business_local (business_local_id)
         ON UPDATE RESTRICT ON DELETE RESTRICT
@@ -232,7 +232,7 @@ CREATE TABLE business_bank_account(
     state BOOLEAN,
 
     CONSTRAINT pk_business_bank_account PRIMARY KEY (business_bank_account_id),
-    CONSTRAINT fk_business_bank_account_document_code FOREIGN KEY (currency_code) REFERENCES currency_type_code (code)
+    CONSTRAINT fk_business_bank_account_document_code FOREIGN KEY (currency_code) REFERENCES cat_currency_type_code (code)
         ON UPDATE RESTRICT ON DELETE RESTRICT,
     CONSTRAINT fk_business_bank_account_business_local FOREIGN KEY (business_local_id) REFERENCES business_local (business_local_id)
         ON UPDATE RESTRICT ON DELETE RESTRICT
@@ -262,9 +262,9 @@ CREATE TABLE product(
     isc FLOAT,
     type ENUM('NIU','ZZ'),
     CONSTRAINT pk_product PRIMARY KEY (product_id),
-    CONSTRAINT fk_product_unit_measure_code FOREIGN KEY (unit_measure_code) REFERENCES unit_measure_type_code (code)
+    CONSTRAINT fk_product_unit_measure_code FOREIGN KEY (unit_measure_code) REFERENCES cat_unit_measure_type_code (code)
         ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_product_product_code FOREIGN KEY (product_code) REFERENCES product_code (code)
+    CONSTRAINT fk_product_product_code FOREIGN KEY (product_code) REFERENCES cat_product_code (code)
         ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 
@@ -357,11 +357,11 @@ CREATE TABLE sale_note (
     CONSTRAINT uk_sale_note UNIQUE KEY (sale_note_key),
     CONSTRAINT fk_sale_note_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id)
     ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_note_currency_type_code FOREIGN KEY (currency_code) REFERENCES currency_type_code (code)
+    CONSTRAINT fk_sale_note_currency_type_code FOREIGN KEY (currency_code) REFERENCES cat_currency_type_code (code)
     ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_note_operation_type_code FOREIGN KEY (operation_code) REFERENCES operation_type_code (code)
+    CONSTRAINT fk_sale_note_operation_type_code FOREIGN KEY (operation_code) REFERENCES cat_operation_type_code (code)
     ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_note_document_type_code FOREIGN KEY (document_code) REFERENCES document_type_code (code)
+    CONSTRAINT fk_sale_note_document_type_code FOREIGN KEY (document_code) REFERENCES cat_document_type_code (code)
     ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 ALTER TABLE sale_note ADD INDEX in_sale_note_indexes (serie,correlative,local_id);
@@ -431,9 +431,9 @@ CREATE TABLE sale_note_referral_guide(
     CONSTRAINT uk_sale_note_referral_guide UNIQUE KEY (sale_note_id),
     CONSTRAINT fk_sale_note_referral_guide_sale_note FOREIGN KEY (sale_note_id) REFERENCES sale_note (sale_note_id)
     ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_note_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES geographical_location_code (code)
+    CONSTRAINT fk_sale_note_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES cat_geographical_location_code (code)
     ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_note_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES geographical_location_code (code)
+    CONSTRAINT fk_sale_note_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES cat_geographical_location_code (code)
     ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 CREATE TABLE sale_note_detraction(
@@ -537,11 +537,11 @@ CREATE TABLE sale(
     CONSTRAINT uk_sale UNIQUE (sale_key),
     CONSTRAINT fk_sale_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id)
      ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_currency_type_code FOREIGN KEY (currency_code) REFERENCES currency_type_code (code)
+    CONSTRAINT fk_sale_currency_type_code FOREIGN KEY (currency_code) REFERENCES cat_currency_type_code (code)
      ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_operation_type_code FOREIGN KEY (operation_code) REFERENCES operation_type_code (code)
+    CONSTRAINT fk_sale_operation_type_code FOREIGN KEY (operation_code) REFERENCES cat_operation_type_code (code)
      ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_document_type_code FOREIGN KEY (document_code) REFERENCES document_type_code (code)
+    CONSTRAINT fk_sale_document_type_code FOREIGN KEY (document_code) REFERENCES cat_document_type_code (code)
      ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 ALTER TABLE sale ADD INDEX in_sale_indexes (serie,correlative,local_id);
@@ -615,9 +615,9 @@ CREATE TABLE sale_referral_guide(
     CONSTRAINT uk_sale_referral_guide UNIQUE KEY (sale_id),
     CONSTRAINT fk_sale_referral_sale FOREIGN KEY (sale_id) REFERENCES sale (sale_id)
         ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES geographical_location_code (code)
+    CONSTRAINT fk_sale_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES cat_geographical_location_code (code)
         ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES geographical_location_code (code)
+    CONSTRAINT fk_sale_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES cat_geographical_location_code (code)
         ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 CREATE TABLE sale_detraction(
@@ -700,9 +700,9 @@ CREATE TABLE referral_guide(
     CONSTRAINT uk_referral_guide UNIQUE KEY (referral_guide_key),
     CONSTRAINT fk_referral_guide_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id)
        ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES geographical_location_code (code)
+    CONSTRAINT fk_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES cat_geographical_location_code (code)
        ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES geographical_location_code (code)
+    CONSTRAINT fk_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES cat_geographical_location_code (code)
        ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 ALTER TABLE referral_guide ADD INDEX in_sale_indexes (serie,correlative,local_id);
@@ -758,7 +758,7 @@ CREATE TABLE detail_sale_summary(
        ON UPDATE RESTRICT ON DELETE RESTRICT,
     CONSTRAINT fk_detail_sale_summary_sale FOREIGN KEY (sale_id) REFERENCES sale (sale_id)
         ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_detail_sale_summary_summary_state_code FOREIGN KEY (summary_state_code) REFERENCES summary_state_code (code)
+    CONSTRAINT fk_detail_sale_summary_summary_state_code FOREIGN KEY (summary_state_code) REFERENCES cat_summary_state_code (code)
         ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 
@@ -995,7 +995,7 @@ DELIMITER ;
 -- INSERT SUNAT DATA
 
 # Catalogue 1
-INSERT INTO document_type_code(code, description) VALUES
+INSERT INTO cat_document_type_code(code, description)VALUES
 ('01', 'FACTURA'),
 ('03', 'BOLETA DE VENTA'),
 ('07', 'NOTA DE CREDITO'),
@@ -1003,14 +1003,14 @@ INSERT INTO document_type_code(code, description) VALUES
 ('09', 'GUIA DE REMISIÓN REMITENTE');
 
 # Catalogue 2
-INSERT INTO currency_type_code(code, description, entity, symbol) VALUES
+INSERT INTO cat_currency_type_code(code, description, entity, symbol)VALUES
 ('PEN','SOLES','PERU','S/'),
 ('EUR','EURO','','€'),
 ('JPY','YEN','JAPON','¥'),
 ('USD','DÓLARES AMERICANOS','AMERICAN SAMOA','$');
 
 # Catalogue 3
-INSERT INTO unit_measure_type_code(code, description, extend) VALUES
+INSERT INTO cat_unit_measure_type_code(code, description, extend)VALUES
 ('4A','BOBINAS',false),
 ('BJ','BALDE',false),
 ('BLL','BARRILES',false),
@@ -1076,7 +1076,7 @@ INSERT INTO unit_measure_type_code(code, description, extend) VALUES
 
 # Catalogue 4
 # Catalogue 5
-INSERT INTO tribute_type_code(code, description, international_code, name) VALUES
+INSERT INTO cat_tribute_type_code(code, description, international_code, name)VALUES
 ('1000','IGV Impuesto General a las Ventas','VAT','IGV'),
 ('1016','Impuesto a la Venta Arroz Pilado','VAT','IVAP'),
 ('2000','ISC Impuesto Selectivo al Consumo','EXC','ISC'),
@@ -1088,7 +1088,7 @@ INSERT INTO tribute_type_code(code, description, international_code, name) VALUE
 ('9999','Otros tributos','OTH','OTROS');
 
 # Catalogue 6
-INSERT INTO identity_document_type_code(code, description) VALUES
+INSERT INTO cat_identity_document_type_code(code, description)VALUES
 ('0', '0 NO DOMICILIADO, SIN RUC (EXPORTACIÓN)'),
 ('1', '1 DNI - DOC. NACIONAL DE IDENTIDAD'),
 ('4', '4 CARNET DE EXTRANJERIA'),
@@ -1101,7 +1101,7 @@ INSERT INTO identity_document_type_code(code, description) VALUES
 ('-','- VARIOS - VENTAS MENORES A S/.700.00 Y OTROS');
 
 # Catalogue 7
-INSERT INTO affectation_igv_type_code(description, code, tribute_code, onerous) VALUES
+INSERT INTO cat_affectation_igv_type_code(description, code, tribute_code, onerous)VALUES
     ('Gravado - Operación Onerosa','10','1000', 1),
     ('[Gratuita] Gravado – Retiro por premio','11','9996', 2),
     ('[Gratuita] Gravado – Retiro por donación','12','9996', 2),
@@ -1120,13 +1120,13 @@ INSERT INTO affectation_igv_type_code(description, code, tribute_code, onerous) 
     ('Exportación','40','9995', 1);
 
 # Catalogue 8
-INSERT INTO system_isc_type_code(code, description) VALUES
+INSERT INTO cat_system_isc_type_code(code, description)VALUES
     ('01','Sistema al valor (Apéndice IV, lit. A – T.U.O IGV e ISC)'),
     ('02','Aplicación del Monto Fijo ( Sistema específico, bienes en el apéndice III, Apéndice IV, lit. B – T.U.O IGV e ISC)'),
     ('03','Sistema de Precios de Venta al Público (Apéndice IV, lit. C – T.U.O IGV e ISC)');
 
 # Catalogue 9
-INSERT INTO credit_note_type_code(code, description) VALUES
+INSERT INTO cat_credit_note_type_code(code, description)VALUES
 ('01', 'Anulación de la operación'),
 ('02', 'Anulación por error en el RUC'),
 ('03', 'Corrección por error en la descripción'),
@@ -1139,13 +1139,13 @@ INSERT INTO credit_note_type_code(code, description) VALUES
 ('10', 'Otros Conceptos ');
 
 # Catalogue 10
-INSERT INTO debit_note_type_code(code, description) VALUES
+INSERT INTO cat_debit_note_type_code(code, description)VALUES
 ('01','Intereses por mora'),
 ('02','Aumento en el valor'),
 ('03','Penalidades/ otros conceptos');
 
 # Catalogue 15
-INSERT INTO additional_legend_code(code, description) VALUES
+INSERT INTO cat_additional_legend_code(code, description)VALUES
     ('1000','Monto en Letras'),
     ('1002','Leyenda "TRANSFERENCIA GRATUITA DE UN BIEN Y/O SERVICIO PRESTADO GRATUITAMENTE"'),
     ('2000','Leyenda “COMPROBANTE DE PERCEPCIÓN”'),
@@ -1190,7 +1190,7 @@ INSERT INTO additional_legend_code(code, description) VALUES
     ('7001','Venta exonerada del IGV-ISC-IPM. Prohibida la venta fuera de la zona comercial de Tacna');
 
 # Catalogue 17
-INSERT INTO operation_type_code(code,description) VALUES
+INSERT INTO cat_operation_type_code(code,description)VALUES
     ('0101', 'Venta lnterna'),
 #     ('0104', 'Venta Interna – Anticipos'), # Falta verificar la valides en UBL 2.1
     ('0200', 'Exportación de Bienes'),
@@ -1200,18 +1200,18 @@ INSERT INTO operation_type_code(code,description) VALUES
     ('1004', 'Operación Sujeta a Detracción- Servicios de Transporte Carga');
 
 # Catalogue 18
-INSERT INTO transport_mode_code(code, description) VALUES
+INSERT INTO cat_transport_mode_code(code, description)VALUES
     ('01','Transporte público'),
     ('02','Transporte privado');
 
 # Catalogue 19
-INSERT INTO summary_state_code(code, description) VALUES
+INSERT INTO cat_summary_state_code(code, description)VALUES
     ('1','Adicionar'),
     ('2','Modificar'),
     ('3','Anulado');
 
 # Catalogue 20
-INSERT INTO transfer_reason_code (code, description) VALUES
+INSERT INTO cat_transfer_reason_code (code, description) VALUES
     ('01', 'Venta'),
     ('02', 'Compra'),
     ('04', 'Traslado entre establecimientos de la misma empresa'),
@@ -1222,7 +1222,7 @@ INSERT INTO transfer_reason_code (code, description) VALUES
     ('18', 'Traslado emisor itinerante CP'),
     ('19', 'Traslado a zona primaria');
 
-INSERT INTO perception_type_code (code, description, percentage) VALUES
+INSERT INTO cat_perception_type_code (code, description, percentage) VALUES
     ('01','Percepción Venta Interna', 2),
     ('02','Percepción a la adquisición de combustible', 1),
     ('03','Percepción realizada al agente de percepción con tasa especial',	0.5);

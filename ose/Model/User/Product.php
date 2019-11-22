@@ -15,10 +15,10 @@ class Product extends BaseModel
             $totalRows = $this->db->query('SELECT COUNT(*) FROM product WHERE business_id = ' . $businessId)->fetchColumn();
             $totalPages = ceil($totalRows / $limit);
 
-            $sql = "SELECT product.*, unit_measure_type_code.description as unit_measure_type_code_description, product_code.description as product_code_description, affectation_igv_type_code.description as affectation_igv_type_code_description  FROM product 
-                INNER JOIN unit_measure_type_code ON product.unit_measure_code = unit_measure_type_code.code
-                INNER JOIN product_code ON product.product_code = product_code.code
-                INNER JOIN affectation_igv_type_code ON product.affectation_code = affectation_igv_type_code.code
+            $sql = "SELECT product.*, cat_unit_measure_type_code.description as unit_measure_type_code_description, cat_product_code.description as product_code_description, cat_affectation_igv_type_code.description as affectation_igv_type_code_description  FROM product 
+                INNER JOIN cat_unit_measure_type_code ON product.unit_measure_code = cat_unit_measure_type_code.code
+                INNER JOIN cat_product_code ON product.product_code = cat_product_code.code
+                INNER JOIN cat_affectation_igv_type_code ON product.affectation_code = cat_affectation_igv_type_code.code
                 WHERE product.business_id = :business_id
                 ORDER BY product.product_id DESC LIMIT $offset, $limit";
             $stmt = $this->db->prepare($sql);

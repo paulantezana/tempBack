@@ -1,6 +1,6 @@
 <?php
 
-require_once MODEL_PATH . 'User/GeographicalLocationCode.php';
+require_once MODEL_PATH . 'User/CatGeographicalLocationCode.php';
 
 class GeographicalLocationCodeController
 {
@@ -18,7 +18,7 @@ class GeographicalLocationCodeController
 
         $search = $_POST['q'] ?? '';
 
-        $geographicalLocationCodeModel = new GeographicalLocationCode($this->connection);
+        $geographicalLocationCodeModel = new CatGeographicalLocationCode($this->connection);
         $data = $geographicalLocationCodeModel->Search($search);
 
         // Response data
