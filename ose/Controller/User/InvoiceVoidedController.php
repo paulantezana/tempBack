@@ -1,13 +1,13 @@
 <?php
 
-require_once MODEL_PATH . 'User/Sale.php';
-require_once MODEL_PATH . 'User/SaleVoided.php';
+require_once MODEL_PATH . 'User/Invoice.php';
+require_once MODEL_PATH . 'User/InvoiceVoided.php';
 require_once MODEL_PATH . 'User/Business.php';
 
 require_once CONTROLLER_PATH . 'Helper/BillingManager.php';
 require_once CONTROLLER_PATH . 'Helper/DocumentManager.php';
 
-class SaleVoidedController
+class InvoiceVoidedController
 {
     private $connection;
     private $param;
@@ -20,8 +20,8 @@ class SaleVoidedController
         $this->connection = $connection;
         $this->param = $param;
 
-        $this->saleVoidedModel = new SaleVoided($this->connection);
-        $this->saleModel = new Sale($this->connection);
+        $this->saleVoidedModel = new InvoiceVoided($this->connection);
+        $this->saleModel = new Invoice($this->connection);
         $this->businessModel = new Business($this->connection);
     }
 
@@ -48,7 +48,7 @@ class SaleVoidedController
             $parameter['message'] = $message;
             $parameter['messageType'] = $messageType;
 
-            $content = requireToVar(VIEW_PATH . "User/SaleVoided.php", $parameter);
+            $content = requireToVar(VIEW_PATH . "User/InvoiceVoidedded.php", $parameter);
             require_once(VIEW_PATH. "User/Layout/main.php");
         } catch (Exception $e) {
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
@@ -192,14 +192,14 @@ class SaleVoidedController
         try{
             $saleVoidedId = $_GET['SaleVoidedId'] ?? 0;
             if(!$saleVoidedId){
-                header('Location: ' . FOLDER_NAME . '/SaleVoided');
+                header('Location: ' . FOLDER_NAME . '/InvoiceVoided');
             }
 
             $resRunDoc = $this->BuildVoided($saleVoidedId);
             if (!$resRunDoc->success){
-                header('Location: ' . FOLDER_NAME . '/SaleVoided?&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
+                header('Location: ' . FOLDER_NAME . '/InvoiceVoided?&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
             } else{
-                header('Location: ' . FOLDER_NAME . '/SaleVoided');
+                header('Location: ' . FOLDER_NAME . '/InvoiceVoided');
             }
         } catch (Exception $e) {
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
@@ -211,7 +211,7 @@ class SaleVoidedController
         $error = [];
         $saleVoided = $_POST['saleVoided'] ?? [];
 
-        // Query By Sale
+        // Query By Invoice
         $saleId = $_GET['SaleId'] ?? 0;
         if ($saleId && is_numeric($saleId) ){
             $data = $this->saleModel->GetByIdDocumentDescription($saleId);
@@ -233,9 +233,9 @@ class SaleVoidedController
 
                 $resRunDoc = $this->BuildVoided($saleVoidedId);
                 if (!$resRunDoc->success){
-                    header('Location: ' . FOLDER_NAME . '/SaleVoided?&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
+                    header('Location: ' . FOLDER_NAME . '/InvoiceVoided?&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
                 } else{
-                    header('Location: ' . FOLDER_NAME . '/SaleVoided');
+                    header('Location: ' . FOLDER_NAME . '/InvoiceVoided');
                 }
                 return;
             }catch (Exception $exception){

@@ -158,7 +158,7 @@ CREATE TABLE business(
     email VARCHAR(64),
     phone VARCHAR(32),
     web_site VARCHAR(64),
-    is_production TINYINT,
+    environment TINYINT,
     logo VARCHAR(255),
     UNIQUE KEY uk_company (web_site,email),
     CONSTRAINT pk_company PRIMARY KEY (business_id)
@@ -289,9 +289,300 @@ CREATE TABLE customer(
     CONSTRAINT pk_customer PRIMARY KEY (customer_id)
 )ENGINE = InnoDB;
 
-CREATE TABLE sale_note (
-    sale_note_id INT AUTO_INCREMENT NOT NULL,
-    sale_note_key VARCHAR(32) NOT NULL,
+CREATE TABLE invoice_state (
+    invoice_state_id SMALLINT AUTO_INCREMENT NOT NULL,
+    state VARCHAR(64),
+    CONSTRAINT pk_invoice_state PRIMARY KEY (invoice_state_id)
+);
+
+CREATE TABLE invoice(
+    invoice_id INT AUTO_INCREMENT NOT NULL,
+    invoice_key VARCHAR(32) NOT NULL,
+    updated_at DATETIME,
+    created_at DATETIME,
+    creation_user_id INT,
+    modification_user_id INT,
+
+    local_id INT,
+
+    date_of_issue DATE NOT NULL,            # fecha_de_emision
+    time_of_issue TIME NOT NULL,            # hora_de_emision
+    date_of_due DATE,                       # fecha_de_vencimiento
+    serie VARCHAR(64),                      # serie_documento
+    correlative INT NOT NULL,               # numero_documento
+    observation TEXT,
+    change_type VARCHAR(255),               # TIPO DE CAMBIO
+    document_code VARCHAR(2),               # CODIGO TIPO DE DOCUMENTO
+    currency_code VARCHAR(8),               # CODIGO TIPO DE MONEDA
+    operation_code VARCHAR(8),              # CODIGO TIPO DE OPERACION
+
+    total_prepayment FLOAT,                 # total_anticipos
+    total_free FLOAT,                       # total_operaciones_gratuitas
+    total_exportation FLOAT,                # total_exportacion
+    total_other_charged FLOAT,              # total_otros_cargos
+    total_discount FLOAT,                   # total_descuentos
+    total_exonerated FLOAT,                 # total_operaciones_exoneradas
+    total_unaffected FLOAT,                 # total_operaciones_inafectas
+    total_taxed FLOAT,                      # total_operaciones_gravadas
+    total_igv FLOAT,                        # total_igv
+    total_base_isc FLOAT,                   # total_base_isc
+    total_isc FLOAT,                        # total_isc
+    total_charge FLOAT,                     # total_cargos
+    total_base_other_taxed FLOAT,           # total_base_otros_impuestos
+    total_other_taxed FLOAT,                # total_otros_impuestos
+    total_value FLOAT,                      # total_valor
+    total_plastic_bag_tax FLOAT,            # total_plastic_bag_tag
+    total FLOAT NOT NULL,                   # total_venta
+
+    global_discount_percentage FLOAT,
+    purchase_order VARCHAR(255),
+    vehicle_plate VARCHAR(255),
+    term VARCHAR(255),
+    percentage_plastic_bag_tax FLOAT,
+    percentage_igv FLOAT,
+
+    perception_code VARCHAR(2),     # JSON Array de percepciones
+    detraction TEXT,                # JSON Array de detracciones
+    related TEXT,                   # JSON Array de documentos relacionados
+    guide TEXT,                     # JSON Array de guia de referencia
+    legend TEXT,                    # JSON Array de leyendas // SAVE ONLY LEYEND CODES.
+
+    pdf_format VARCHAR(16),
+    itinerant_enable BOOLEAN,
+    itinerant_location VARCHAR(6),
+    itinerant_address varchar(255),
+    itinerant_urbanization varchar(255),
+
+    CONSTRAINT pk_invoice PRIMARY KEY (invoice_id),
+    CONSTRAINT uk_invoice UNIQUE (invoice_key),
+    INDEX (serie,correlative,local_id),
+    CONSTRAINT fk_invoice_currency_type_code FOREIGN KEY (currency_code) REFERENCES cat_currency_type_code (code)
+     ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_operation_type_code FOREIGN KEY (operation_code) REFERENCES cat_operation_type_code (code)
+     ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_document_type_code FOREIGN KEY (document_code) REFERENCES cat_document_type_code (code)
+     ON UPDATE RESTRICT ON DELETE RESTRICT
+)ENGINE = InnoDB;
+
+CREATE TABLE invoice_item(
+    invoice_item_id INT AUTO_INCREMENT NOT NULL,
+    invoice_id INT NOT NULL,
+
+    unit_measure VARCHAR(4) NOT NULL,
+    product_code VARCHAR(255) NOT NULL,
+    description VARCHAR(128) NOT NULL,
+    quantity INT NOT NULL,
+    unit_value FLOAT NOT NULL,
+    unit_price FLOAT NOT NULL,
+
+    discount FLOAT,
+    charge FLOAT,
+
+    affectation_code VARCHAR(8) NOT NULL,
+    total_base_igv FLOAT,
+    igv FLOAT, # Igv
+
+    system_isc_code VARCHAR(2),
+    total_base_isc FLOAT,
+    tax_isc FLOAT,
+    isc FLOAT,
+
+    total_base_other_taxed FLOAT,
+    percentage_other_taxed FLOAT,
+    other_taxed FLOAT,
+
+    quantity_plastic_bag FLOAT,
+    plastic_bag_tax FLOAT,
+
+    prepayment_regulation BOOLEAN,
+    prepayment_serie VARCHAR(4),
+    prepayment_correlative varchar(9),
+
+    total_value FLOAT,
+    total FLOAT,
+
+    CONSTRAINT pk_invoice_item PRIMARY KEY (invoice_item_id),
+    CONSTRAINT fk_invoice_item_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT
+)ENGINE = InnoDB;
+
+CREATE TABLE invoice_sunat(
+    invoice_sunat_id INT AUTO_INCREMENT NOT NULL,
+    invoice_state_id SMALLINT,
+    invoice_id INT NOT NULL,
+    send BOOLEAN,
+    response_code BOOLEAN,
+    response_message VARCHAR(15),
+    other_message TEXT,
+    pdf_url varchar(255),
+    xml_url VARCHAR(255),
+    cdr_url varchar(255),
+    CONSTRAINT pk_invoice_sunat PRIMARY KEY (invoice_sunat_id),
+    CONSTRAINT uk_invoice_sunat UNIQUE KEY (invoice_id),
+    CONSTRAINT fk_invoice_sunat_invoice_state FOREIGN KEY (invoice_state_id) REFERENCES invoice_state (invoice_state_id)
+      ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_sunat_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT
+);
+
+CREATE TABLE invoice_customer(
+    invoice_customer_id INT AUTO_INCREMENT NOT NULL,
+    invoice_id INT NOT NULL,
+    document_number VARCHAR(16) NOT NULL,
+    identity_document_code VARCHAR(64) NOT NULL,
+    social_reason VARCHAR(255),
+    fiscal_address VARCHAR(255),
+    email VARCHAR(64),
+    telephone VARCHAR(255),
+    sent_to_client BOOLEAN,
+    CONSTRAINT pk_invoice_customer PRIMARY KEY (invoice_customer_id),
+    CONSTRAINT uk_invoice_customer_sunat UNIQUE KEY (invoice_id),
+    CONSTRAINT fk_invoice_customer_identity_document_type_code FOREIGN KEY (identity_document_code) REFERENCES cat_identity_document_type_code (code)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_customer_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT
+);
+
+CREATE TABLE invoice_referral_guide(
+   invoice_referral_guide_id INT AUTO_INCREMENT NOT NULL,
+   invoice_id INT NOT NULL,
+    document_code VARCHAR(2) NOT NULL,
+    whit_guide BOOLEAN,
+
+    transfer_code VARCHAR(2),
+    transport_code VARCHAR(2),
+    transfer_start_date DATE,
+    total_gross_weight FLOAT,
+
+    carrier_document_code VARCHAR(1),
+    carrier_document_number VARCHAR(24),
+    carrier_denomination VARCHAR(255),
+    carrier_plate_number VARCHAR(64),
+
+    driver_document_code VARCHAR(1),
+    driver_document_number VARCHAR(24),
+    driver_full_name VARCHAR(255),
+
+    location_starting_code VARCHAR(6),
+    address_starting_point VARCHAR(128),
+
+    location_arrival_code VARCHAR(6),
+    address_arrival_point VARCHAR(128),
+    CONSTRAINT pk_invoice_referral_guide PRIMARY KEY (invoice_referral_guide_id),
+    CONSTRAINT uk_invoice_referral_guide UNIQUE KEY (invoice_id),
+    CONSTRAINT fk_invoice_referral_guide FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES cat_geographical_location_code (code)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES cat_geographical_location_code (code)
+        ON UPDATE RESTRICT ON DELETE RESTRICT
+)ENGINE = InnoDB;
+
+CREATE TABLE invoice_detraction(
+   invoice_detraction_id INT AUTO_INCREMENT NOT NULL,
+   invoice_id INT NOT NULL,
+
+    whit_detraction BOOLEAN,
+    detraction_code VARCHAR(3),
+    percentage FLOAT,
+    amount FLOAT,
+
+    referral_value VARCHAR(1),
+    effective_load VARCHAR(24),
+    useful_load VARCHAR(255),
+    travel_detail VARCHAR(255),
+    location_starting_code VARCHAR(6),
+    address_starting_point VARCHAR(128),
+    location_arrival_code VARCHAR(6),
+    address_arrival_point VARCHAR(128),
+
+    boat_registration VARCHAR(32),
+    boat_name VARCHAR(32),
+    species_kind VARCHAR(32),
+    delivery_address VARCHAR(64),
+    delivery_date DATETIME,
+    quantity FLOAT,
+
+    CONSTRAINT pk_invoice_detraction PRIMARY KEY (invoice_detraction_id),
+    CONSTRAINT uk_invoice_detraction UNIQUE KEY (invoice_id),
+    CONSTRAINT fk_invoice_detraction_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
+);
+
+CREATE TABLE invoice_summary(
+    invoice_summary_id INT AUTO_INCREMENT NOT NULL,
+    invoice_summary_key varchar(32) NOT NULL,
+    updated_at DATETIME,
+    created_at DATETIME,
+    creation_user_id INT,
+    modification_user_id INT,
+
+    local_id INT,
+    correlative INT,
+    date_of_issue DATE NOT NULL,
+    date_of_reference DATE NOT NULL,
+    ticket VARCHAR(255),
+
+    pdf_format VARCHAR(16),
+    pdf_url varchar(255),
+    xml_url VARCHAR(255),
+    cdr_url varchar(255),
+    sunat_state SMALLINT,
+    sunat_error_message VARCHAR(255),
+
+    CONSTRAINT pk_invoice_summary PRIMARY KEY (invoice_summary_id),
+    CONSTRAINT uk_invoice_summary UNIQUE KEY (invoice_summary_key)
+)ENGINE = InnoDB;
+
+CREATE TABLE invoice_summary_item(
+     invoice_summary_item_id INT AUTO_INCREMENT NOT NULL,
+     invoice_summary_id INT NOT NULL,
+    invoice_id INT NOT NULL,
+    local_id INT,
+
+    date_of_issue DATE NOT NULL,
+    date_of_reference DATE NOT NULL,
+    summary_state_code ENUM('1','2','3') NOT NULL,
+
+    sunat_state INT null,
+    CONSTRAINT pk_invoice_summary_item PRIMARY KEY (invoice_summary_item_id),
+    CONSTRAINT fk_invoice_summary_item_invoice_summary FOREIGN KEY (invoice_summary_id) REFERENCES invoice_summary (invoice_summary_id)
+       ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_summary_item_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_summary_item_summary_state_code FOREIGN KEY (summary_state_code) REFERENCES cat_summary_state_code (code)
+        ON UPDATE RESTRICT ON DELETE RESTRICT
+)ENGINE = InnoDB;
+
+CREATE TABLE invoice_voided(
+    invoice_voided_id INT AUTO_INCREMENT NOT NULL,
+    updated_at DATETIME,
+    created_at DATETIME,
+    creation_user_id INT,
+    modification_user_id INT,
+
+    local_id INT,
+    invoice_id INT NOT NULL,
+    ticket VARCHAR(64),
+    reason VARCHAR(255),
+
+    date_of_issue DATE NOT NULL,
+    correlative INT,
+
+    pdf_url VARCHAR(255),
+    xml_url VARCHAR(255),
+    cdr_url varchar(255),
+    sunat_state SMALLINT,
+    sunat_error_message VARCHAR(255),
+
+    CONSTRAINT pk_invoice_voided PRIMARY KEY (invoice_voided_id),
+    CONSTRAINT uk_invoice_voided UNIQUE (invoice_id),
+    CONSTRAINT fk_invoice_voided_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
+    ON UPDATE RESTRICT ON DELETE RESTRICT
+) ENGINE = InnoDB;
+
+CREATE TABLE invoice_note (
+    invoice_note_id INT AUTO_INCREMENT NOT NULL,
+    invoice_note_key VARCHAR(32) NOT NULL,
     updated_at DATETIME,
     created_at DATETIME,
     creation_user_id INT,
@@ -351,23 +642,24 @@ CREATE TABLE sale_note (
     cdr_url varchar(255),
     sent_to_client BOOLEAN,
     reason_update_code VARCHAR(16),
-    sale_id INT,
+    invoice_id INT,
 
-    CONSTRAINT pk_sale_note PRIMARY KEY (sale_note_id),
-    CONSTRAINT uk_sale_note UNIQUE KEY (sale_note_key),
-    CONSTRAINT fk_sale_note_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id)
-    ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_note_currency_type_code FOREIGN KEY (currency_code) REFERENCES cat_currency_type_code (code)
-    ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_note_operation_type_code FOREIGN KEY (operation_code) REFERENCES cat_operation_type_code (code)
-    ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_note_document_type_code FOREIGN KEY (document_code) REFERENCES cat_document_type_code (code)
-    ON UPDATE RESTRICT ON DELETE RESTRICT
+    CONSTRAINT pk_invoice_note PRIMARY KEY (invoice_note_id),
+    CONSTRAINT uk_invoice_note UNIQUE KEY (invoice_note_key),
+    INDEX ix_invoice_note_indexes (serie,correlative,local_id),
+    CONSTRAINT fk_invoice_note_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id)
+       ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_note_currency_type_code FOREIGN KEY (currency_code) REFERENCES cat_currency_type_code (code)
+       ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_note_operation_type_code FOREIGN KEY (operation_code) REFERENCES cat_operation_type_code (code)
+       ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_note_document_type_code FOREIGN KEY (document_code) REFERENCES cat_document_type_code (code)
+       ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
-ALTER TABLE sale_note ADD INDEX in_sale_note_indexes (serie,correlative,local_id);
-CREATE TABLE detail_sale_note (
-    detail_sale_note_id INT AUTO_INCREMENT NOT NULL,
-    sale_note_id INT NOT NULL,
+
+CREATE TABLE invoice_note_item (
+    invoice_note_item_id INT AUTO_INCREMENT NOT NULL,
+    invoice_note_id INT NOT NULL,
 
     unit_measure VARCHAR(4) NOT NULL,
     product_code VARCHAR(255) NOT NULL,
@@ -398,13 +690,68 @@ CREATE TABLE detail_sale_note (
     total_value FLOAT,
     total FLOAT,
 
-    CONSTRAINT pk_detail_sale_note PRIMARY KEY (detail_sale_note_id),
-    CONSTRAINT fk_detail_sale_note_sale_note FOREIGN KEY (sale_note_id) REFERENCES sale_note (sale_note_id)
-        ON UPDATE RESTRICT ON DELETE RESTRICT
+    CONSTRAINT pk_invoice_note_item PRIMARY KEY (invoice_note_item_id),
+    CONSTRAINT fk_invoice_note_item_invoice_note FOREIGN KEY (invoice_note_id) REFERENCES invoice_note (invoice_note_id)
+    ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
-CREATE TABLE sale_note_referral_guide(
-    sale_note_referral_guide_id INT AUTO_INCREMENT NOT NULL,
-    sale_note_id INT NOT NULL,
+
+CREATE TABLE invoice_note_sunat(
+                              invoice_sunat_id INT AUTO_INCREMENT NOT NULL,
+                              invoice_state_id SMALLINT,
+                              invoice_id INT NOT NULL,
+                              send BOOLEAN,
+                              response_code BOOLEAN,
+                              response_message VARCHAR(15),
+                              other_message TEXT,
+                              pdf_url varchar(255),
+                              xml_url VARCHAR(255),
+                              cdr_url varchar(255),
+                              CONSTRAINT pk_invoice_sunat PRIMARY KEY (invoice_sunat_id),
+                              CONSTRAINT uk_invoice_sunat UNIQUE KEY (invoice_id),
+                              CONSTRAINT fk_invoice_sunat_invoice_state FOREIGN KEY (invoice_state_id) REFERENCES invoice_state (invoice_state_id)
+                                  ON UPDATE RESTRICT ON DELETE RESTRICT,
+                              CONSTRAINT fk_invoice_sunat_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
+                                  ON UPDATE RESTRICT ON DELETE RESTRICT
+);
+
+CREATE TABLE invoice_note_customer(
+                                 invoice_customer_id INT AUTO_INCREMENT NOT NULL,
+                                 invoice_id INT NOT NULL,
+                                 document_number VARCHAR(16) NOT NULL,
+                                 identity_document_code VARCHAR(64) NOT NULL,
+                                 social_reason VARCHAR(255),
+                                 fiscal_address VARCHAR(255),
+                                 email VARCHAR(64),
+                                 telephone VARCHAR(255),
+                                 sent_to_client BOOLEAN,
+                                 CONSTRAINT pk_invoice_customer PRIMARY KEY (invoice_customer_id),
+                                 CONSTRAINT uk_invoice_customer_sunat UNIQUE KEY (invoice_id),
+                                 CONSTRAINT fk_invoice_customer_identity_document_type_code FOREIGN KEY (identity_document_code) REFERENCES cat_identity_document_type_code (code)
+                                     ON UPDATE RESTRICT ON DELETE RESTRICT,
+                                 CONSTRAINT fk_invoice_customer_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
+                                     ON UPDATE RESTRICT ON DELETE RESTRICT
+);
+
+CREATE TABLE invoice_note_customer(
+    invoice_note_customer_id INT AUTO_INCREMENT NOT NULL,
+    invoice_note_id INT NOT NULL,
+    document_number VARCHAR(16) NOT NULL,
+    identity_document_code VARCHAR(64) NOT NULL,
+    social_reason VARCHAR(255),
+    fiscal_address VARCHAR(255),
+    email VARCHAR(64),
+    telephone VARCHAR(255),
+    sent_to_client BOOLEAN,
+    CONSTRAINT pk_invoice_note_customer PRIMARY KEY (invoice_note_customer_id),
+    CONSTRAINT fk_invoice_note_customer_identity_document_type_code FOREIGN KEY (identity_document_code) REFERENCES cat_identity_document_type_code (code)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_note_customer_invoice FOREIGN KEY (invoice_note_id) REFERENCES invoice (invoice_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT
+);
+
+CREATE TABLE invoice_note_referral_guide(
+    invoice_note_referral_guide_id INT AUTO_INCREMENT NOT NULL,
+    invoice_note_id INT NOT NULL,
     document_code VARCHAR(2) NOT NULL,
     whit_guide BOOLEAN,
 
@@ -427,20 +774,19 @@ CREATE TABLE sale_note_referral_guide(
 
     location_arrival_code VARCHAR(6),
     address_arrival_point VARCHAR(128),
-    CONSTRAINT pk_sale_note_referral_guide PRIMARY KEY (sale_note_referral_guide_id),
-    CONSTRAINT uk_sale_note_referral_guide UNIQUE KEY (sale_note_id),
-    CONSTRAINT fk_sale_note_referral_guide_sale_note FOREIGN KEY (sale_note_id) REFERENCES sale_note (sale_note_id)
+    CONSTRAINT pk_invoice_note_referral_guide PRIMARY KEY (invoice_note_referral_guide_id),
+    CONSTRAINT uk_invoice_note_referral_guide UNIQUE KEY (invoice_note_id),
+    CONSTRAINT fk_invoice_note_referral_guide_invoice_note FOREIGN KEY (invoice_note_id) REFERENCES invoice_note (invoice_note_id)
     ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_note_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES cat_geographical_location_code (code)
+    CONSTRAINT fk_invoice_note_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES cat_geographical_location_code (code)
     ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_note_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES cat_geographical_location_code (code)
+    CONSTRAINT fk_invoice_note_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES cat_geographical_location_code (code)
     ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
-CREATE TABLE sale_note_detraction(
-    sale_note_detraction_id INT AUTO_INCREMENT NOT NULL,
-    sale_note_id INT NOT NULL,
 
-    whit_detraction BOOLEAN,
+CREATE TABLE invoice_note_detraction(
+    invoice_note_detraction_id BOOLEAN,
+    invoice_note_id INT NOT NULL,
     detraction_code VARCHAR(3),
     percentage FLOAT,
     amount FLOAT,
@@ -461,194 +807,79 @@ CREATE TABLE sale_note_detraction(
     delivery_date DATETIME,
     quantity FLOAT,
 
-    CONSTRAINT pk_sale_note_detraction PRIMARY KEY (sale_note_detraction_id),
-    CONSTRAINT uk_sale_note_detraction UNIQUE KEY (sale_note_id),
-    CONSTRAINT fk_sale_note_detraction_sale_note FOREIGN KEY (sale_note_id) REFERENCES sale_note (sale_note_id)
+    CONSTRAINT pk_invoice_note_detraction PRIMARY KEY (invoice_note_detraction_id),
+    CONSTRAINT uk_invoice_note_detraction UNIQUE KEY (invoice_note_id),
+    CONSTRAINT fk_invoice_note_detraction_invoice_note FOREIGN KEY (invoice_note_id) REFERENCES invoice_note (invoice_note_id)
 );
 
-CREATE TABLE sale(
-    sale_id INT AUTO_INCREMENT NOT NULL,
-    sale_key VARCHAR(32) NOT NULL,
+CREATE TABLE invoice_note_summary(
+    invoice_note_summary_id INT AUTO_INCREMENT NOT NULL,
+    invoice_note_summary_key varchar(32) NOT NULL,
     updated_at DATETIME,
     created_at DATETIME,
     creation_user_id INT,
     modification_user_id INT,
 
     local_id INT,
+    correlative INT,
+    date_of_issue DATE NOT NULL,
+    date_of_reference DATE NOT NULL,
+    ticket VARCHAR(255),
 
-    date_of_issue DATE NOT NULL,            # fecha_de_emision
-    time_of_issue TIME NOT NULL,            # hora_de_emision
-    date_of_due DATE,                       # fecha_de_vencimiento
-    serie VARCHAR(64),                      # serie_documento
-    correlative INT NOT NULL,               # numero_documento
-    observation TEXT,
-    change_type VARCHAR(255),               # TIPO DE CAMBIO
-    document_code VARCHAR(2),               # CODIGO TIPO DE DOCUMENTO
-    currency_code VARCHAR(8),               # CODIGO TIPO DE MONEDA
-    operation_code VARCHAR(8),              # CODIGO TIPO DE OPERACION
-    customer_id INT NOT NULL,               # ID del cliente
-
-    sunat_state SMALLINT,
-    sunat_error_message VARCHAR(255),
-
-    total_prepayment FLOAT,                 # total_anticipos
-    total_free FLOAT,                       # total_operaciones_gratuitas
-    total_exportation FLOAT,                # total_exportacion
-    total_other_charged FLOAT,              # total_otros_cargos
-    total_discount FLOAT,                   # total_descuentos
-    total_exonerated FLOAT,                 # total_operaciones_exoneradas
-    total_unaffected FLOAT,                 # total_operaciones_inafectas
-    total_taxed FLOAT,                      # total_operaciones_gravadas
-    total_igv FLOAT,                        # total_igv
-    total_base_isc FLOAT,                   # total_base_isc
-    total_isc FLOAT,                        # total_isc
-    total_charge FLOAT,                     # total_cargos
-    total_base_other_taxed FLOAT,           # total_base_otros_impuestos
-    total_other_taxed FLOAT,                # total_otros_impuestos
-    total_value FLOAT,                      # total_valor
-    total_plastic_bag_tax FLOAT,            # total_plastic_bag_tag
-    total FLOAT NOT NULL,                   # total_venta
-
-    global_discount_percentage FLOAT,
-    purchase_order VARCHAR(255),
-    vehicle_plate VARCHAR(255),
-    term VARCHAR(255),
-    percentage_plastic_bag_tax FLOAT,
-    percentage_igv FLOAT,
-
-    perception_code VARCHAR(2),     # JSON Array de percepciones
-    detraction TEXT,                # JSON Array de detracciones
-    related TEXT,                   # JSON Array de documentos relacionados
-    guide TEXT,                     # JSON Array de guia de referencia
-    legend TEXT,                    # JSON Array de leyendas // SAVE ONLY LEYEND CODES.
-
-    pdf_format VARCHAR(16),         # Se se puede quitar
+    pdf_format VARCHAR(16),
     pdf_url varchar(255),
     xml_url VARCHAR(255),
     cdr_url varchar(255),
-    sent_to_client BOOLEAN,
-
-    itinerant_enable BOOLEAN,
-    itinerant_location VARCHAR(6),
-    itinerant_address varchar(255),
-    itinerant_urbanization varchar(255),
-
-    CONSTRAINT pk_sale PRIMARY KEY (sale_id),
-    CONSTRAINT uk_sale UNIQUE (sale_key),
-    CONSTRAINT fk_sale_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id)
-     ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_currency_type_code FOREIGN KEY (currency_code) REFERENCES cat_currency_type_code (code)
-     ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_operation_type_code FOREIGN KEY (operation_code) REFERENCES cat_operation_type_code (code)
-     ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_document_type_code FOREIGN KEY (document_code) REFERENCES cat_document_type_code (code)
-     ON UPDATE RESTRICT ON DELETE RESTRICT
+    sunat_state SMALLINT,
+    sunat_error_message VARCHAR(255),
+    CONSTRAINT pk_invoice_note_summary PRIMARY KEY (invoice_note_summary_id)
 )ENGINE = InnoDB;
-ALTER TABLE sale ADD INDEX in_sale_indexes (serie,correlative,local_id);
-CREATE TABLE detail_sale(
-    detail_sale_id INT AUTO_INCREMENT NOT NULL,
-    sale_id INT NOT NULL,
 
-    unit_measure VARCHAR(4) NOT NULL,
-    product_code VARCHAR(255) NOT NULL,
-    description VARCHAR(128) NOT NULL,
-    quantity INT NOT NULL,
-    unit_value FLOAT NOT NULL,
-    unit_price FLOAT NOT NULL,
+CREATE TABLE invoice_note_summary_item(
+  invoice_note_summary_item_id INT AUTO_INCREMENT NOT NULL,
+    invoice_note_summary_id INT NOT NULL,
+    invoice_note_id INT NOT NULL,
+    local_id INT,
 
-    discount FLOAT,
-    charge FLOAT,
+    date_of_issue DATE NOT NULL,
+    date_of_reference DATE NOT NULL,
+    summary_state_code ENUM('1','2','3') NOT NULL,
 
-    affectation_code VARCHAR(8) NOT NULL,
-    total_base_igv FLOAT,
-    igv FLOAT, # Igv
+    sunat_state INT null,
+    CONSTRAINT pk_invoice_note_summary_item PRIMARY KEY (invoice_note_summary_item_id),
+    CONSTRAINT fk_invoice_note_summary_item_invoice_note_summary FOREIGN KEY (invoice_note_summary_id) REFERENCES invoice_note_summary (invoice_note_summary_id)
+      ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_note_summary_item_invoice_note FOREIGN KEY (invoice_note_id) REFERENCES invoice_note (invoice_note_id)
+      ON UPDATE RESTRICT ON DELETE RESTRICT
+)ENGINE = InnoDB;
 
-    system_isc_code VARCHAR(2),
-    total_base_isc FLOAT,
-    tax_isc FLOAT,
-    isc FLOAT,
+CREATE TABLE invoice_note_voided(
+    invoice_note_voided_id INT AUTO_INCREMENT NOT NULL,
+    updated_at DATETIME,
+    created_at DATETIME,
+    creation_user_id INT,
+    modification_user_id INT,
 
-    total_base_other_taxed FLOAT,
-    percentage_other_taxed FLOAT,
-    other_taxed FLOAT,
+    local_id INT,
+    invoice_note_id INT NOT NULL,
+    ticket VARCHAR(64),
+    reason VARCHAR(255),
 
-    quantity_plastic_bag FLOAT,
-    plastic_bag_tax FLOAT,
+    correlative INT,
+    date_of_issue DATE NOT NULL,
+    date_of_reference DATE NOT NULL,
 
-    prepayment_regulation BOOLEAN,
-    prepayment_serie VARCHAR(4),
-    prepayment_correlative varchar(9),
+    pdf_url VARCHAR(255),
+    xml_url VARCHAR(255),
+    cdr_url varchar(255),
+    sunat_state SMALLINT,
+    sunat_error_message VARCHAR(255),
 
-    total_value FLOAT,
-    total FLOAT,
-
-    CONSTRAINT pk_detail_sale PRIMARY KEY (detail_sale_id),
-    CONSTRAINT fk_detail_sale_sale FOREIGN KEY (sale_id) REFERENCES sale (sale_id)
+    CONSTRAINT pk_invoice_note_voided PRIMARY KEY (invoice_note_voided_id),
+    CONSTRAINT uk_invoice_note UNIQUE (invoice_note_id),
+    CONSTRAINT fk_invoice_note_voided_invoice FOREIGN KEY (invoice_note_id) REFERENCES invoice_note (invoice_note_id)
         ON UPDATE RESTRICT ON DELETE RESTRICT
-)ENGINE = InnoDB;
-CREATE TABLE sale_referral_guide(
-    referral_guide_id INT AUTO_INCREMENT NOT NULL,
-    sale_id INT NOT NULL,
-    document_code VARCHAR(2) NOT NULL,
-    whit_guide BOOLEAN,
-
-    transfer_code VARCHAR(2),
-    transport_code VARCHAR(2),
-    transfer_start_date DATE,
-    total_gross_weight FLOAT,
-
-    carrier_document_code VARCHAR(1),
-    carrier_document_number VARCHAR(24),
-    carrier_denomination VARCHAR(255),
-    carrier_plate_number VARCHAR(64),
-
-    driver_document_code VARCHAR(1),
-    driver_document_number VARCHAR(24),
-    driver_full_name VARCHAR(255),
-
-    location_starting_code VARCHAR(6),
-    address_starting_point VARCHAR(128),
-
-    location_arrival_code VARCHAR(6),
-    address_arrival_point VARCHAR(128),
-    CONSTRAINT pk_sale_referral_guide PRIMARY KEY (referral_guide_id),
-    CONSTRAINT uk_sale_referral_guide UNIQUE KEY (sale_id),
-    CONSTRAINT fk_sale_referral_sale FOREIGN KEY (sale_id) REFERENCES sale (sale_id)
-        ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES cat_geographical_location_code (code)
-        ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_sale_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES cat_geographical_location_code (code)
-        ON UPDATE RESTRICT ON DELETE RESTRICT
-)ENGINE = InnoDB;
-CREATE TABLE sale_detraction(
-    sale_detraction_id INT AUTO_INCREMENT NOT NULL,
-    sale_id INT NOT NULL,
-
-    whit_detraction BOOLEAN,
-    detraction_code VARCHAR(3),
-    percentage FLOAT,
-    amount FLOAT,
-
-    referral_value VARCHAR(1),
-    effective_load VARCHAR(24),
-    useful_load VARCHAR(255),
-    travel_detail VARCHAR(255),
-    location_starting_code VARCHAR(6),
-    address_starting_point VARCHAR(128),
-    location_arrival_code VARCHAR(6),
-    address_arrival_point VARCHAR(128),
-
-    boat_registration VARCHAR(32),
-    boat_name VARCHAR(32),
-    species_kind VARCHAR(32),
-    delivery_address VARCHAR(64),
-    delivery_date DATETIME,
-    quantity FLOAT,
-
-    CONSTRAINT pk_sale_detraction PRIMARY KEY (sale_detraction_id),
-    CONSTRAINT uk_sale_detraction UNIQUE KEY (sale_id),
-    CONSTRAINT fk_sale_detraction_sale FOREIGN KEY (sale_id) REFERENCES sale (sale_id)
-);
+) ENGINE = InnoDB;
 
 CREATE TABLE referral_guide(
     referral_guide_id INT AUTO_INCREMENT NOT NULL,
@@ -698,6 +929,7 @@ CREATE TABLE referral_guide(
     sunat_error_message VARCHAR(255),
     CONSTRAINT pk_referral_guide PRIMARY KEY (referral_guide_id),
     CONSTRAINT uk_referral_guide UNIQUE KEY (referral_guide_key),
+    INDEX ix_invoice_indexes (serie,correlative,local_id),
     CONSTRAINT fk_referral_guide_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id)
        ON UPDATE RESTRICT ON DELETE RESTRICT,
     CONSTRAINT fk_referral_guide_location_starting_code FOREIGN KEY (location_starting_code) REFERENCES cat_geographical_location_code (code)
@@ -705,171 +937,41 @@ CREATE TABLE referral_guide(
     CONSTRAINT fk_referral_guide_location_arrival_code FOREIGN KEY (location_arrival_code) REFERENCES cat_geographical_location_code (code)
        ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
-ALTER TABLE referral_guide ADD INDEX in_sale_indexes (serie,correlative,local_id);
-CREATE TABLE detail_referral_guide(
-    detail_referral_guide_id INT AUTO_INCREMENT NOT NULL,
+
+CREATE TABLE referral_guide_item(
+    referral_guide_item_id INT AUTO_INCREMENT NOT NULL,
     quantity FLOAT NOT NULL,
     description VARCHAR(128),
     product_code VARCHAR(255),
     unit_measure VARCHAR(4),
     referral_guide_id INT NOT NULL,
-    CONSTRAINT pk_detail_referral_guide PRIMARY KEY (detail_referral_guide_id),
-    CONSTRAINT fk_detail_referral_guide_referral_guide FOREIGN KEY (referral_guide_id) REFERENCES referral_guide (referral_guide_id)
-        ON UPDATE RESTRICT ON DELETE RESTRICT
+    CONSTRAINT pk_referral_guide_item_guide PRIMARY KEY (referral_guide_item_id),
+    CONSTRAINT fk_referral_guide_item_guide_referral_guide FOREIGN KEY (referral_guide_id) REFERENCES referral_guide (referral_guide_id)
+    ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 
-CREATE TABLE sale_summary(
-    sale_summary_id INT AUTO_INCREMENT NOT NULL,
-    sale_summary_key varchar(32) NOT NULL,
+CREATE TABLE api_request(
+    api_request_id INT AUTO_INCREMENT NOT NULL,
     updated_at DATETIME,
     created_at DATETIME,
     creation_user_id INT,
     modification_user_id INT,
 
-    local_id INT,
-    correlative INT,
-    date_of_issue DATE NOT NULL,
-    date_of_reference DATE NOT NULL,
-    ticket VARCHAR(255),
-
-    pdf_format VARCHAR(16),
-    pdf_url varchar(255),
-    xml_url VARCHAR(255),
-    cdr_url varchar(255),
-    sunat_state SMALLINT,
-    sunat_error_message VARCHAR(255),
-
-    CONSTRAINT pk_sale_summary PRIMARY KEY (sale_summary_id),
-    CONSTRAINT uk_sale_summary UNIQUE KEY (sale_summary_key)
-)ENGINE = InnoDB;
-CREATE TABLE detail_sale_summary(
-    detail_sale_summary_id INT AUTO_INCREMENT NOT NULL,
-    sale_summary_id INT NOT NULL,
-    sale_id INT NOT NULL,
+    origin_ip VARCHAR(32),
+    document varchar(64) NOT NULL,
+    description varchar(255),
     local_id INT,
 
-    date_of_issue DATE NOT NULL,
-    date_of_reference DATE NOT NULL,
-    summary_state_code ENUM('1','2','3') NOT NULL,
-
-    sunat_state INT null,
-    CONSTRAINT pk_detail_sale_summary PRIMARY KEY (detail_sale_summary_id),
-    CONSTRAINT fk_detail_sale_summary_sale_summary FOREIGN KEY (sale_summary_id) REFERENCES sale_summary (sale_summary_id)
-       ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_detail_sale_summary_sale FOREIGN KEY (sale_id) REFERENCES sale (sale_id)
-        ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_detail_sale_summary_summary_state_code FOREIGN KEY (summary_state_code) REFERENCES cat_summary_state_code (code)
-        ON UPDATE RESTRICT ON DELETE RESTRICT
-)ENGINE = InnoDB;
-
-CREATE TABLE sale_note_summary(
-    sale_note_summary_id INT AUTO_INCREMENT NOT NULL,
-    sale_note_summary_key varchar(32) NOT NULL,
-    updated_at DATETIME,
-    created_at DATETIME,
-    creation_user_id INT,
-    modification_user_id INT,
-
-    local_id INT,
-    correlative INT,
-    date_of_issue DATE NOT NULL,
-    date_of_reference DATE NOT NULL,
-    ticket VARCHAR(255),
-
-    pdf_format VARCHAR(16),
-    pdf_url varchar(255),
-    xml_url VARCHAR(255),
-    cdr_url varchar(255),
-    sunat_state SMALLINT,
-    sunat_error_message VARCHAR(255),
-    CONSTRAINT pk_sale_note_summary PRIMARY KEY (sale_note_summary_id)
-)ENGINE = InnoDB;
-CREATE TABLE detail_sale_note_summary(
-    detail_sale_note_summary_id INT AUTO_INCREMENT NOT NULL,
-    sale_note_summary_id INT NOT NULL,
-    sale_note_id INT NOT NULL,
-    local_id INT,
-
-    date_of_issue DATE NOT NULL,
-    date_of_reference DATE NOT NULL,
-    summary_state_code ENUM('1','2','3') NOT NULL,
-
-    sunat_state INT null,
-    CONSTRAINT pk_detail_sale_note_summary PRIMARY KEY (detail_sale_note_summary_id),
-    CONSTRAINT fk_detail_sale_note_summary_sale_note_summary FOREIGN KEY (sale_note_summary_id) REFERENCES sale_note_summary (sale_note_summary_id)
-      ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_detail_sale_note_summary_sale_note FOREIGN KEY (sale_note_id) REFERENCES sale_note (sale_note_id)
-      ON UPDATE RESTRICT ON DELETE RESTRICT
-)ENGINE = InnoDB;
-
-CREATE TABLE sale_voided(
-    sale_voided_id INT AUTO_INCREMENT NOT NULL,
-    updated_at DATETIME,
-    created_at DATETIME,
-    creation_user_id INT,
-    modification_user_id INT,
-
-    local_id INT,
-    sale_id INT NOT NULL,
-    ticket VARCHAR(64),
-    reason VARCHAR(255),
-
-    date_of_issue DATE NOT NULL,
-    correlative INT,
-
-    pdf_url VARCHAR(255),
-    xml_url VARCHAR(255),
-    cdr_url varchar(255),
-    sunat_state SMALLINT,
-    sunat_error_message VARCHAR(255),
-
-    CONSTRAINT pk_sale_voided PRIMARY KEY (sale_voided_id),
-    CONSTRAINT uk_sale UNIQUE (sale_id),
-    CONSTRAINT fk_sale_voided_sale FOREIGN KEY (sale_id) REFERENCES sale (sale_id)
-        ON UPDATE RESTRICT ON DELETE RESTRICT
-) ENGINE = InnoDB;
-
-CREATE TABLE sale_note_voided(
-    sale_note_voided_id INT AUTO_INCREMENT NOT NULL,
-    updated_at DATETIME,
-    created_at DATETIME,
-    creation_user_id INT,
-    modification_user_id INT,
-
-    local_id INT,
-    sale_note_id INT NOT NULL,
-    ticket VARCHAR(64),
-    reason VARCHAR(255),
-
-    correlative INT,
-    date_of_issue DATE NOT NULL,
-    date_of_reference DATE NOT NULL,
-
-    pdf_url VARCHAR(255),
-    xml_url VARCHAR(255),
-    cdr_url varchar(255),
-    sunat_state SMALLINT,
-    sunat_error_message VARCHAR(255),
-
-    CONSTRAINT pk_sale_note_voided PRIMARY KEY (sale_note_voided_id),
-    CONSTRAINT uk_sale_note UNIQUE (sale_note_id),
-    CONSTRAINT fk_sale_note_voided_sale FOREIGN KEY (sale_note_id) REFERENCES sale_note (sale_note_id)
-        ON UPDATE RESTRICT ON DELETE RESTRICT
-) ENGINE = InnoDB;
-
-CREATE TABLE invoice_state (
-    invoice_state_id SMALLINT AUTO_INCREMENT NOT NULL,
-    state VARCHAR(64),
-    CONSTRAINT pk_invoice_state PRIMARY KEY (invoice_state_id)
+    CONSTRAINT pk_api_request_guide PRIMARY KEY (api_request_id)
 );
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- -----------------------------------------------------------------------------------------------------------------
 -- TRIGGER
--- sale_correlative_bi_before
-DROP TRIGGER IF EXISTS sale_correlative_bi_before;
+-- invoice_correlative_bi_before
+DROP TRIGGER IF EXISTS invoice_correlative_bi_before;
 DELIMITER $$
-CREATE TRIGGER sale_correlative_bi_before BEFORE INSERT ON sale FOR EACH ROW
+CREATE TRIGGER invoice_correlative_bi_before BEFORE INSERT ON invoice FOR EACH ROW
     BEGIN
         UPDATE business_serie SET max_correlative = NEW.correlative
             WHERE business_local_id = NEW.local_id
@@ -878,10 +980,10 @@ CREATE TRIGGER sale_correlative_bi_before BEFORE INSERT ON sale FOR EACH ROW
     END$$
 DELIMITER ;
 
--- sale_note_correlative_bi_before
-DROP TRIGGER IF EXISTS sale_note_correlative_bi_before;
+-- invoice_note_correlative_bi_before
+DROP TRIGGER IF EXISTS invoice_note_correlative_bi_before;
 DELIMITER $$
-CREATE TRIGGER sale_note_correlative_bi_before BEFORE INSERT ON sale_note FOR EACH ROW
+CREATE TRIGGER invoice_note_correlative_bi_before BEFORE INSERT ON invoice_note FOR EACH ROW
 BEGIN
     UPDATE business_serie SET max_correlative = NEW.correlative
         WHERE business_local_id = NEW.local_id
@@ -890,10 +992,10 @@ BEGIN
 END$$
 DELIMITER ;
 
--- sale_referral_guide_bi_before
-DROP TRIGGER IF EXISTS sale_referral_guide_bi_before;
+-- invoice_referral_guide_bi_before
+DROP TRIGGER IF EXISTS invoice_referral_guide_bi_before;
 DELIMITER $$
-CREATE TRIGGER sale_referral_guide_bi_before BEFORE INSERT ON referral_guide FOR EACH ROW
+CREATE TRIGGER invoice_referral_guide_bi_before BEFORE INSERT ON referral_guide FOR EACH ROW
 BEGIN
     UPDATE business_serie SET max_correlative = NEW.correlative
         WHERE business_local_id = NEW.local_id
@@ -903,9 +1005,9 @@ END$$
 DELIMITER ;
 
 -- ticket_summary_bi_before
-DROP TRIGGER IF EXISTS sale_summary_bi_before;
+DROP TRIGGER IF EXISTS invoice_summary_bi_before;
 DELIMITER $$
-CREATE TRIGGER sale_summary_bi_before BEFORE INSERT ON sale_summary FOR EACH ROW
+CREATE TRIGGER invoice_summary_bi_before BEFORE INSERT ON invoice_summary FOR EACH ROW
 BEGIN
     DECLARE maxCorrelative INT;
     SET maxCorrelative = 0;
@@ -924,10 +1026,10 @@ BEGIN
 END$$
 DELIMITER ;
 
--- sale_note_summary_bi_before
-DROP TRIGGER IF EXISTS sale_note_summary_bi_before;
+-- invoice_note_summary_bi_before
+DROP TRIGGER IF EXISTS invoice_note_summary_bi_before;
 DELIMITER $$
-CREATE TRIGGER sale_note_summary_bi_before BEFORE INSERT ON sale_note_summary FOR EACH ROW
+CREATE TRIGGER invoice_note_summary_bi_before BEFORE INSERT ON invoice_note_summary FOR EACH ROW
 BEGIN
     DECLARE maxCorrelative INT;
     SET maxCorrelative = 0;
@@ -946,10 +1048,10 @@ BEGIN
 END$$
 DELIMITER ;
 
--- sale_voided_bi_before
-DROP TRIGGER IF EXISTS sale_voided_bi_before;
+-- invoice_voided_bi_before
+DROP TRIGGER IF EXISTS invoice_voided_bi_before;
 DELIMITER $$
-CREATE TRIGGER sale_voided_bi_before BEFORE INSERT ON sale_voided FOR EACH ROW
+CREATE TRIGGER invoice_voided_bi_before BEFORE INSERT ON invoice_voided FOR EACH ROW
 BEGIN
     DECLARE maxCorrelative INT;
     SET maxCorrelative = 0;
@@ -968,10 +1070,10 @@ BEGIN
 END$$
 DELIMITER ;
 
--- sale_voided_bi_before
-DROP TRIGGER IF EXISTS sale_note_voided_bi_before;
+-- invoice_voided_bi_before
+DROP TRIGGER IF EXISTS invoice_note_voided_bi_before;
 DELIMITER $$
-CREATE TRIGGER sale_note_voided_bi_before BEFORE INSERT ON sale_note_voided FOR EACH ROW
+CREATE TRIGGER invoice_note_voided_bi_before BEFORE INSERT ON invoice_note_voided FOR EACH ROW
 BEGIN
     DECLARE maxCorrelative INT;
     SET maxCorrelative = 0;
@@ -1194,7 +1296,7 @@ INSERT INTO cat_operation_type_code(code,description)VALUES
     ('0101', 'Venta lnterna'),
 #     ('0104', 'Venta Interna – Anticipos'), # Falta verificar la valides en UBL 2.1
     ('0200', 'Exportación de Bienes'),
-#     ('0401', 'Ventas no domiciliados que no califican como exportación'),
+    ('0401', 'Ventas no domiciliados que no califican como exportación'),
     ('1001', 'Operación Sujeta a Detracción'),
     ('2001', 'Operación Sujeta a Percepción'),
     ('1004', 'Operación Sujeta a Detracción- Servicios de Transporte Carga');
@@ -1234,7 +1336,7 @@ INSERT INTO invoice_state (state) VALUES
     ('Comunicación de Baja (Anulado)');
 
 # Catalogue 54
-INSERT INTO subject_detraction_code (code, description) VALUES
+INSERT INTO cat_subject_detraction_code (code, description) VALUES
     ('001', 'Azúcar y melaza de caña'),
     ('002', 'Arroz'),
     ('003', 'Alcohol etílico'),

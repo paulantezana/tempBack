@@ -22,7 +22,7 @@
                     <label class="custom-control-label" for="customSwitch1">Ver Opciones Avanzadas:</label>
                 </div>
                 <div class="collapse" id="collapseAdvancedOptions">
-                    <form action="<?= FOLDER_NAME . '/TicketSummary'?>" method="GET" class="mt-4">
+                    <form action="<?= FOLDER_NAME . '/InvoiceSummary'?>" method="GET" class="mt-4">
                         <div class="form-row">
                             <div class="form-group col-lg-3">
                                 <label for="filterStartDate">Fecha inicio</label>
@@ -36,7 +36,7 @@
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Filtrar</button>
-                            <a href="<?= FOLDER_NAME . '/TicketSummary'?>" class="btn btn-light">Mostrar Todo</a>
+                            <a href="<?= FOLDER_NAME . '/InvoiceSummary'?>" class="btn btn-light">Mostrar Todo</a>
                         </div>
                     </form>
                 </div>
@@ -109,7 +109,7 @@
                                             <span class="text-primary">CDR</span>
                                         </a>
                                     <?php elseif ($row['sunat_state'] == 3): ?>
-                                        <a href="<?=  FOLDER_NAME . '/TicketSummary' ?>">
+                                        <a href="<?=  FOLDER_NAME . '/InvoiceSummary' ?>">
                                             <i class="fas fa-chevron-circle-right text-primary"></i>
                                         </a>
                                     <?php endif; ?>

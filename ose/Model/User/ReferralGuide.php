@@ -153,7 +153,7 @@ class ReferralGuide extends BaseModel
 
             // Insert items
             foreach ($guide['item'] as $row){
-                $sql = "INSERT INTO detail_referral_guide(quantity, description, product_code, unit_measure, referral_guide_id) VALUES 
+                $sql = "INSERT INTO referral_guide_item(quantity, description, product_code, unit_measure, referral_guide_id) VALUES 
                                                         (:quantity, :description, :product_code, :unit_measure, :referral_guide_id)";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([
@@ -226,14 +226,14 @@ class ReferralGuide extends BaseModel
             }
 
             foreach ($guide['item'] as $row){
-                $stmt = $this->db->prepare("SELECT * FROM  detail_referral_guide WHERE referral_guide_id = :referral_guide_id");
+                $stmt = $this->db->prepare("SELECT * FROM  referral_guide_item WHERE referral_guide_id = :referral_guide_id");
                 $stmt -> execute([
                     ':referral_guide_id' => $row['detail_referral_guide_id'],
                 ]);
                 $data = $stmt->fetch();
 
                 if ($stmt->rowCount() > 0) {
-                    $stmt = $this->db->prepare("UPDATE detail_referral_guide SET description = :description, quantity = :quantity, product_code = :product_code, referral_guide_id = :referral_guide_id
+                    $stmt = $this->db->prepare("UPDATE referral_guide_item SET description = :description, quantity = :quantity, product_code = :product_code, referral_guide_id = :referral_guide_id
                                                             WHERE detail_referral_guide_id = :detail_referral_guide_id");
                     $stmt->execute([
                         ":description" => $row['description'],
@@ -245,7 +245,7 @@ class ReferralGuide extends BaseModel
                     continue;
                 }
 
-                $sql = "INSERT INTO detail_referral_guide(description, quantity, product_code, referral_guide_id) VALUES (:description, :quantity, :product_code, :referral_guide_id)";
+                $sql = "INSERT INTO referral_guide_item(description, quantity, product_code, referral_guide_id) VALUES (:description, :quantity, :product_code, :referral_guide_id)";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([
                     ":description" => $row['description'] ?? 0,

@@ -1,7 +1,7 @@
 <?php
-    require_once MODEL_PATH . 'User/TicketSummary.php';
+    require_once MODEL_PATH . 'User/InvoiceSummaryy.php';
     require_once MODEL_PATH . 'User/DetailTicketSummary.php';
-    require_once MODEL_PATH . 'User/Sale.php';
+    require_once MODEL_PATH . 'User/Invoice.phpphp';
     require_once MODEL_PATH . 'User/Business.php';
     require_once MODEL_PATH . 'User/Customer.php';
     require_once MODEL_PATH . 'User/CatPerceptionTypeCode.php';
@@ -22,9 +22,9 @@
 
         public function __construct(PDO $connection)
         {
-            $this->ticketSummaryModel = new TicketSummary($connection);
+            $this->ticketSummaryModel = new InvoiceSummary($connection);
             $this->detailTicketSummaryModel = new detailTicketSummary($connection);
-            $this->saleModel = new Sale($connection);
+            $this->saleModel = new Invoice($connection);
             $this->connection = $connection;
 
             $this->customerModel = new Customer($connection);

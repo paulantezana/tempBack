@@ -4,7 +4,7 @@
 require_once MODEL_PATH . 'User/CatAdditionalLegendCode.php';
 require_once MODEL_PATH . 'User/CatPerceptionTypeCode.php';
 require_once MODEL_PATH . 'User/Business.php';
-require_once MODEL_PATH . 'User/Sale.php';
+require_once MODEL_PATH . 'User/Invoice.php';
 
 class InvoiceCalculate
 {

@@ -2,16 +2,16 @@
 
 require_once MODEL_PATH . '/Helper/BaseModel.php';
 
-class DetailReferralGuide extends BaseModel
+class ReferralGuideItem extends BaseModel
 {
     public function __construct(PDO $db)
     {
-        parent::__construct("referral_guide","referral_guide_id",$db);
+        parent::__construct("referral_guide_item","referral_guide_item_id",$db);
     }
 
     public function ByReferralGuideIdXML(int $referralGuideId) {
         try{
-            $sql = 'SELECT * FROM detail_referral_guide WHERE referral_guide_id = :referral_guide_id';
+            $sql = 'SELECT * FROM referral_guide_item WHERE referral_guide_id = :referral_guide_id';
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([

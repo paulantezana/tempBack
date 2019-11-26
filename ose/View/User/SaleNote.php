@@ -15,8 +15,8 @@
                     Emitir comprobante (CPE)
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuNewInvoice">
-                    <a href="<?= FOLDER_NAME . '/SaleNote/NewCreditNote' ?>" class="dropdown-item">Nueva NOTA DE CRÉDITO</a>
-                    <a href="<?= FOLDER_NAME . '/SaleNote/NewDebitNote' ?>" class="dropdown-item">Nueva NOTA DE DÉBITO</a>
+                    <a href="<?= FOLDER_NAME . '/InvoiceNote/NewCreditNote' ?>" class="dropdown-item">Nueva NOTA DE CRÉDITO</a>
+                    <a href="<?= FOLDER_NAME . '/InvoiceNote/NewDebitNote' ?>" class="dropdown-item">Nueva NOTA DE DÉBITO</a>
                 </div>
             </div>
         </div>
@@ -29,7 +29,7 @@
                 <label class="custom-control-label" for="customSwitch1">Ver Opciones Avanzadas:</label>
             </div>
             <div class="collapse" id="collapseAdvancedOptions">
-                <form action="<?= FOLDER_NAME . '/SaleNote'?>" method="GET" class="mt-4">
+                <form action="<?= FOLDER_NAME . '/InvoiceNote'?>" method="GET" class="mt-4">
                     <div class="form-row">
                         <div class="form-group col-lg-3">
                             <label for="filterDocumentCode">Tipo de comprobante</label>
@@ -74,7 +74,7 @@
                         </div>
                         <div class="btn-group col-lg-4">
                             <button type="submit" class="btn btn-primary">Filtrar</button>
-                            <a href="<?= FOLDER_NAME . '/Sale'?>" class="btn btn-light">Mostrar Todo</a>
+                            <a href="<?= FOLDER_NAME . '/Invoice'?>" class="btn btn-light">Mostrar Todo</a>
                         </div>
                     </div>
                 </form>
@@ -189,7 +189,7 @@
                                         <span class="text-primary">CDR</span>
                                     </a>
                                 <?php elseif ($row["sale_document_code"] == '03' && $row['sunat_state'] == 3): ?>
-                                    <a href="<?=  FOLDER_NAME . '/TicketSummary' ?>" title="Ver resumen" style="font-size: 0.85rem">
+                                    <a href="<?=  FOLDER_NAME . '/InvoiceSummary' ?>" title="Ver resumen" style="font-size: 0.85rem">
                                         <i class="fas fa-chevron-circle-right text-primary"></i>
                                     </a>
                                 <?php endif; ?>
@@ -286,13 +286,13 @@
                                         <i class="fas fa-bars"></i>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/SaleNote/View?SaleNoteId=' . $row['sale_note_id'] ?>"> <i class="fas fa-eye"></i> Ver detalles</a>
+                                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote/View?SaleNoteId=' . $row['sale_note_id'] ?>"> <i class="fas fa-eye"></i> Ver detalles</a>
                                         <?php if (($row['sunat_state'] == 1 || $row['sunat_state'] == 2) && $row['sale_document_code'] === '01' ): ?>
-                                            <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/SaleNote/ResendInvoice?SaleNoteId=' . $row['sale_note_id'] ?>"> <i class="fas fa-file-alt"></i> Consultar o recuperar constancia</a>
+                                            <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/InvoiceNote/ResendInvoice?SaleNoteId=' . $row['sale_note_id'] ?>"> <i class="fas fa-file-alt"></i> Consultar o recuperar constancia</a>
                                         <?php endif; if (($row['sunat_state'] ?? 0) >= 1 && ($row['sunat_state'] ?? 0) < 4): ?>
                                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#saleSendEmailModal"> <i class="fas fa-envelope"></i>  Enviar a un email personalizado</a>
                                         <?php endif; if (($row['sunat_state'] == 3 && $row['sale_document_code'] == '01') || (($row['sunat_state'] == 2 || $row['sunat_state'] == 3) && $row['sale_document_code'] == '03')): ?>
-                                            <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/SaleNoteVoided/NewSaleNoteVoided?SaleNoteId=' . $row['sale_note_id'] ?>"> <i class="fas fa-times-circle"></i> ANULAR o COMUNICAR DE BAJA</a>
+                                            <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/InvoiceNoteVoided/NewSaleNoteVoided?SaleNoteId=' . $row['sale_note_id'] ?>"> <i class="fas fa-times-circle"></i> ANULAR o COMUNICAR DE BAJA</a>
                                         <?php endIf;?>
                                         <a class="dropdown-item text-success" href="http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?E=20490086278&T=03&R=16766987&S=B003&N=47&F=15/08/2019&T=260.0" target="_blank"> <i class="fas fa-check"></i> Verificar en la SUNAT la validéz del CPE</a>
                                         <a class="dropdown-item text-success" href="http://www.sunat.gob.pe/ol-ti-itconsverixml/ConsVeriXml.htm" target="_blank"> <i class="fas fa-check"></i> Verificar XML en la SUNAT</a>

@@ -1,11 +1,11 @@
-<?php 
+<?php
 
 class Router
 {
 	public $uri;
 	public $controller;
 	public $method;
-	public $param; 
+	public $param;
 
 	public function __construct()
 	{
@@ -37,6 +37,10 @@ class Router
 					$_SESSION[CONTROLLER_GROUP] = 'User/';
 					$this->controller = "Login";
 				}
+				else if($this->controller == 'ApiRequest'){
+                    $_SESSION[CONTROLLER_GROUP] = 'User/';
+                    $this->controller = "ApiRequest";
+                }
 				else{
 					header('Location: '. DEFAULT_URL);
 					exit();
@@ -48,8 +52,8 @@ class Router
 			}
 		}
 
-		$this->controller .='Controller'; 
-		
+		$this->controller .='Controller';
+
   		require_once(CONTROLLER_PATH . $_SESSION[CONTROLLER_GROUP] . "$this->controller.php");
 	}
 
@@ -63,7 +67,7 @@ class Router
 
 	public function setParam(){
 		if(REQUEST_METHOD === 'POST')
-		  $this->param = $_POST; 
+		  $this->param = $_POST;
 		else if (REQUEST_METHOD === 'GET')
 			$this->param =! empty($this->uri[5]) ? $this->uri[5] : '';
 			/*if(!empty($this->uri[4])){$this->param[]=$this->uri[4];}

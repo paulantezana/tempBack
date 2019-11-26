@@ -6,11 +6,11 @@ require_once MODEL_PATH . 'User/CatTransferReasonCode.php';
 require_once MODEL_PATH . 'User/CatTransportModeCode.php';
 require_once MODEL_PATH . 'User/CatIdentityDocumentTypeCode.php';
 require_once MODEL_PATH . 'User/ReferralGuide.php';
-require_once MODEL_PATH . 'User/DetailReferralGuide.php';
+require_once MODEL_PATH . 'User/ReferralGuideItem.php';
 require_once MODEL_PATH . 'User/CatGeographicalLocationCode.php';
 require_once MODEL_PATH . 'User/Product.php';
-require_once MODEL_PATH . 'User/Sale.php';
-require_once MODEL_PATH . 'User/DetailSale.php';
+require_once MODEL_PATH . 'User/Invoice.php';
+require_once MODEL_PATH . 'User/InvoiceItem.php';
 require_once MODEL_PATH . 'User/Business.php';
 require_once MODEL_PATH . 'User/BusinessSerie.php';
 
@@ -33,7 +33,7 @@ class ReferralGuideController
         $this->param = $param;
 
         $this->referralGuideModel = new ReferralGuide($this->connection);
-        $this->detailReferralGuideModel = new DetailReferralGuide($this->connection);
+        $this->detailReferralGuideModel = new ReferralGuideItem($this->connection);
         $this->customerModel = new Customer($this->connection);
         $this->businessModel = new Business($this->connection);
     }
@@ -363,10 +363,10 @@ class ReferralGuideController
             $saleId = $_GET['SaleId'] ?? 0;
             $sale = null;
             if ($saleId && is_numeric($saleId) ) {
-                $saleModel = new Sale($this->connection);
+                $saleModel = new Invoice($this->connection);
                 $sale = $saleModel -> GetById($saleId);
                 if ($sale){
-                    $detailSaleModel = new DetailSale($this->connection);
+                    $detailSaleModel = new InvoiceItem($this->connection);
                     $guide['item'] = $detailSaleModel->BySaleIdSummary($sale['sale_id']);
                 }
             }

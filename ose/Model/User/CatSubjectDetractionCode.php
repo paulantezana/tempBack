@@ -6,6 +6,6 @@ class CatSubjectDetractionCode extends BaseModel
 {
     public function __construct(PDO $db)
     {
-        parent::__construct("subject_detraction_code","code",$db);
+        parent::__construct("cat_subject_detraction_code","code",$db);
     }
 }

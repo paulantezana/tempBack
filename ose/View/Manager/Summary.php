@@ -138,7 +138,7 @@
                                         <span class="text-primary">CDR</span>
                                     </a>
                                 <?php elseif ($row['sunat_state'] == 3): ?>
-                                    <a href="<?=  FOLDER_NAME . '/TicketSummary' ?>">
+                                    <a href="<?=  FOLDER_NAME . '/InvoiceSummary' ?>">
                                         <i class="fas fa-chevron-circle-right text-primary"></i>
                                     </a>
                                 <?php endif; ?>

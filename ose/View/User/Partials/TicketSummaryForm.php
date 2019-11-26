@@ -9,7 +9,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="summaryForm" action="<?= FOLDER_NAME . '/TicketSummary' ?>" method="POST">
+                <form id="summaryForm" action="<?= FOLDER_NAME . '/InvoiceSummary' ?>" method="POST">
                     <div class="form-group">
                         <label for="dateOfReference">Selecciona cuidadosamente el día.</label>
                         <input type="date" class="form-control" id="dateOfReference" name="dateOfReference">

@@ -822,8 +822,8 @@ CREATE TABLE `sale` (
 -- Disparadores `sale`
 --
 DELIMITER $$
-CREATE TRIGGER `sale_correlative_bi_before` BEFORE INSERT ON `sale` FOR EACH ROW BEGIN
-        IF((SELECT count(*) FROM sale WHERE document_code = NEW.document_code AND
+CREATE TRIGGER `sale_correlative_bi_before` BEFORE INSERT ON invoice FOR EACH ROW BEGIN
+        IF((SELECT count(*) FROM invoice WHERE document_code = NEW.document_code AND
                                             correlative = NEW.correlative AND serie = NEW.serie AND
                                             user_id = NEW.user_id) > 0) then
             SET NEW.correlative = (SELECT max_correlative FROM document_correlative WHERE
@@ -905,8 +905,8 @@ CREATE TABLE `sale_note` (
 -- Disparadores `sale_note`
 --
 DELIMITER $$
-CREATE TRIGGER `sale_note_correlative_bi_before` BEFORE INSERT ON `sale_note` FOR EACH ROW BEGIN
-    IF((SELECT count(*) FROM sale_note WHERE document_code = NEW.document_code AND
+CREATE TRIGGER `sale_note_correlative_bi_before` BEFORE INSERT ON invoice_note FOR EACH ROW BEGIN
+    IF((SELECT count(*) FROM invoice_note WHERE document_code = NEW.document_code AND
             correlative = NEW.correlative AND serie = NEW.serie AND
             user_id = NEW.user_id) > 0) then
         SET NEW.correlative = (SELECT max_correlative FROM document_correlative WHERE
@@ -1472,7 +1472,7 @@ ALTER TABLE cat_debit_note_type_code
 --
 -- Indices de la tabla `detail_referral_guide`
 --
-ALTER TABLE `detail_referral_guide`
+ALTER TABLE referral_guide_item
   ADD PRIMARY KEY (`detail_referral_guide_id`),
   ADD KEY `fk_detail_referral_guide_product` (`product_id`),
   ADD KEY `fk_detail_referral_guide_referral_guide` (`referral_guide_id`);
@@ -1480,15 +1480,15 @@ ALTER TABLE `detail_referral_guide`
 --
 -- Indices de la tabla `detail_sale`
 --
-ALTER TABLE `detail_sale`
-  ADD PRIMARY KEY (`detail_sale_id`),
-  ADD KEY `fk_detail_sale_sale` (`sale_id`),
+ALTER TABLE invoice_item
+  ADD PRIMARY KEY (invoice_item_id),
+  ADD KEY `fk_detail_sale_sale` (invoice_id),
   ADD KEY `fk_detail_sale_product` (`product_id`);
 
 --
 -- Indices de la tabla `detail_sale_note`
 --
-ALTER TABLE `detail_sale_note`
+ALTER TABLE invoice_note_item
   ADD PRIMARY KEY (`detail_sale_note_id`),
   ADD KEY `fk_detail_sale_note_sale_note` (`sale_note_id`),
   ADD KEY `fk_detail_sale_note_product` (`product_id`);
@@ -1496,7 +1496,7 @@ ALTER TABLE `detail_sale_note`
 --
 -- Indices de la tabla `detail_sale_note_summary`
 --
-ALTER TABLE `detail_sale_note_summary`
+ALTER TABLE invoice_note_summary_item
   ADD PRIMARY KEY (`detail_sale_note_summary_id`),
   ADD KEY `fk_detail_sale_note_summary_sale_note_summary` (`sale_note_summary_id`),
   ADD KEY `fk_detail_sale_note_summary_sale_note` (`sale_note_id`);
@@ -1591,8 +1591,8 @@ ALTER TABLE `roles`
 --
 -- Indices de la tabla `sale`
 --
-ALTER TABLE `sale`
-  ADD PRIMARY KEY (`sale_id`),
+ALTER TABLE invoice
+  ADD PRIMARY KEY (invoice_id),
   ADD KEY `fk_sale_customer` (`customer_id`),
   ADD KEY `fk_sale_currency_type_code` (`currency_code`),
   ADD KEY `fk_sale_operation_type_code` (`operation_code`),
@@ -1602,7 +1602,7 @@ ALTER TABLE `sale`
 --
 -- Indices de la tabla `sale_note`
 --
-ALTER TABLE `sale_note`
+ALTER TABLE invoice_note
   ADD PRIMARY KEY (`sale_note_id`),
   ADD KEY `fk_sale_note_customer` (`customer_id`),
   ADD KEY `fk_sale_note_currency_type_code` (`currency_code`),
@@ -1613,27 +1613,27 @@ ALTER TABLE `sale_note`
 --
 -- Indices de la tabla `sale_note_summary`
 --
-ALTER TABLE `sale_note_summary`
+ALTER TABLE invoice_note_summary
   ADD PRIMARY KEY (`sale_note_summary_id`);
 
 --
 -- Indices de la tabla `sale_note_voided`
 --
-ALTER TABLE `sale_note_voided`
+ALTER TABLE invoice_note_voided
   ADD PRIMARY KEY (`sale_note_voided_id`),
   ADD KEY `fk_sale_note_voided_sale` (`sale_note_id`);
 
 --
 -- Indices de la tabla `sale_referral_guide`
 --
-ALTER TABLE `sale_referral_guide`
+ALTER TABLE invoice_referral_guide
   ADD KEY `fk_sale_referral_guide` (`sale_id`),
   ADD KEY `fk_sale_referral_guide_referral_guide` (`referral_guide_id`);
 
 --
 -- Indices de la tabla `sale_voided`
 --
-ALTER TABLE `sale_voided`
+ALTER TABLE invoice_voided
   ADD PRIMARY KEY (`sale_voided_id`),
   ADD UNIQUE KEY `uk_sale` (`sale_id`);
 
@@ -1740,25 +1740,25 @@ ALTER TABLE `customer`
 --
 -- AUTO_INCREMENT de la tabla `detail_referral_guide`
 --
-ALTER TABLE `detail_referral_guide`
+ALTER TABLE referral_guide_item
   MODIFY `detail_referral_guide_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `detail_sale`
 --
-ALTER TABLE `detail_sale`
-  MODIFY `detail_sale_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE invoice_item
+  MODIFY invoice_item_id int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `detail_sale_note`
 --
-ALTER TABLE `detail_sale_note`
+ALTER TABLE invoice_note_item
   MODIFY `detail_sale_note_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `detail_sale_note_summary`
 --
-ALTER TABLE `detail_sale_note_summary`
+ALTER TABLE invoice_note_summary_item
   MODIFY `detail_sale_note_summary_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -1812,31 +1812,31 @@ ALTER TABLE `roles`
 --
 -- AUTO_INCREMENT de la tabla `sale`
 --
-ALTER TABLE `sale`
-  MODIFY `sale_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE invoice
+  MODIFY invoice_id int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `sale_note`
 --
-ALTER TABLE `sale_note`
+ALTER TABLE invoice_note
   MODIFY `sale_note_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `sale_note_summary`
 --
-ALTER TABLE `sale_note_summary`
+ALTER TABLE invoice_note_summary
   MODIFY `sale_note_summary_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `sale_note_voided`
 --
-ALTER TABLE `sale_note_voided`
+ALTER TABLE invoice_note_voided
   MODIFY `sale_note_voided_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `sale_voided`
 --
-ALTER TABLE `sale_voided`
+ALTER TABLE invoice_voided
   MODIFY `sale_voided_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -1900,36 +1900,36 @@ ALTER TABLE `business_user`
 --
 -- Filtros para la tabla `detail_referral_guide`
 --
-ALTER TABLE `detail_referral_guide`
+ALTER TABLE referral_guide_item
   ADD CONSTRAINT `fk_detail_referral_guide_product` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`),
   ADD CONSTRAINT `fk_detail_referral_guide_referral_guide` FOREIGN KEY (`referral_guide_id`) REFERENCES `referral_guide` (`referral_guide_id`);
 
 --
 -- Filtros para la tabla `detail_sale`
 --
-ALTER TABLE `detail_sale`
+ALTER TABLE invoice_item
   ADD CONSTRAINT `fk_detail_sale_product` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`),
-  ADD CONSTRAINT `fk_detail_sale_sale` FOREIGN KEY (`sale_id`) REFERENCES `sale` (`sale_id`);
+  ADD CONSTRAINT `fk_detail_sale_sale` FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id);
 
 --
 -- Filtros para la tabla `detail_sale_note`
 --
-ALTER TABLE `detail_sale_note`
+ALTER TABLE invoice_note_item
   ADD CONSTRAINT `fk_detail_sale_note_product` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`),
-  ADD CONSTRAINT `fk_detail_sale_note_sale_note` FOREIGN KEY (`sale_note_id`) REFERENCES `sale_note` (`sale_note_id`);
+  ADD CONSTRAINT `fk_detail_sale_note_sale_note` FOREIGN KEY (`sale_note_id`) REFERENCES invoice_note (`sale_note_id`);
 
 --
 -- Filtros para la tabla `detail_sale_note_summary`
 --
-ALTER TABLE `detail_sale_note_summary`
-  ADD CONSTRAINT `fk_detail_sale_note_summary_sale_note` FOREIGN KEY (`sale_note_id`) REFERENCES `sale_note` (`sale_note_id`),
-  ADD CONSTRAINT `fk_detail_sale_note_summary_sale_note_summary` FOREIGN KEY (`sale_note_summary_id`) REFERENCES `sale_note_summary` (`sale_note_summary_id`);
+ALTER TABLE invoice_note_summary_item
+  ADD CONSTRAINT `fk_detail_sale_note_summary_sale_note` FOREIGN KEY (`sale_note_id`) REFERENCES invoice_note (`sale_note_id`),
+  ADD CONSTRAINT `fk_detail_sale_note_summary_sale_note_summary` FOREIGN KEY (`sale_note_summary_id`) REFERENCES invoice_note_summary (`sale_note_summary_id`);
 
 --
 -- Filtros para la tabla `detail_ticket_summary`
 --
 ALTER TABLE `detail_ticket_summary`
-  ADD CONSTRAINT `fk_detail_ticket_summary_sale` FOREIGN KEY (`sale_id`) REFERENCES `sale` (`sale_id`),
+  ADD CONSTRAINT `fk_detail_ticket_summary_sale` FOREIGN KEY (`sale_id`) REFERENCES invoice (invoice_id),
   ADD CONSTRAINT `fk_detail_ticket_summary_summary_state_code` FOREIGN KEY (`summary_state_code`) REFERENCES cat_summary_state_code (`code`),
   ADD CONSTRAINT `fk_detail_ticket_summary_ticket_summary` FOREIGN KEY (`ticket_summary_id`) REFERENCES `ticket_summary` (`ticket_summary_id`);
 
@@ -1957,7 +1957,7 @@ ALTER TABLE `referral_guide`
 --
 -- Filtros para la tabla `sale`
 --
-ALTER TABLE `sale`
+ALTER TABLE invoice
   ADD CONSTRAINT `fk_sale_currency_type_code` FOREIGN KEY (`currency_code`) REFERENCES cat_currency_type_code (`code`),
   ADD CONSTRAINT `fk_sale_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`),
   ADD CONSTRAINT `fk_sale_document_type_code` FOREIGN KEY (`document_code`) REFERENCES cat_document_type_code (`code`),
@@ -1966,7 +1966,7 @@ ALTER TABLE `sale`
 --
 -- Filtros para la tabla `sale_note`
 --
-ALTER TABLE `sale_note`
+ALTER TABLE invoice_note
   ADD CONSTRAINT `fk_sale_note_currency_type_code` FOREIGN KEY (`currency_code`) REFERENCES cat_currency_type_code (`code`),
   ADD CONSTRAINT `fk_sale_note_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`),
   ADD CONSTRAINT `fk_sale_note_document_type_code` FOREIGN KEY (`document_code`) REFERENCES cat_document_type_code (`code`),
@@ -1975,21 +1975,21 @@ ALTER TABLE `sale_note`
 --
 -- Filtros para la tabla `sale_note_voided`
 --
-ALTER TABLE `sale_note_voided`
-  ADD CONSTRAINT `fk_sale_note_voided_sale` FOREIGN KEY (`sale_note_id`) REFERENCES `sale_note` (`sale_note_id`);
+ALTER TABLE invoice_note_voided
+  ADD CONSTRAINT `fk_sale_note_voided_sale` FOREIGN KEY (`sale_note_id`) REFERENCES invoice_note (`sale_note_id`);
 
 --
 -- Filtros para la tabla `sale_referral_guide`
 --
-ALTER TABLE `sale_referral_guide`
-  ADD CONSTRAINT `fk_sale_referral_guide` FOREIGN KEY (`sale_id`) REFERENCES `sale` (`sale_id`),
+ALTER TABLE invoice_referral_guide
+  ADD CONSTRAINT `fk_sale_referral_guide` FOREIGN KEY (`sale_id`) REFERENCES invoice (invoice_id),
   ADD CONSTRAINT `fk_sale_referral_guide_referral_guide` FOREIGN KEY (`referral_guide_id`) REFERENCES `referral_guide` (`referral_guide_id`);
 
 --
 -- Filtros para la tabla `sale_voided`
 --
-ALTER TABLE `sale_voided`
-  ADD CONSTRAINT `fk_sale_voided_sale` FOREIGN KEY (`sale_id`) REFERENCES `sale` (`sale_id`);
+ALTER TABLE invoice_voided
+  ADD CONSTRAINT `fk_sale_voided_sale` FOREIGN KEY (`sale_id`) REFERENCES invoice (invoice_id);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

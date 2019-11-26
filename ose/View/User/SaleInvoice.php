@@ -1,7 +1,7 @@
 <div class="container">
     <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
 
-    <form action="<?= FOLDER_NAME . '/Sale/NewInvoice' ?>" method="POST" class="mt-4 mb-4">
+    <form action="<?= FOLDER_NAME . '/Invoice/NewInvoice' ?>" method="POST" class="mt-4 mb-4">
 
         <div class="mb-4">
             <div>Documento eléctronico:</div>

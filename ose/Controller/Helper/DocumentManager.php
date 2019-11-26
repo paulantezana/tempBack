@@ -519,7 +519,7 @@ class DocumentManager
         $this->pdf->MultiCell(0, $lineHeight, ': '. $invoice['percentageIgv'] . ' %', 0, 'L');
         $this->pdf->Ln();
 
-        // Sale Detail
+        // Invoice Detail
         $this->pdf->SetTableWidths([40, 12, 17]);
         $this->pdf->SetTableHAligns(['L', 'R', 'R']);
 
@@ -536,7 +536,7 @@ class DocumentManager
         }
         $this->pdf->Ln(2);
 
-        // Sale Detail resume
+        // Invoice Detail resume
         $this->pdf->SetTableWidths([40, 12, 17]);
         $this->pdf->SetTableHAligns(['R', 'R', 'R']);
 
@@ -936,7 +936,7 @@ class DocumentManager
         $this->pdf->MultiCell(0, $lineHeight, ': '. $invoice['percentageIgv'] . ' %', 0, 'L');
         $this->pdf->Ln();
 
-        // Sale Detail
+        // Invoice Detail
         $this->pdf->SetTableWidths([40, 12, 17]);
         $this->pdf->SetTableHAligns(['L', 'R', 'R']);
 
@@ -953,7 +953,7 @@ class DocumentManager
         }
         $this->pdf->Ln(2);
 
-        // Sale Detail resume
+        // Invoice Detail resume
         $this->pdf->SetTableWidths([40, 12, 17]);
         $this->pdf->SetTableHAligns(['R', 'R', 'R']);
 

@@ -3,15 +3,15 @@
     <div class="mt-5 mb-5">
         <h5 class="mb-3"><?= $parameter['invoice']['document_type_code_description']  ?></h5>
         <div class="btn btn-group" style="padding: 0">
-            <div class="btn btn-primary JsSaleShowPdf" onclick="DocumentPrinter.showModal('<?= $parameter['invoice']['pdf_url']  ?>', true)" >Imprimir</div>
-            <div class="btn btn-light JsSaleShowPdf" onclick="DocumentPrinter.showModal('<?= $parameter['invoice']['pdf_url']  ?>', false)">VER PDF</div>
+            <div class="btn btn-primary JsSaleShowPdf" onclick="DocumentPrinter.showModal('<?php //$parameter['invoice']['pdf_url']  ?>', true)" >Imprimir</div>
+            <div class="btn btn-light JsSaleShowPdf" onclick="DocumentPrinter.showModal('<?php //$parameter['invoice']['pdf_url']  ?>', false)">VER PDF</div>
             <div class="btn btn-light" data-toggle="modal" data-target="#saleSendEmailModal">Enviar Email</div>
             <div class="dropdown">
                 <a class="btn btn-light dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Más acciones
                 </a>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                    <a class="dropdown-item" href="<?php echo  FOLDER_NAME . '/SaleVoided/NewSaleVoided?SaleId=' . ($parameter['invoice']['sale_id'] ) ?>">ANULAR O COMUNICAR DE BAJA</a>
+                    <a class="dropdown-item" href="<?php echo  FOLDER_NAME . '/InvoiceVoided/NewSaleVoided?SaleId=' . ($parameter['invoice']['invoice_id'] ) ?>">ANULAR O COMUNICAR DE BAJA</a>
                     <a class="dropdown-item" href="#">DESCARGAR XML</a>
                 </div>
             </div>

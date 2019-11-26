@@ -2,11 +2,11 @@
 
 require_once MODEL_PATH . '/Helper/BaseModel.php';
 
-class TicketSummary extends BaseModel
+class InvoiceSummary extends BaseModel
 {
     public function __construct(PDO $db)
     {
-        parent::__construct("sale_summary","sale_summary_id",$db);
+        parent::__construct("invoice_summary","invoice_summary_id",$db);
     }
 
     public function Paginate($page, $limit = 10, $filter = [], $localId = 0){
@@ -14,24 +14,24 @@ class TicketSummary extends BaseModel
         $sqlFilter = '';
         if ($filter['startDate'] ?? false){
             $sqlFilter .= $filterNumber >= 1 ? ' AND ' : ' WHERE ';
-            $sqlFilter .= " WHERE sale_summary.date_of_issue >= '{$filter['startDate']}'";
+            $sqlFilter .= " WHERE invoice_summary.date_of_issue >= '{$filter['startDate']}'";
             $filterNumber++;
         }
         if ($filter['endDate'] ?? false){
             $sqlFilter .= $filterNumber >= 1 ? ' AND ' : ' WHERE ';
-            $sqlFilter .= "sale_summary.date_of_issue <= '{$filter['endDate']}'";
+            $sqlFilter .= "invoice_summary.date_of_issue <= '{$filter['endDate']}'";
         }
 
         $sqlFilter .= $filterNumber >= 1 ? ' AND ' : ' WHERE ';
-        $sqlFilter .= "sale_summary.local_id = {$localId}";
+        $sqlFilter .= "invoice_summary.local_id = {$localId}";
 
         $offset = ($page - 1) * $limit;
-        $totalRows = $this->db->query("SELECT COUNT(*) FROM sale_summary {$sqlFilter}")->fetchColumn();
+        $totalRows = $this->db->query("SELECT COUNT(*) FROM invoice_summary {$sqlFilter}")->fetchColumn();
         $totalPages = ceil($totalRows / $limit);
 
-        $sql = "SELECT * FROM sale_summary";
+        $sql = "SELECT * FROM invoice_summary";
         $sql .= $sqlFilter;
-        $sql .= " ORDER BY sale_summary.sale_summary_id DESC LIMIT $offset, $limit";
+        $sql .= " ORDER BY invoice_summary.invoice_summary_id DESC LIMIT $offset, $limit";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -50,7 +50,7 @@ class TicketSummary extends BaseModel
             $this->db->beginTransaction();
 
             if (count($invoice) >= 1){
-                $sql = "INSERT INTO sale_summary (local_id, date_of_issue, date_of_reference, ticket, pdf_format, sunat_state, creation_user_id)
+                $sql = "INSERT INTO invoice_summary (local_id, date_of_issue, date_of_reference, ticket, pdf_format, sunat_state, creation_user_id)
                             VALUES (:local_id, :date_of_issue, :date_of_reference, :ticket, :pdf_format, :sunat_state, :creation_user_id)";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([
@@ -65,12 +65,12 @@ class TicketSummary extends BaseModel
                 $ticketSummaryId = (int)$this->db->lastInsertId();
 
                 foreach ($invoice as $key => $row){
-                    $sql = "INSERT INTO detail_sale_summary (sale_summary_id, sale_id, sunat_state, date_of_issue, date_of_reference, local_id, summary_state_code)
-                            VALUES (:sale_summary_id, :sale_id, :sunat_state, :date_of_issue, :date_of_reference, :local_id,:summary_state_code);";
+                    $sql = "INSERT INTO invoice_summary_item (invoice_summary_id, invoice_id, sunat_state, date_of_issue, date_of_reference, local_id, summary_state_code)
+                            VALUES (:invoice_summary_id, :invoice_id, :sunat_state, :date_of_issue, :date_of_reference, :local_id,:summary_state_code);";
                     $stmt = $this->db->prepare($sql);
                     $stmt->execute([
-                        ':sale_summary_id' => $ticketSummaryId,
-                        ':sale_id' => $row['sale_id'],
+                        ':invoice_summary_id' => $ticketSummaryId,
+                        ':invoice_id' => $row['invoice_id'],
                         ':date_of_issue' => date('Y-m-d'),
                         ':date_of_reference' => $row['date_of_issue'],
                         ':sunat_state' => '1',
@@ -78,11 +78,11 @@ class TicketSummary extends BaseModel
                         ':summary_state_code' => $row['summary_state_code'],
                     ]);
 
-                    $sql = "UPDATE sale SET sunat_state = :sunat_state WHERE sale_id = :sale_id";
+                    $sql = "UPDATE invoice SET sunat_state = :sunat_state WHERE invoice_id = :invoice_id";
                     $stmt = $this->db->prepare($sql);
                     if(!$stmt->execute([
                         ':sunat_state' => 3,
-                        ':sale_id' => $row['sale_id'],
+                        ':invoice_id' => $row['invoice_id'],
                     ])){
                         throw new Exception("Error al generar el resumen diario");
                     }

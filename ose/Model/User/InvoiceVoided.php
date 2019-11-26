@@ -2,11 +2,11 @@
 
 require_once MODEL_PATH . '/Helper/BaseModel.php';
 
-class SaleVoided extends BaseModel
+class InvoiceVoided extends BaseModel
 {
     public function __construct(PDO $db)
     {
-        parent::__construct("sale_voided","sale_voided_id",$db);
+        parent::__construct("invoice_voided","invoice_voided_id",$db);
     }
 
     public function Paginate($page = 1, $limit = 10, array $filter = [], $localId = 0) {
@@ -14,29 +14,29 @@ class SaleVoided extends BaseModel
             $filterNumber = 0;
             $sqlFilter = '';
             if ($filter['startDate'] ?? false){
-                $sqlFilter .= " WHERE sale_voided.date_of_issue >= '{$filter['startDate']}'";
+                $sqlFilter .= " WHERE invoice_voided.date_of_issue >= '{$filter['startDate']}'";
                 $filterNumber++;
             }
             if ($filter['endDate'] ?? false){
                 $sqlFilter .= $filterNumber >= 1 ? ' AND ' : ' WHERE ';
-                $sqlFilter .= "sale_voided.date_of_issue <= '{$filter['endDate']}'";
+                $sqlFilter .= "invoice_voided.date_of_issue <= '{$filter['endDate']}'";
             }
             $sqlFilter .= $filterNumber >= 1 ? ' AND ' : ' WHERE ';
-            $sqlFilter .= "sale_voided.local_id = {$_COOKIE['CurrentBusinessLocal']}";
+            $sqlFilter .= "invoice_voided.local_id = {$_COOKIE['CurrentBusinessLocal']}";
 
             $limit = 10;
             $offset = ($page - 1) * $limit;
-            $totalRows = $this->db->query("SELECT COUNT(*) FROM sale_voided {$sqlFilter}")->fetchColumn();
+            $totalRows = $this->db->query("SELECT COUNT(*) FROM invoice_voided {$sqlFilter}")->fetchColumn();
             $totalPages = ceil($totalRows / $limit);
 
-            $sql = "SELECT sale_voided.*, sale.correlative as sale_correlative, sale.serie as sale_serie, sale.date_of_issue as sale_date_of_issue,
-                        sale.document_code as sale_document_code,
-                        dtc.description as sale_document_code_description
-                        FROM sale_voided
-                        INNER JOIN sale ON sale_voided.sale_id = sale.sale_id
-                        INNER JOIN cat_document_type_code dtc on sale.document_code = dtc.code";
+            $sql = "SELECT invoice_voided.*, invoice.correlative as invoice_correlative, invoice.serie as invoice_serie, invoice.date_of_issue as invoice_date_of_issue,
+                        invoice.document_code as invoice_document_code,
+                        dtc.description as invoice_document_code_description
+                        FROM invoice_voided
+                        INNER JOIN invoice ON invoice_voided.invoice_id = invoice.invoice_id
+                        INNER JOIN cat_document_type_code dtc on invoice.document_code = dtc.code";
             $sql .= $sqlFilter;
-            $sql .= " ORDER BY sale_voided.sale_voided_id DESC LIMIT $offset, $limit";
+            $sql .= " ORDER BY invoice_voided.invoice_voided_id DESC LIMIT $offset, $limit";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
@@ -53,21 +53,21 @@ class SaleVoided extends BaseModel
         }
     }
 
-    public function Insert($saleVoided){
+    public function Insert($invoiceVoided){
         try{
             $this->db->beginTransaction();
             $currentDate = date('Y-m-d H:i:s');
 
-            $sql = "INSERT INTO sale_voided (local_id, date_of_issue, sale_id, reason,
+            $sql = "INSERT INTO invoice_voided (local_id, date_of_issue, invoice_id, reason,
                                                 created_at,updated_at,creation_user_id,modification_user_id) 
-                                        VALUES (:local_id, :date_of_issue, :sale_id, :reason,
+                                        VALUES (:local_id, :date_of_issue, :invoice_id, :reason,
                                                 :created_at,:updated_at,:creation_user_id,:modification_user_id)";
             $stmt = $this->db->prepare($sql);
             if(!$stmt->execute([
                 ':local_id' => $_COOKIE['CurrentBusinessLocal'],
                 ':date_of_issue' => date('Y-m-d'),
-                ':sale_id' => $saleVoided['saleId'],
-                ':reason' => $saleVoided['reason'],
+                ':invoice_id' => $invoiceVoided['invoiceId'],
+                ':reason' => $invoiceVoided['reason'],
 
                 ":created_at" => $currentDate,
                 ":updated_at" => $currentDate,
@@ -79,11 +79,11 @@ class SaleVoided extends BaseModel
             $voidedId = (int)$this->db->lastInsertId();
 
 
-            $sql = "UPDATE sale SET sunat_state = :sunat_state, modification_user_id = :modification_user_id, updated_at = :updated_at WHERE sale_id = :sale_id";
+            $sql = "UPDATE invoice SET sunat_state = :sunat_state, modification_user_id = :modification_user_id, updated_at = :updated_at WHERE invoice_id = :invoice_id";
             $stmt = $this->db->prepare($sql);
             if(!$stmt->execute([
                 ':sunat_state' => 4,
-                ':sale_id' => $saleVoided['saleId'],
+                ':invoice_id' => $invoiceVoided['invoiceId'],
 
                 ":updated_at" => $currentDate,
                 ":modification_user_id" => $_SESSION[SESS],

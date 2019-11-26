@@ -9,9 +9,9 @@ require_once MODEL_PATH . 'User/CatCurrencyTypeCode.php';
 require_once MODEL_PATH . 'User/CatDocumentTypeCode.php';
 require_once MODEL_PATH . 'User/CatIdentityDocumentTypeCode.php';
 require_once MODEL_PATH . 'User/CatOperationTypeCode.php';
-require_once MODEL_PATH . 'User/Sale.php';
+require_once MODEL_PATH . 'User/Invoice.php';
 require_once MODEL_PATH . 'User/Customer.php';
-require_once MODEL_PATH . 'User/DetailSale.php';
+require_once MODEL_PATH . 'User/InvoiceItem.php';
 require_once MODEL_PATH . 'User/Product.php';
 require_once MODEL_PATH . 'User/CatCreditNoteTypeCode.php';
 require_once MODEL_PATH . 'User/CatDebitNoteTypeCode.php';
@@ -27,7 +27,7 @@ require_once CONTROLLER_PATH . 'Helper/InvoiceCalculate.php';
 require_once CONTROLLER_PATH . 'Helper/InvoiceValidate.php';
 require_once CONTROLLER_PATH . 'Helper/BillingManager.php';
 
-class SaleController
+class InvoiceController
 {
     protected $connection;
     private $param;
@@ -41,8 +41,8 @@ class SaleController
         $this->connection = $connection;
         $this->param = $param;
 
-        $this->saleModel = new Sale($this->connection);
-        $this->detailSaleModel = new DetailSale($this->connection);
+        $this->saleModel = new Invoice($this->connection);
+        $this->detailSaleModel = new InvoiceItem($this->connection);
         $this->customerModel = new Customer($this->connection);
         $this->businessModel = new Business($this->connection);
     }
@@ -86,7 +86,7 @@ class SaleController
                 'startDate' => $filterStartDate,
                 'endDate' => $filterEndDate,
                 'saleSearch' => [
-                    'sale_id' => $filterSaleSearch,
+                    'invoice_id' => $filterSaleSearch,
                     'description' => $saleDescription,
                 ]
             ];
@@ -99,12 +99,12 @@ class SaleController
                     'customerID' => $filterCustomer,
                     'startDate' => $filterStartDate,
                     'endDate' => $filterEndDate,
-                    'saleSearch' => $filterSaleSearch,
+                    'invoiceSearch' => $filterSaleSearch,
                 ]
             );
             $parameter['documentTypeCode'] = $documentTypeCode;
 
-            $content = requireToVar(VIEW_PATH . "User/Sale.php", $parameter);
+            $content = requireToVar(VIEW_PATH . "User/Invoice.php", $parameter);
             require_once(VIEW_PATH. "User/Layout/main.php");
         } catch (Exception $e) {
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
@@ -115,7 +115,6 @@ class SaleController
         $business = $documentData['business'];
         $sale =  $documentData['sale'];
         $detailSale =  $documentData['detailSale'];
-        $customer =  $documentData['customer'];
 
         $business = array_merge($business,[
             'address' => 'AV. HUASCAR NRO. 224 DPTO. 303',
@@ -141,10 +140,10 @@ class SaleController
         $invoice['businessAddress'] = $business['address'];
         $invoice['businessLocation'] = $business['district'] . ' ' . $business['province'] . ' ' . $business['region'];
 
-        $invoice['customerDocumentNumber'] = $customer['document_number'];
-        $invoice['customerDocumentCode'] = $customer['document_number'];
-        $invoice['customerSocialReason'] = $customer['social_reason'];
-        $invoice['customerFiscalAddress'] = $customer['fiscal_address'];
+        $invoice['customerDocumentNumber'] = $sale['customer_document_number'];
+        $invoice['customerDocumentCode'] = $sale['customer_document_number'];
+        $invoice['customerSocialReason'] = $sale['customer_social_reason'];
+        $invoice['customerFiscalAddress'] = $sale['customer_fiscal_address'];
         $invoice['digestValue'] = $sale['digestValue'];
         $invoice['dateOfIssue'] = $sale['date_of_issue'];
         $invoice['dateOfDue'] = $sale['date_of_due'];
@@ -219,7 +218,7 @@ class SaleController
         $resPdf = $documentManager->Invoice($invoice,$sale['pdf_format'] !== '' ? $sale['pdf_format'] : 'A4',$_SESSION[ENVIRONMENT]);
 
         if ($resPdf->success){
-            $this->saleModel->UpdateById($sale['sale_id'],[
+            $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
                 'pdf_url'=> '..' . $resPdf->pdfPath
             ]);
         }
@@ -230,7 +229,6 @@ class SaleController
         $business = $documentData['business'];
         $sale =  $documentData['sale'];
         $detailSale =  $documentData['detailSale'];
-        $customer =  $documentData['customer'];
 
         $detailSale = array_map(function ($item) use ($sale, $business){
             $discountBase = $item['total_value'] + $item['discount'];
@@ -297,9 +295,9 @@ class SaleController
         $invoice['defaultUrl'] = 'WWW.SKYFACT.COM';
         $invoice['supplierName'] = htmlspecialchars($business['social_reason']);
         $invoice['supplierDocumentType'] = '6';					// TIPO DE DOCUMENTO EMISOR
-        $invoice['customerDocumentType'] = $customer['identity_document_code'];					// TIPO DE DOCUMENTO CLIENTE
-        $invoice['customerDocument'] = $customer['document_number'];			// DOCUMENTO DEL CLIENTE
-        $invoice['customerName'] = htmlspecialchars($customer['social_reason']);
+        $invoice['customerDocumentType'] = $sale['customer_identity_document_code'];					// TIPO DE DOCUMENTO CLIENTE
+        $invoice['customerDocument'] = $sale['customer_document_number'];			// DOCUMENTO DEL CLIENTE
+        $invoice['customerName'] = htmlspecialchars($sale['customer_social_reason']);
         $invoice['totalTaxAmount'] = RoundCurrency($sale['total_tax']);					// TOTAL DE IMPUESTOS
         $invoice['totalBaseAmount'] = RoundCurrency($sale['total_value']);					// VALOR TOTAL DE LA VENTA
         $invoice['totalSaleAmount'] = RoundCurrency($sale['total']);					// VALOR TOTAL DE LA VENTA + IMPUESTOS
@@ -475,15 +473,18 @@ class SaleController
         $res->digestValue = '';
 
 //        if ($sale['document_code'] === '01'){
-            $resInvoice = $billingManager->SendInvoice($sale['sale_id'], $invoice, $_SESSION[SESS]);
+            $resInvoice = $billingManager->SendInvoice($sale['invoice_id'], $invoice, $_SESSION[SESS]);
             if ($resInvoice->success){
-                $this->saleModel->UpdateById($sale['sale_id'],[
+                $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
                     'xml_url' => $directoryXmlPath . $fileName,
-                    'sunat_state' => 2,
+                    'invoice_state_id' => 2,
                 ]);
                 $res->digestValue = $resInvoice->digestValue;
                 $res->success = true;
             }else{
+//                $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
+//                    'other_message' => $resInvoice->errorMessage,
+//                ]);
                 $res->errorMessage .= $resInvoice->errorMessage;
                 $res->success = false;
                 return $res;
@@ -498,10 +499,10 @@ class SaleController
             }
 
             if ($resInvoice->readerSuccess){
-                $this->saleModel->UpdateById($sale['sale_id'],[
+                $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
                     'cdr_url' => $directoryXmlPath . 'R-' . $fileName,
-                    'sunat_state' => 3,
-                    'sunat_error_message' => '',
+                    'invoice_state_id' => 3,
+                    'response_message' => '',
                 ]);
                 $res->success = true;
             } else {
@@ -509,12 +510,12 @@ class SaleController
                 $res->success = false;
             }
 //        }elseif ($sale['document_code'] === '03'){
-//            $resInvoice = $billingManager->SaveTicketInvoice($sale['sale_id'], $invoice, $_SESSION[SESS]);
+//            $resInvoice = $billingManager->SaveTicketInvoice($sale['invoice_id'], $invoice, $_SESSION[SESS]);
 //
 //            if ($resInvoice->success){
-//                $this->saleModel->UpdateById($sale['sale_id'],[
+//                $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
 //                    'xml_url' => $directoryXmlPath . $fileName,
-//                    'sunat_state' => 2,
+//                    'invoice_state_id' => 2,
 //                ]);
 //                $res->digestValue = $resInvoice->digestValue;
 //                $res->success = true;
@@ -534,15 +535,14 @@ class SaleController
         try{
             $business = $this->businessModel->GetByUserId($_SESSION[SESS]);
             $sale = $this->saleModel->summaryById($saleId);
-            $detailSale = $this->detailSaleModel->BySaleIdXML($saleId);
-            $customer = $this->customerModel->GetById($sale['customer_id']);
+            $detailSale = $this->detailSaleModel->ByInvoiceIdXML($saleId);
 
             $perceptionTypeCodeModel = new CatPerceptionTypeCode($this->connection);
             $perceptionTypeCode = $perceptionTypeCodeModel->GetAll();
 
-            if ($sale['sunat_state'] == '3'){
+            if ($sale['invoice_state_id'] == '3'){
                 throw new Exception('Este documento ya fue informado ante la sunat');
-            } elseif (($sale['sunat_state'] == '4' && $sale['document_code'] == '01')){
+            } elseif (($sale['invoice_state_id'] == '4' && $sale['document_code'] == '01')){
                 throw new Exception('Este documento esta anulado');
             }
 
@@ -581,15 +581,14 @@ class SaleController
             $documentData = [
                 'sale' => $sale,
                 'detailSale' => $detailSale,
-                'customer' => $customer,
                 'business' => $business,
             ];
             $resXml = $this->GenerateXML($documentData);
             $res->errorMessage = $resXml->errorMessage;
             $res->success = $resXml->success;
             if (!$resXml->success){
-                $this->saleModel->UpdateById($saleId,[
-                    'sunat_error_message' =>  $resXml->errorMessage,
+                $this->saleModel->UpdateInvoiceSunatByInvoiceId($saleId,[
+                    'other_message' =>  $resXml->errorMessage,
                 ]);
             }
 
@@ -616,14 +615,14 @@ class SaleController
         try{
             $saleId = $_GET['SaleId'] ?? 0;
             if(!$saleId){
-                header('Location: ' . FOLDER_NAME . '/Sale');
+                header('Location: ' . FOLDER_NAME . '/Invoice');
             }
 
             $resRunDoc = $this->BuildDocument($saleId);
             if ($resRunDoc->success){
-                header('Location: ' . FOLDER_NAME . '/Sale/View?SaleId=' . $saleId . '&message=' . 'El documento se guardó y se envió a la SUNAT exitosamente' . '&messageType=success');
+                header('Location: ' . FOLDER_NAME . '/Invoice/View?SaleId=' . $saleId . '&message=' . 'El documento se guardó y se envió a la SUNAT exitosamente' . '&messageType=success');
             } else {
-                header('Location: ' . FOLDER_NAME . '/Sale/View?SaleId=' . $saleId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
+                header('Location: ' . FOLDER_NAME . '/Invoice/View?SaleId=' . $saleId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
             }
         } catch (Exception $e) {
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
@@ -633,7 +632,7 @@ class SaleController
     public function JsonSearch(){
         $search = $_POST['q'] ?? '';
 
-        $saleModel = new Sale($this->connection);
+        $saleModel = new Invoice($this->connection);
         $data = $saleModel->searchBySerieCorrelative($search);
 
         echo json_encode([
@@ -674,19 +673,37 @@ class SaleController
                     $invoice['legend'] = $legend;
                     $invoice['total_value'] = $invoice['total_unaffected'] + $invoice['total_taxed'] + $invoice['total_exonerated'];
 
+                    $customer = $this->customerModel->GetById($invoice['customer_id']);
+                    $invoice['customer']['document_number'] = $customer['document_number'];
+                    $invoice['customer']['identity_document_code'] = $customer['identity_document_code'];
+                    $invoice['customer']['social_reason'] = $customer['social_reason'];
+                    $invoice['customer']['fiscal_address'] = $customer['fiscal_address'];
+                    $invoice['customer']['email'] = $customer['main_email'];
+                    $invoice['customer']['telephone'] = $customer['telephone'];
+
+                    $invoice['itinerant_enable'] = ($invoice['itinerant_enable'] ?? false) == 'on' ? 1 : 0;
+                    $invoice['prepayment_regulation'] = ($invoice['prepayment_regulation'] ?? false) == 'on' ? 1 : 0;
+
+                    $invoice['guide_array'] = [];
+                    if (isset($invoice['guide'])){
+                        foreach ($invoice['guide'] as $key => $value){
+                            array_push($invoice['guide_array'],$value);
+                        }
+                    }
+
 //                    $validateInput = $this->ValidateInput($invoice);
 //                    $error = $validateInput->error;
 //                    if (!$validateInput->success){
 //                        throw new Exception($validateInput->errorMessage);
 //                    }
-                    $saleId = $this->saleModel->Insert($invoice);
+                    $saleId = $this->saleModel->Insert($invoice, $_SESSION[SESS], $_COOKIE['CurrentBusinessLocal']);
 
-                   $resRunDoc = $this->BuildDocument($saleId);
-                   if ($saleId >= 1 && $resRunDoc->success){
-                       header('Location: ' . FOLDER_NAME . '/Sale/View?SaleId=' . $saleId . '&message=' . urlencode('El documento se guardó y se envió a la SUNAT exitosamente') . '&messageType=success');
-                   } else {
-                       header('Location: ' . FOLDER_NAME . '/Sale/View?SaleId=' . $saleId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
-                   }
+                       $resRunDoc = $this->BuildDocument($saleId);
+                       if ($saleId >= 1 && $resRunDoc->success){
+                           header('Location: ' . FOLDER_NAME . '/Invoice/View?SaleId=' . $saleId . '&message=' . urlencode('El documento se guardó y se envió a la SUNAT exitosamente') . '&messageType=success');
+                       } else {
+                           header('Location: ' . FOLDER_NAME . '/Invoice/View?SaleId=' . $saleId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
+                       }
                     return;
                 }catch (Exception $exception){
                     $message = $exception->getMessage();
@@ -789,9 +806,9 @@ class SaleController
                     $resRunDoc = $this->BuildDocument($saleId);
 
                    if ($saleId >= 1 && $resRunDoc->success){
-                       header('Location: ' . FOLDER_NAME . '/Sale/View?SaleId=' . $saleId . '&message=' . urlencode('El documento se guardó y se envió a la SUNAT exitosamente') . '&messageType=success');
+                       header('Location: ' . FOLDER_NAME . '/Invoice/View?SaleId=' . $saleId . '&message=' . urlencode('El documento se guardó y se envió a la SUNAT exitosamente') . '&messageType=success');
                    } else {
-                       header('Location: ' . FOLDER_NAME . '/Sale/View?SaleId=' . $saleId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
+                       header('Location: ' . FOLDER_NAME . '/Invoice/View?SaleId=' . $saleId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
                    }
                    return;
                 }catch (Exception $exception){
@@ -858,8 +875,7 @@ class SaleController
             $messageType = ($messageType == 'success') ? 'success' : ($messageType == 'error' ? 'danger' : '');
 
             $invoice = $this->saleModel->summaryById($saleId);
-            $parameter['detailSale'] = $this->detailSaleModel->BySaleIdSummary($saleId);
-            $parameter['customer'] = $this->customerModel->GetById($invoice['customer_id']);
+            $parameter['detailSale'] = $this->detailSaleModel->ByInvoiceIdSummary($saleId);
             $parameter['invoice'] = $invoice;
             $parameter['message'] = $message;
             $parameter['messageType'] = $messageType;

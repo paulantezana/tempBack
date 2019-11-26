@@ -1323,7 +1323,7 @@ $('.filterSaleSearch').selectpicker()
     .filter(".with-ajax")
     .ajaxSelectPicker({
         ajax: {
-            url: service.apiPath + '/Sale/JsonSearch',
+            url: service.apiPath + '/Invoice/JsonSearch',
             type: 'POST',
             dataType: 'json',
             data: {
@@ -1355,7 +1355,7 @@ $('.filterSaleNoteSearch').selectpicker()
     .filter(".with-ajax")
     .ajaxSelectPicker({
         ajax: {
-            url: service.apiPath + '/SaleNote/JsonSearch',
+            url: service.apiPath + '/InvoiceNote/JsonSearch',
             type: 'POST',
             dataType: 'json',
             data: {
@@ -1621,7 +1621,7 @@ searchReferralGuide.selectpicker()
 function JsDetailTicketSummaryModal(summaryId){
     $("#detailTicketSummaryModal").modal('show');
     $.ajax({
-        url: service.apiPath + '/TicketSummary/DetailTicketSummary',
+        url: service.apiPath + '/InvoiceSummary/DetailTicketSummary',
         type: "POST",
         dataType: 'json',
         contentType: 'application/json',

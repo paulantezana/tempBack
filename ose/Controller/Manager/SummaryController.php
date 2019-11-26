@@ -2,7 +2,7 @@
 
 require_once MODEL_PATH . 'Manager/Summary.php';
 require_once MODEL_PATH . 'Manager/user.php';
-require_once MODEL_PATH . 'User/Sale.php';
+require_once MODEL_PATH . 'User/Invoiceice.php';
 require_once MODEL_PATH . 'User/DetailTicketSummary.php';
 
 require_once CONTROLLER_PATH . 'Helper/SummaryManager.php';
@@ -67,9 +67,9 @@ class SummaryController
                 return $item['sale_id'];
             }, $summaryItem);
 
-            $saleModel = new Sale($this->connection);
+            $saleModel = new Invoice($this->connection);
             $sale = $saleModel->GetByIds($ids,$userReferenceId)->result;
-            
+
             $newSummaryItem = array_map(function ($item) use ($sale){
                 $index = array_search($item['sale_id'], array_column($sale, 'sale_id'));
                 return array_merge($item,['date_of_issue' => $sale[$index]['date_of_issue'] ?? '']);

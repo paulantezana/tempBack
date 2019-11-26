@@ -17,15 +17,15 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <h6 class="dropdown-header">Ventas</h6>
-                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/Sale' ?>">☰ Ver Facturas, Boletas</a>
-                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/Sale/NewInvoice' ?>">＋ Nueva FACTURA</a>
-                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/Sale/NewTicket' ?>">＋ Nueva BOLETA DE VENTA</a>
+                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/Invoice' ?>">☰ Ver Facturas, Boletas</a>
+                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/Invoice/NewInvoice' ?>">＋ Nueva FACTURA</a>
+                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/Invoice/NewTicket' ?>">＋ Nueva BOLETA DE VENTA</a>
                         <h6 class="dropdown-header">Notas</h6>
-                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/SaleNote' ?>">☰ Ver Notas de Crédito y Débito</a>
-                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/SaleNote/NewCreditNote' ?>">＋ Nueva NOTA DE CRÉDITO</a>
-                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/SaleNote/NewDebitNote' ?>">＋ Nueva NOTA DE DÉBITO</a>
+                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote' ?>">☰ Ver Notas de Crédito y Débito</a>
+                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote/NewCreditNote' ?>">＋ Nueva NOTA DE CRÉDITO</a>
+                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote/NewDebitNote' ?>">＋ Nueva NOTA DE DÉBITO</a>
                         <h6 class="dropdown-header">Resumen Diario Boletas</h6>
-                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/TicketSummary' ?>">☰ Resúmenes diarios de Boletas</a>
+                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceSummary' ?>">☰ Resúmenes diarios de Boletas</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -42,10 +42,10 @@
                         Anulaciones
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/SaleVoided' ?>">Comunicación de Baja</a>
-                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/SaleNoteVoided' ?>">Comunicación de Baja ND NC</a>
-<!--                        <a class="dropdown-item" href="--><?//= FOLDER_NAME . '/Sale/NewInvoice' ?><!--">Reversión de Retenciones</a>-->
-<!--                        <a class="dropdown-item" href="--><?//= FOLDER_NAME . '/Sale/NewInvoice' ?><!--">Reversión de Percepciones</a>-->
+                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceVoided' ?>">Comunicación de Baja</a>
+                        <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNoteVoided' ?>">Comunicación de Baja ND NC</a>
+<!--                        <a class="dropdown-item" href="--><?//= FOLDER_NAME . '/Invoice/NewInvoice' ?><!--">Reversión de Retenciones</a>-->
+<!--                        <a class="dropdown-item" href="--><?//= FOLDER_NAME . '/Invoice/NewInvoice' ?><!--">Reversión de Percepciones</a>-->
                     </div>
                 </li>
                 <li class="nav-item dropdown">

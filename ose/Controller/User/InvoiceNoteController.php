@@ -5,11 +5,11 @@ require_once MODEL_PATH . 'User/CatCurrencyTypeCode.php';
 require_once MODEL_PATH . 'User/CatDocumentTypeCode.php';
 require_once MODEL_PATH . 'User/CatIdentityDocumentTypeCode.php';
 require_once MODEL_PATH . 'User/CatOperationTypeCode.php';
-require_once MODEL_PATH . 'User/Sale.php';
-require_once MODEL_PATH . 'User/SaleNote.php';
+require_once MODEL_PATH . 'User/Invoice.php';
+require_once MODEL_PATH . 'User/InvoiceNote.php';
 require_once MODEL_PATH . 'User/Customer.php';
-require_once MODEL_PATH . 'User/DetailSale.php';
-require_once MODEL_PATH . 'User/DetailSaleNote.php';
+require_once MODEL_PATH . 'User/InvoiceItem.php';
+require_once MODEL_PATH . 'User/InvoiceNoteItem.php';
 require_once MODEL_PATH . 'User/Product.php';
 require_once MODEL_PATH . 'User/CatCreditNoteTypeCode.php';
 require_once MODEL_PATH . 'User/CatDebitNoteTypeCode.php';
@@ -24,7 +24,7 @@ require_once CONTROLLER_PATH . 'Helper/InvoiceValidate.php';
 
 require_once CONTROLLER_PATH . 'Helper/BillingManager.php';
 
-class SaleNoteController
+class InvoiceNoteController
 {
     private $connection;
     private $param;
@@ -40,8 +40,8 @@ class SaleNoteController
         $this->connection = $connection;
         $this->param = $param;
 
-        $this->saleNoteModel = new SaleNote($this->connection);
-        $this->detailSaleNoteModel = new DetailSaleNote($this->connection);
+        $this->saleNoteModel = new InvoiceNote($this->connection);
+        $this->detailSaleNoteModel = new InvoiceNoteItem($this->connection);
         $this->customerModel = new Customer($this->connection);
         $this->businessModel = new Business($this->connection);
 
@@ -62,7 +62,7 @@ class SaleNoteController
             $filterEndDate = $_GET['filter']['endDate'] ?? '';
             $filterSaleNoteSearch = $_GET['filter']['saleNoteSearch'] ?? 0;
 
-            $saleNoteModel = new SaleNote($this->connection);
+            $saleNoteModel = new InvoiceNote($this->connection);
             $documentTypeCodeModel = new CatDocumentTypeCode($this->connection);
             $customerModel = new Customer($this->connection);
 
@@ -109,7 +109,7 @@ class SaleNoteController
             );
             $parameter['documentTypeCode'] = $documentTypeCode;
 
-            $content = requireToVar(VIEW_PATH . "User/SaleNote.php", $parameter);
+            $content = requireToVar(VIEW_PATH . "User/InvoiceNote.phpphp", $parameter);
             require_once(VIEW_PATH. "User/Layout/main.php");
         } catch (Exception $e) {
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
@@ -486,14 +486,14 @@ class SaleNoteController
         try{
             $saleNoteId = $_GET['SaleNoteId'] ?? 0;
             if(!$saleNoteId){
-                header('Location: ' . FOLDER_NAME . '/SaleNote');
+                header('Location: ' . FOLDER_NAME . '/InvoiceNote');
             }
 
             $resRunDoc = $this->BuildDocument($saleNoteId);
             if ($resRunDoc->success){
-                header('Location: ' . FOLDER_NAME . '/SaleNote/View?SaleNoteId=' . $saleNoteId . '&message=' . 'El documento se guardó y se envió a la SUNAT exitosamente' . '&messageType=success');
+                header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleNoteId=' . $saleNoteId . '&message=' . 'El documento se guardó y se envió a la SUNAT exitosamente' . '&messageType=success');
             }else{
-                header('Location: ' . FOLDER_NAME . '/SaleNote/View?SaleNoteId=' . $saleNoteId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
+                header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleNoteId=' . $saleNoteId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
             }
         } catch (Exception $e) {
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
@@ -516,7 +516,7 @@ class SaleNoteController
         $error = [];
         $invoice = $_POST['invoice'] ?? [];
 
-        $saleModel = new Sale($this->connection);
+        $saleModel = new Invoice($this->connection);
         $customerModel = new Customer($this->connection);
 
         // cuando se envia un parametro SaleId desde la url
@@ -544,7 +544,7 @@ class SaleNoteController
 
                 $invoice['guide'] = json_decode($invoice['guide'],true);
 
-                $detailSaleModel = new DetailSale($this->connection);
+                $detailSaleModel = new InvoiceItem($this->connection);
                 $invoice['item'] = $detailSaleModel->BySaleIdSummary($saleId);
 
                 $customer = $customerModel->GetById($invoice['customer_id']);
@@ -562,7 +562,7 @@ class SaleNoteController
                     throw new Exception('No hay ningun campo');
                 }
 
-                $saleModel = new Sale($this->connection);
+                $saleModel = new Invoice($this->connection);
                 $saleId  = $saleModel -> ExistDocument(
                     $invoice['sale_update']['correlative'],
                     $invoice['sale_update']['serie'],
@@ -594,10 +594,10 @@ class SaleNoteController
 
                 // ALL SUCCESS
                 if ($saleNoteId >= 1 && $resRunDoc->errorMessage === ''){
-                    header('Location: ' . FOLDER_NAME . '/SaleNote/View?SaleNoteId=' . $saleNoteId . '&message=' . urlencode('El documento se guardó exitosamente') . '&messageType=success');
+                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleNoteId=' . $saleNoteId . '&message=' . urlencode('El documento se guardó exitosamente') . '&messageType=success');
                     return;
                 } else{
-                    header('Location: ' . FOLDER_NAME . '/SaleNote/View?SaleId=' . $saleNoteId . '&message=' . urlencode($resRunDoc->errorMessag) . '&messageType=error');
+                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleId=' . $saleNoteId . '&message=' . urlencode($resRunDoc->errorMessag) . '&messageType=error');
                     return;
                 }
             }catch (Exception $exception){
@@ -655,7 +655,7 @@ class SaleNoteController
         $error = [];
         $invoice = $_POST['invoice'] ?? [];
 
-        $saleModel = new Sale($this->connection);
+        $saleModel = new Invoice($this->connection);
         $customerModel = new Customer($this->connection);
 
         // cuando se envia un parametro SaleId desde la url
@@ -683,7 +683,7 @@ class SaleNoteController
 
                 $invoice['guide'] = json_decode($invoice['guide'],true);
 
-                $detailSaleModel = new DetailSale($this->connection);
+                $detailSaleModel = new InvoiceItem($this->connection);
                 $invoice['item'] = $detailSaleModel->BySaleIdSummary($saleId);
 
                 $customer = $customerModel->GetById($invoice['customer_id']);
@@ -701,7 +701,7 @@ class SaleNoteController
                     throw new Exception('No hay ningun campo');
                 }
 
-                $saleModel = new Sale($this->connection);
+                $saleModel = new Invoice($this->connection);
                 $saleId  = $saleModel -> ExistDocument(
                     $invoice['sale_update']['correlative'],
                     $invoice['sale_update']['serie'],
@@ -734,10 +734,10 @@ class SaleNoteController
 
                 // ALL SUCCESS
                 if ($saleNoteId >= 1 && $resRunDoc->errorMessage === ''){
-                    header('Location: ' . FOLDER_NAME . '/SaleNote/View?SaleNoteId=' . $saleNoteId . '&message=' . urlencode('El documento se guardó exitosamente') . '&messageType=success');
+                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleNoteId=' . $saleNoteId . '&message=' . urlencode('El documento se guardó exitosamente') . '&messageType=success');
                     return;
                 } else{
-                    header('Location: ' . FOLDER_NAME . '/SaleNote/View?SaleId=' . $saleNoteId . '&message=' . urlencode($resRunDoc->errorMessag) . '&messageType=error');
+                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleId=' . $saleNoteId . '&message=' . urlencode($resRunDoc->errorMessag) . '&messageType=error');
                     return;
                 }
             }catch (Exception $exception){

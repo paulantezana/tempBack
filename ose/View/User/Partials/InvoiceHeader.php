@@ -15,23 +15,48 @@
 <hr>
 
 <div class="row mb-5">
-    <div class="col">
-        <div class="form-group">
-            <label for="selectCustomerSearch">Cliente</label>
-            <div class="input-group">
-                <select class="selectpicker with-ajax searchCustomer" data-live-search="true" id="selectCustomerSearch" name="invoice[customer_id]" required>
-                    <?php if (isset($parameter['invoice']['customer']['customer_id'])): ?>
-                        <option value="<?= $parameter['invoice']['customer']['customer_id'] ?? ''?>" selected >
-                            <?php echo ($parameter['invoice']['customer']['document_number'] ?? '') . ' ' . ($parameter['invoice']['customer']['social_reason'] ?? '') ?>
-                        </option>
-                    <?php endif; ?>
-                </select>
-                <div class="input-group-prepend">
-                    <button class="btn btn-primary btn-sm" type="button" id="invoiceNewCustomer">Nuevo</button>
-                </div>
+    <div class="form-group col-md-4">
+        <label for="selectCustomerSearch">Cliente</label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <button class="btn btn-primary btn-sm" type="button" id="invoiceNewCustomer">Nuevo</button>
             </div>
+            <select class="selectpicker with-ajax searchCustomer" data-live-search="true" id="selectCustomerSearch" name="invoice[customer_id]" required>
+                <?php if (isset($parameter['invoice']['customer']['customer_id'])): ?>
+                    <option value="<?= $parameter['invoice']['customer']['customer_id'] ?? ''?>" selected >
+                        <?php echo ($parameter['invoice']['customer']['document_number'] ?? '') . ' ' . ($parameter['invoice']['customer']['social_reason'] ?? '') ?>
+                    </option>
+                <?php endif; ?>
+            </select>
         </div>
     </div>
+<!--    <div class="form-group col-md-4">-->
+<!--        <label for="invoiceCustomerIdentityDocumentNumber">Cliente</label>-->
+<!--        <div class="input-group">-->
+<!--            <div class="input-group-prepend">-->
+<!--                <button class="btn btn-primary btn-sm" type="button" id="invoiceNewCustomer">Nuevo</button>-->
+<!--            </div>-->
+<!--            <select class="selectpicker with-ajax searchCustomer" data-live-search="true" id="invoiceCustomerIdentityDocumentNumber" name="invoice[customer][document_number]" required>-->
+<!--                --><?php //if (isset($parameter['invoice']['customer']['customer_id'])): ?>
+<!--                    <option value="--><?//= $parameter['invoice']['customer']['customer_id'] ?? ''?><!--" selected >-->
+<!--                        --><?php //echo ($parameter['invoice']['customer']['document_number'] ?? '') . ' ' . ($parameter['invoice']['customer']['social_reason'] ?? '') ?>
+<!--                    </option>-->
+<!--                --><?php //endif; ?>
+<!--            </select>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="form-group col-md-3">-->
+<!--        <label for="invoiceCustomerIdentityDocumentCode">Tipo Doc.Ident</label>-->
+<!--        <select class="form-control" id="invoiceCustomerIdentityDocumentCode" name="invoice[customer][identity_document_code]">-->
+<!--            --><?php //foreach ($parameter['identityDocumentTypeCode'] ?? [] as $row): ?>
+<!--                <option value="--><?//= $row['code']?><!--">--><?//= $row['description']?><!--</option>-->
+<!--            --><?php //endforeach; ?>
+<!--        </select>-->
+<!--    </div>-->
+<!--    <div class="form-group col-md-5">-->
+<!--        <label for="invoiceCustomerIdentityDocumentCode">Razón Social:</label>-->
+<!--        <input type="text" class="form-control" id="invoiceCustomerIdentityDocumentCode" name="invoice[customer][social_reason]">-->
+<!--    </div>-->
 </div>
 
 <div class="modal fade" id="invoiceReferralGuide" tabindex="-1" role="dialog" aria-labelledby="invoiceReferralGuideLabel" aria-hidden="true">

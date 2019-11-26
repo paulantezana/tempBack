@@ -1,13 +1,13 @@
 <?php
 
-require_once MODEL_PATH . 'User/TicketSummary.php';
+require_once MODEL_PATH . 'User/InvoiceSummary.php';
 require_once MODEL_PATH . 'User/DetailTicketSummary.php';
-require_once MODEL_PATH . 'User/Sale.php';
+require_once MODEL_PATH . 'User/Invoice.php';
 require_once MODEL_PATH . 'User/Business.php';
 
 require_once CONTROLLER_PATH . 'Helper/SummaryManager.php';
 
-class TicketSummaryController
+class InvoiceSummaryController
 {
     private $connection;
     private $param;
@@ -45,7 +45,7 @@ class TicketSummaryController
 
             $filter = $_GET['filter'] ?? [];
 
-            $summaryModel = new TicketSummary($this->connection);
+            $summaryModel = new InvoiceSummary($this->connection);
             $summary = $summaryModel->paginate(
                 $page,
                 10,
@@ -59,7 +59,7 @@ class TicketSummaryController
             $parameter['message'] = $message;
             $parameter['messageType'] = $messageType;
 
-            $content = requireToVar(VIEW_PATH . "User/TicketSummary.php", $parameter);
+            $content = requireToVar(VIEW_PATH . "User/InvoiceSummaryy.php", $parameter);
             require_once(VIEW_PATH. "User/Layout/main.php");
         } catch (Exception $e) {
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
@@ -80,7 +80,7 @@ class TicketSummaryController
     }
 
     private function GeneratePdf(int $ticketSummaryID) : array {
-        $ticketSummaryModel = new TicketSummary($this->connection);
+        $ticketSummaryModel = new InvoiceSummary($this->connection);
         $companyModel = new Business($this->connection);
 
         $ticketSummary = $ticketSummaryModel -> GetById($ticketSummaryID);

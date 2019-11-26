@@ -8,7 +8,7 @@ function CustomGenerateSummary() {
     });
 
     const executeAddItemCustomSummary = uniqueId => {
-        // Search Sale
+        // Search Invoice
         summaryUserReferenceIdValue = parseInt(summaryUserReferenceId.val());
 
         let selectSaleSearchOptions = {

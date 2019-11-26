@@ -9,7 +9,7 @@
 
         <div class="col-auto d-flex align-items-center">
             <div class="btn-group">
-                <a href="<?= FOLDER_NAME . '/SaleNoteVoided/NewSaleNoteVoided' ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo</a>
+                <a href="<?= FOLDER_NAME . '/InvoiceNoteVoided/NewSaleNoteVoided' ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo</a>
             </div>
         </div>
     </div>
@@ -21,7 +21,7 @@
                 <label class="custom-control-label" for="customSwitch1">Ver Opciones Avanzadas:</label>
             </div>
             <div class="collapse" id="collapseAdvancedOptions">
-                <form action="<?= FOLDER_NAME . '/SaleNoteVoided'?>" method="GET" class="mt-4">
+                <form action="<?= FOLDER_NAME . '/InvoiceNoteVoided'?>" method="GET" class="mt-4">
                 <div class="form-row">
                     <div class="form-group col-lg-3">
                         <label for="filterStartDate">Fecha inicio</label>
@@ -36,7 +36,7 @@
                 </div>
                 <div class="btn-group">
                     <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Filtrar</button>
-                    <a href="<?= FOLDER_NAME . '/SaleNoteVoided'?>" class="btn btn-light">Mostrar Todo</a>
+                    <a href="<?= FOLDER_NAME . '/InvoiceNoteVoided'?>" class="btn btn-light">Mostrar Todo</a>
                 </div>
             </form>
             </div>
@@ -203,8 +203,8 @@
                                             <i class="fas fa-bars"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/SaleNoteVoided/ResendSaleNoteVoided?SaleNoteVoidedId=' . $row['sale_note_voided_id'] ?>"> <i class="fas fa-file-alt"></i> Consultar o recuperar constancia</a>
-<!--                                            <a class="dropdown-item" href="--><?//= FOLDER_NAME . '/SaleNoteVoided/ResendSaleNoteVoided?SaleNoteVoidedId=' . $row['sale_note_voided_id'] ?><!--"> Consultar estado a la SUNAT</a>-->
+                                            <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/InvoiceNoteVoided/ResendSaleNoteVoided?SaleNoteVoidedId=' . $row['sale_note_voided_id'] ?>"> <i class="fas fa-file-alt"></i> Consultar o recuperar constancia</a>
+<!--                                            <a class="dropdown-item" href="--><?//= FOLDER_NAME . '/InvoiceNoteVoided/ResendSaleNoteVoided?SaleNoteVoidedId=' . $row['sale_note_voided_id'] ?><!--"> Consultar estado a la SUNAT</a>-->
                                         </div>
                                     </div>
                                 </td>

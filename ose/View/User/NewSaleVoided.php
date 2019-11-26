@@ -11,7 +11,7 @@
 
     <div class="card mb-3">
         <div class="card-body">
-            <form action="<?= FOLDER_NAME . '/SaleVoided/NewSaleVoided'?>" method="POST">
+            <form action="<?= FOLDER_NAME . '/InvoiceVoided/NewSaleVoided'?>" method="POST">
                 <div class="form-group">
                     <label for="saleVoidedSaleId">Buscar documento a anular</label>
                     <select class="selectpicker with-ajax filterSaleSearch" data-live-search="true" id="saleVoidedSaleId" name="saleVoided[saleId]" data-width="100%" required>

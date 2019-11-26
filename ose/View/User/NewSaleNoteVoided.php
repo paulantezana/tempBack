@@ -11,7 +11,7 @@
 
     <div class="card mb-3">
         <div class="card-body">
-            <form action="<?= FOLDER_NAME . '/SaleNoteVoided/NewSaleNoteVoided'?>" method="POST">
+            <form action="<?= FOLDER_NAME . '/InvoiceNoteVoided/NewSaleNoteVoided'?>" method="POST">
                 <div class="form-group">
                     <label for="saleNoteVoidedSaleNoteId">Buscar documento a anular</label>
                     <select class="selectpicker with-ajax filterSaleNoteSearch" data-live-search="true" id="saleNoteVoidedSaleNoteId" name="saleNoteVoided[saleNoteId]" data-width="100%" required>

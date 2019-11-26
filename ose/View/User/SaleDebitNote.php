@@ -1,7 +1,7 @@
 <div class="container">
     <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
 
-    <form action="<?= FOLDER_NAME . '/SaleNote/NewDebitNote' ?>" method="POST" id="invoiceForm" class="mt-5 mb-5">
+    <form action="<?= FOLDER_NAME . '/InvoiceNote/NewDebitNote' ?>" method="POST" id="invoiceForm" class="mt-5 mb-5">
         <div class="mb-4">
             <div>Documento eléctronico:</div>
             <h3><?= $parameter['documentTypeCode']['description'] ?? ''?></h3>
