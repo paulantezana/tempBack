@@ -520,17 +520,21 @@ CREATE TABLE invoice_summary(
     correlative INT,
     date_of_issue DATE NOT NULL,
     date_of_reference DATE NOT NULL,
-    ticket VARCHAR(255),
 
-    pdf_format VARCHAR(16),
+    invoice_state_id SMALLINT,
+    send BOOLEAN,
+    ticket VARCHAR(64),
+    response_code BOOLEAN,
+    response_message VARCHAR(15),
+    other_message TEXT,
     pdf_url varchar(255),
     xml_url VARCHAR(255),
     cdr_url varchar(255),
-    sunat_state SMALLINT,
-    sunat_error_message VARCHAR(255),
 
     CONSTRAINT pk_invoice_summary PRIMARY KEY (invoice_summary_id),
-    CONSTRAINT uk_invoice_summary UNIQUE KEY (invoice_summary_key)
+    CONSTRAINT uk_invoice_summary UNIQUE KEY (invoice_summary_key),
+    CONSTRAINT fk_invoice_summary_invoice_state FOREIGN KEY (invoice_state_id) REFERENCES invoice_state (invoice_state_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 
 CREATE TABLE invoice_summary_item(
@@ -562,22 +566,26 @@ CREATE TABLE invoice_voided(
 
     local_id INT,
     invoice_id INT NOT NULL,
-    ticket VARCHAR(64),
     reason VARCHAR(255),
-
     date_of_issue DATE NOT NULL,
     correlative INT,
 
-    pdf_url VARCHAR(255),
+    invoice_state_id SMALLINT,
+    send BOOLEAN,
+    ticket VARCHAR(64),
+    response_code BOOLEAN,
+    response_message VARCHAR(15),
+    other_message TEXT,
+    pdf_url varchar(255),
     xml_url VARCHAR(255),
     cdr_url varchar(255),
-    sunat_state SMALLINT,
-    sunat_error_message VARCHAR(255),
 
     CONSTRAINT pk_invoice_voided PRIMARY KEY (invoice_voided_id),
     CONSTRAINT uk_invoice_voided UNIQUE (invoice_id),
     CONSTRAINT fk_invoice_voided_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
-    ON UPDATE RESTRICT ON DELETE RESTRICT
+    ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_voided_invoice_state FOREIGN KEY (invoice_state_id) REFERENCES invoice_state (invoice_state_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
 CREATE TABLE invoice_note (
@@ -696,40 +704,40 @@ CREATE TABLE invoice_note_item (
 )ENGINE = InnoDB;
 
 CREATE TABLE invoice_note_sunat(
-                              invoice_sunat_id INT AUTO_INCREMENT NOT NULL,
-                              invoice_state_id SMALLINT,
-                              invoice_id INT NOT NULL,
-                              send BOOLEAN,
-                              response_code BOOLEAN,
-                              response_message VARCHAR(15),
-                              other_message TEXT,
-                              pdf_url varchar(255),
-                              xml_url VARCHAR(255),
-                              cdr_url varchar(255),
-                              CONSTRAINT pk_invoice_sunat PRIMARY KEY (invoice_sunat_id),
-                              CONSTRAINT uk_invoice_sunat UNIQUE KEY (invoice_id),
-                              CONSTRAINT fk_invoice_sunat_invoice_state FOREIGN KEY (invoice_state_id) REFERENCES invoice_state (invoice_state_id)
-                                  ON UPDATE RESTRICT ON DELETE RESTRICT,
-                              CONSTRAINT fk_invoice_sunat_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
-                                  ON UPDATE RESTRICT ON DELETE RESTRICT
+    invoice_note_sunat_id INT AUTO_INCREMENT NOT NULL,
+    invoice_state_id SMALLINT,
+    invoice_note_id INT NOT NULL,
+    send BOOLEAN,
+    response_code BOOLEAN,
+    response_message VARCHAR(15),
+    other_message TEXT,
+    pdf_url varchar(255),
+    xml_url VARCHAR(255),
+    cdr_url varchar(255),
+    CONSTRAINT pk_invoice_note_sunat PRIMARY KEY (invoice_note_sunat_id),
+    CONSTRAINT uk_invoice_note_sunat UNIQUE KEY (invoice_note_id),
+    CONSTRAINT fk_invoice_note_sunat_invoice_state FOREIGN KEY (invoice_state_id) REFERENCES invoice_state (invoice_state_id)
+      ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_note_sunat_invoice_note FOREIGN KEY (invoice_note_id) REFERENCES invoice_note (invoice_note_id)
+      ON UPDATE RESTRICT ON DELETE RESTRICT
 );
 
 CREATE TABLE invoice_note_customer(
-                                 invoice_customer_id INT AUTO_INCREMENT NOT NULL,
-                                 invoice_id INT NOT NULL,
-                                 document_number VARCHAR(16) NOT NULL,
-                                 identity_document_code VARCHAR(64) NOT NULL,
-                                 social_reason VARCHAR(255),
-                                 fiscal_address VARCHAR(255),
-                                 email VARCHAR(64),
-                                 telephone VARCHAR(255),
-                                 sent_to_client BOOLEAN,
-                                 CONSTRAINT pk_invoice_customer PRIMARY KEY (invoice_customer_id),
-                                 CONSTRAINT uk_invoice_customer_sunat UNIQUE KEY (invoice_id),
-                                 CONSTRAINT fk_invoice_customer_identity_document_type_code FOREIGN KEY (identity_document_code) REFERENCES cat_identity_document_type_code (code)
-                                     ON UPDATE RESTRICT ON DELETE RESTRICT,
-                                 CONSTRAINT fk_invoice_customer_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
-                                     ON UPDATE RESTRICT ON DELETE RESTRICT
+    invoice_note_customer_id INT AUTO_INCREMENT NOT NULL,
+    invoice_note_id INT NOT NULL,
+    document_number VARCHAR(16) NOT NULL,
+    identity_document_code VARCHAR(64) NOT NULL,
+    social_reason VARCHAR(255),
+    fiscal_address VARCHAR(255),
+    email VARCHAR(64),
+    telephone VARCHAR(255),
+    sent_to_client BOOLEAN,
+    CONSTRAINT pk_invoice_note_customer PRIMARY KEY (invoice_note_customer_id),
+    CONSTRAINT uk_invoice_note_customer_sunat UNIQUE KEY (invoice_note_id),
+    CONSTRAINT fk_invoice_note_customer_identity_document_type_code FOREIGN KEY (identity_document_code) REFERENCES cat_identity_document_type_code (code)
+    ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_note_customer_invoice FOREIGN KEY (invoice_note_id) REFERENCES invoice_note (invoice_note_id)
+    ON UPDATE RESTRICT ON DELETE RESTRICT
 );
 
 CREATE TABLE invoice_note_customer(
@@ -824,19 +832,24 @@ CREATE TABLE invoice_note_summary(
     correlative INT,
     date_of_issue DATE NOT NULL,
     date_of_reference DATE NOT NULL,
-    ticket VARCHAR(255),
 
-    pdf_format VARCHAR(16),
+    invoice_state_id SMALLINT,
+    send BOOLEAN,
+    ticket VARCHAR(64),
+    response_code BOOLEAN,
+    response_message VARCHAR(15),
+    other_message TEXT,
     pdf_url varchar(255),
     xml_url VARCHAR(255),
     cdr_url varchar(255),
-    sunat_state SMALLINT,
-    sunat_error_message VARCHAR(255),
-    CONSTRAINT pk_invoice_note_summary PRIMARY KEY (invoice_note_summary_id)
+    CONSTRAINT pk_invoice_note_summary PRIMARY KEY (invoice_note_summary_id),
+    CONSTRAINT uk_invoice_note_summary UNIQUE KEY (invoice_note_summary_key),
+    CONSTRAINT fk_invoice_note_summary_invoice_state FOREIGN KEY (invoice_state_id) REFERENCES invoice_state (invoice_state_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 
 CREATE TABLE invoice_note_summary_item(
-  invoice_note_summary_item_id INT AUTO_INCREMENT NOT NULL,
+    invoice_note_summary_item_id INT AUTO_INCREMENT NOT NULL,
     invoice_note_summary_id INT NOT NULL,
     invoice_note_id INT NOT NULL,
     local_id INT,
@@ -862,22 +875,27 @@ CREATE TABLE invoice_note_voided(
 
     local_id INT,
     invoice_note_id INT NOT NULL,
-    ticket VARCHAR(64),
     reason VARCHAR(255),
 
     correlative INT,
     date_of_issue DATE NOT NULL,
     date_of_reference DATE NOT NULL,
 
-    pdf_url VARCHAR(255),
+    invoice_state_id SMALLINT,
+    send BOOLEAN,
+    ticket VARCHAR(64),
+    response_code BOOLEAN,
+    response_message VARCHAR(15),
+    other_message TEXT,
+    pdf_url varchar(255),
     xml_url VARCHAR(255),
     cdr_url varchar(255),
-    sunat_state SMALLINT,
-    sunat_error_message VARCHAR(255),
 
     CONSTRAINT pk_invoice_note_voided PRIMARY KEY (invoice_note_voided_id),
-    CONSTRAINT uk_invoice_note UNIQUE (invoice_note_id),
+    CONSTRAINT uk_invoice_note_voided UNIQUE (invoice_note_id),
     CONSTRAINT fk_invoice_note_voided_invoice FOREIGN KEY (invoice_note_id) REFERENCES invoice_note (invoice_note_id)
+        ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_invoice_note_voided_invoice_state FOREIGN KEY (invoice_state_id) REFERENCES invoice_state (invoice_state_id)
         ON UPDATE RESTRICT ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 

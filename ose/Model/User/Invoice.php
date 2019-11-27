@@ -179,6 +179,7 @@ class Invoice extends BaseModel
         try{
             $currentDate = date('Y-m-d H:i:s');
             $currentTime = date('H:i:s');
+
             $this->db->beginTransaction();
 
             // Invoice
@@ -203,7 +204,7 @@ class Invoice extends BaseModel
                 ':local_id' => $localId,
                 ':invoice_key' => $localId . $invoice['document_code'] . $invoice['correlative'] . $invoice['serie'],
                 ':date_of_issue' => $invoice['date_of_issue'],
-                ':time_of_issue' => $currentTime,
+                ':time_of_issue' => $invoice['time_of_issue'],
                 ':date_of_due' => $invoice['date_of_due'],
                 ':serie' => $invoice['serie'],
                 ':correlative' => $invoice['correlative'] ?? 1,
@@ -383,10 +384,9 @@ class Invoice extends BaseModel
                                                         :driver_document_number, :driver_full_name, :location_starting_code, :address_starting_point,
                                                         :location_arrival_code, :address_arrival_point)";
                 $stmt = $this->db->prepare($sql);
-                $referralGuideEnabled = $invoice['referral_guide_enabled'] == 'on' ? 1 : 0;
                 if (!$stmt->execute([
                     ':invoice_id' => $invoiceId,
-                    ':whit_guide' => $referralGuideEnabled,
+                    ':whit_guide' => $invoice['referral_guide_enabled'],
                     ':document_code' => '09',
                     ':transfer_code' => $referralGuide['transfer_code'],
                     ':transport_code' => $referralGuide['transport_code'],
