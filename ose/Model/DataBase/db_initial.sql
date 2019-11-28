@@ -182,6 +182,7 @@ CREATE TABLE business_local(
     pdf_header varchar(255),
     description varchar(255),
     business_id INT NOT NULL,
+    api_token VARCHAR(255),
 
     CONSTRAINT pk_business_local PRIMARY KEY (business_local_id),
     CONSTRAINT fk_business_local_business FOREIGN KEY (business_id) REFERENCES business (business_id)

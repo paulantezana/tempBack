@@ -1,14 +1,17 @@
 <?php
 
 require_once MODEL_PATH . 'Manager/Business.php';
+require_once MODEL_PATH . 'Manager/BusinessLocal.php';
 require_once MODEL_PATH . 'Manager/user.php';
+
+require_once CONTROLLER_PATH . 'Helper/ApiSign.php';
 
 class BusinessController
 {
     private $connection;
     private $businessModel;
 
-    public function __construct($connection)
+    public function __construct(PDO $connection)
     {
         $this->connection = $connection;
         $this->businessModel = new Business($this->connection);;
@@ -52,8 +55,10 @@ class BusinessController
 
     public function Create(){
         $res = new Result();
+        $this->connection->beginTransaction();
         try {
             $business = $_POST;
+
             $validate = $this->validateInput($business);
             if (!$validate->success) {
                 $res->error = $validate->error;
@@ -61,8 +66,8 @@ class BusinessController
             }
 
             $userClassModel = new userClass($this->connection);
-            $userClassModel->userRegistration([
-                'id_rol' => 1,
+            $userId = $userClassModel->userRegistration([
+                'typeUser' => 1,
                 'names' => $business['userName'],
                 'email' => $business['email'],
                 'phone' => $business['phone'],
@@ -73,10 +78,62 @@ class BusinessController
                 'state' => 1,
             ]);
 
-            $res->result = $this->businessModel->Insert($business);
+            $businessId = $this->businessModel->Insert($business, $userId);
+
+            $businessLocalModel = new BusinessLocal($this->connection);
+            $businessLocalId = $businessLocalModel->Insert([
+                'short_name' => 'Local principal',
+                'sunat_code' => '',
+                'location_code' => '',
+                'pdf_invoice_size' => 'A4',
+                'pdf_header' => 'Email: ' . $business['email'],
+                'description' => '',
+                'business_id' => $businessId,
+                'department' => '',
+                'province' => '',
+                'district' => '',
+                'address' => '',
+                'item' => [
+                    [
+                        'serie' => 'F001',
+                        'document_code' => '01',
+                    ],
+                    [
+                        'serie' => 'B001',
+                        'document_code' => '03',
+                    ],
+                    [
+                        'serie' => 'FP01',
+                        'document_code' => '07',
+                    ],
+                    [
+                        'serie' => 'FP01',
+                        'document_code' => '08',
+                    ],
+                    [
+                        'serie' => 'T001',
+                        'document_code' => '09',
+                    ],
+                ]
+            ], $userId);
+
+            $payload = [
+                'localId' => $businessLocalId,
+                'userId' => $userId,
+                'businessId' => $businessId,
+            ];
+
+            $token = ApiSign::encode($payload);
+            $businessLocalModel->UpdateById($businessLocalId,[
+                'api_token' => $token
+            ]);
+
+            // data
+            $this->connection->commit();
             $res->success = true;
             $res->successMessage = 'El registro se inserto exitosamente';
         } catch (Exception $e) {
+            $this->connection->rollBack();
             $res->errorMessage = $e->getMessage();
         }
         echo json_encode($res);

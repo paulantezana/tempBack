@@ -3,6 +3,8 @@
 require_once MODEL_PATH . 'User/Invoice.php';
 require_once MODEL_PATH . 'User/InvoiceItem.php';
 require_once MODEL_PATH . 'User/Business.php';
+require_once MODEL_PATH . 'User/CatSystemIscTypeCode.php';
+require_once MODEL_PATH . 'User/CatPerceptionTypeCode.php';
 
 require_once CONTROLLER_PATH . 'Helper/DocumentManager.php';
 require_once CONTROLLER_PATH . 'Helper/BillingManager.php';
@@ -126,7 +128,7 @@ class InvoiceBuild
         }
 
         $documentManager = new DocumentManager();
-        $resPdf = $documentManager->Invoice($invoice,$sale['pdf_format'] !== '' ? $sale['pdf_format'] : 'A4',$_SESSION[ENVIRONMENT]);
+        $resPdf = $documentManager->Invoice($invoice,$sale['pdf_format'] !== '' ? $sale['pdf_format'] : 'A4',$business['environment']);
 
         if ($resPdf->success){
             $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
@@ -136,7 +138,7 @@ class InvoiceBuild
         return $resPdf;
     }
 
-    private function GenerateXML(array $documentData) {
+    private function GenerateXML(array $documentData, $userReferId) {
         $business = $documentData['business'];
         $sale =  $documentData['sale'];
         $detailSale =  $documentData['detailSale'];
@@ -384,8 +386,7 @@ class InvoiceBuild
         $res->digestValue = '';
 
 //        if ($sale['document_code'] === '01'){
-        $resInvoice = $billingManager->SendInvoice($sale['invoice_id'], $invoice, $_SESSION[SESS]);
-        var_dump($resInvoice);
+        $resInvoice = $billingManager->SendInvoice($sale['invoice_id'], $invoice,$userReferId);
         if ($resInvoice->success){
             $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
                 'xml_url' => $directoryXmlPath . $fileName,
@@ -429,7 +430,7 @@ class InvoiceBuild
             $res->success = false;
         }
 //        }elseif ($sale['document_code'] === '03'){
-//            $resInvoice = $billingManager->SaveTicketInvoice($sale['invoice_id'], $invoice, $_SESSION[SESS]);
+//            $resInvoice = $billingManager->SaveTicketInvoice($sale['invoice_id'], $invoice, $userReferId);
 //
 //            if ($resInvoice->success){
 //                $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
@@ -447,12 +448,12 @@ class InvoiceBuild
         return $res;
     }
 
-    public function BuildDocument($saleId){
+    public function BuildDocument($saleId, $userReferId){
         $res = new Result();
         $res->saleId = 0;
 
         try{
-            $business = $this->businessModel->GetByUserId($_SESSION[SESS]);
+            $business = $this->businessModel->GetByUserId($userReferId);
             $sale = $this->saleModel->summaryById($saleId);
             $detailSale = $this->detailSaleModel->ByInvoiceIdXML($saleId);
 
@@ -502,7 +503,7 @@ class InvoiceBuild
                 'detailSale' => $detailSale,
                 'business' => $business,
             ];
-            $resXml = $this->GenerateXML($documentData);
+            $resXml = $this->GenerateXML($documentData,$userReferId);
             $res->errorMessage = $resXml->errorMessage;
             $res->success = $resXml->success;
             if (!$resXml->success){

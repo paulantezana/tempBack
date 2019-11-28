@@ -76,28 +76,19 @@ class userClass
           $hash_password= hash('sha256', $User['password']);
           $stmt->bindParam(':password',$hash_password);
           $stmt->bindParam(':state',$User['state']);
-          if($stmt->execute()){
-
-          } else{
+          if(!$stmt->execute()){
             throw new Exception("Error en la consulta de insertar.");
           }
-          $answer=true;
-          $message=$data;
+            $userId = (int)$this->db->lastInsertId();
+            return $userId;
         }
         else
         {
-          throw new Exception("El Email ya existe.");
+            throw new Exception("El Email ya existe.");
         }
+      } catch (Exception $e) {
+          throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
       }
-      catch(PDOException $e) {
-        $message = $e->getMessage().' desde pdoexception';
-        $answer=false;
-      }
-      catch(Exception $e) {
-        $message = $e->getMessage().' desde exception';
-        $answer=false;
-      }
-      return array('result' => $answer,'mesagge' => $message);
     }
     public function GetDataUser($IdUser){
       try{

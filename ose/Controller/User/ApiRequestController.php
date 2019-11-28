@@ -2,6 +2,7 @@
 
 require_once MODEL_PATH . 'User/Invoice.php';
 require_once CONTROLLER_PATH . 'Helper/InvoiceBuild.php';
+require_once CONTROLLER_PATH . 'Helper/ApiSign.php';
 
 class ApiRequestController
 {
@@ -17,16 +18,22 @@ class ApiRequestController
     public function Exec(){
         $res = new Result();
         try{
-//            if (!isset($_GET['token'])){
-//                throw new Exception("No se encontró ningún token de autenticación.");
-//            }
-//            $token = $_GET['token'];
             $postData = file_get_contents("php://input");
             $invoice = json_decode($postData, true);
 
-//            $res -> result = $token;
+            if (!isset($_GET['token'])){
+                throw new Exception("No se encontró ningún token de autenticación.");
+            }
+            $token = $_GET['token'];
+            $authorization = ApiSign::decode($token);
+
             $invoice = $this->ValidateInput($invoice);
-            $this->Insert($invoice);
+            $response = $this->BuildDocument($invoice,$authorization);
+            if (!$response->success){
+                throw new Exception($res->errorMessage);
+            }
+            $res->result = $response->result;
+
         } catch (Exception $e){
             $res->errorMessage = $e->getMessage();
         }
@@ -160,7 +167,6 @@ class ApiRequestController
             $invoice['referral_guide']['address_arrival_point'] = $invoiceApi['factura_guia']['dureccion_punto_llegada'];
         }
 
-
         return $invoice;
 
         // Detraction
@@ -182,10 +188,42 @@ class ApiRequestController
 //        $invoice['detraction_quantity'] = $invoiceApi['detraccion'][''];
     }
 
-    private function Insert($invoice){
-        $invoiceBuild = new InvoiceBuild($this->connection);
-        $invoiceId = $this->invoiceModel->Insert($invoice,1,1);
-        $response = $invoiceBuild->BuildDocument($invoiceId);
-        var_dump($response);
+    private function BuildDocument($invoice,$authorization){
+        $res = new Result();
+        try{
+            if($invoice['document_code'] === '01'){
+                $invoiceBuild = new InvoiceBuild($this->connection);
+                $invoiceId = $this->invoiceModel->Insert($invoice,$authorization['userId'],$authorization['localId']);
+
+                $response = $invoiceBuild->BuildDocument($invoiceId, $authorization['userId']);
+                if (!$response->success){
+                    throw new Exception($res->errorMessage);
+                }
+
+                $protocol = stripos($_SERVER['REQUEST_SCHEME'], 'https') === 0 ? 'https://' : 'http://';
+                $hostName = $_SERVER['SERVER_NAME'];
+                $currentUrl = $protocol . $hostName . FOLDER_NAME;
+
+                $invoiceResponse = $this->invoiceModel->GetApiResponseById($invoiceId);
+                $invoiceResponse['enlace_del_pdf'] = $currentUrl . $invoiceResponse['enlace_del_pdf'];
+                $invoiceResponse['enlace_del_xml'] = $currentUrl . $invoiceResponse['enlace_del_xml'];
+                $invoiceResponse['enlace_del_cdr'] = $currentUrl . $invoiceResponse['enlace_del_cdr'];
+
+                $res->result = $invoiceResponse;
+                $res->success = true;
+                return $res;
+            } elseif($invoice['document_code'] === '03'){
+
+            } elseif($invoice['document_code'] === '07'){
+
+            } elseif($invoice['document_code'] === '08'){
+
+            } else {
+                throw new Exception("Tipo de documento no soportado");
+            }
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        return $res;
     }
 }

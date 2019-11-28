@@ -53,6 +53,8 @@ let  Business = {
         businessData.phone = $('#businessPhone').val();
         businessData.email = $('#businessEmail').val();
         businessData.detractionBankAccount = $('#businessDetractionBankAccount').val();
+        businessData.userName = $('#userName').val();
+        businessData.userPassword = $('#userPassword').val();
 
         if (this.currentModeForm === 'create'){
             url = '/Business/Create';
@@ -75,6 +77,7 @@ let  Business = {
                         title: '<h2>Ok</h2>',
                         timer: 1500
                     });
+                    $('#businessModal').modal('hide');
                     this.list();
                 } else {
                     Swal.fire({

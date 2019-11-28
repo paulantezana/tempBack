@@ -35,7 +35,7 @@ class Business extends BaseModel
         }
     }
 
-    public function Insert(array $business) {
+    public function Insert(array $business, $userReferId) {
         try{
             $sql = "INSERT INTO business (include_igv, continue_payment, total_calculation_item, send_email_company, ruc, social_reason, commercial_reason, email, phone, detraction_bank_account)
                         VALUES (:include_igv, :continue_payment, :total_calculation_item, :send_email_company, :ruc, :social_reason, :commercial_reason, :email, :phone, :detraction_bank_account)";
@@ -54,8 +54,17 @@ class Business extends BaseModel
             ])){
                 throw new Exception("Error al insertar el registro");
             }
-
             $businessId = (int)$this->db->lastInsertId();
+
+            $sql = "INSERT INTO business_user (business_id, user_id) VALUES (:business_id, :user_id)";
+            $stmt = $this->db->prepare($sql);
+            if(!$stmt->execute([
+                ':business_id' => $businessId,
+                ':user_id' => $userReferId,
+            ])){
+                throw new Exception("Error al insertar el registro");
+            }
+
             return $businessId;
         } catch (Exception $e) {
             throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());

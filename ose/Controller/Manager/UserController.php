@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once(MODEL_PATH.'Manager/user.php');
 class UserController
 {
@@ -24,16 +24,20 @@ class UserController
     require_once(VIEW_PATH."Manager/Partial/UserTable.php");
   }
   public function RegisterUser(){
-    ValidateFunctionRol($this->db,'usuario','agregar','/','500');
-    $User=$_POST['User'];
-    $ValidateInputs=$this->ValidateData($User);
-    if ($ValidateInputs['result']) {
-      //validar tipo de usuario
-      $AnswerRegistration=$this->user->UserRegistration($User);
-      echo json_encode($AnswerRegistration);
-    }else{
-      echo json_encode($ValidateInputs);
-    }
+      try{
+        ValidateFunctionRol($this->db,'usuario','agregar','/','500');
+        $User=$_POST['User'];
+        $ValidateInputs=$this->ValidateData($User);
+        if ($ValidateInputs['result']) {
+          //validar tipo de usuario
+          $AnswerRegistration = $this->user->UserRegistration($User);
+          echo json_encode(array('result' => true, 'mesagge' => $AnswerRegistration));
+        }else{
+          echo json_encode($ValidateInputs);
+        }
+      } catch (Exception $e){
+          echo json_encode(array('result' => false, 'mesagge' => $e->getMessage()));
+      }
   }
   public function UpdateUser(){
     ValidateFunctionRol($this->db,'usuario','editar','/','500');
@@ -93,10 +97,10 @@ class UserController
     }
   }
   public function CloseSession(){
-    unset($_SESSION[SESS]); 
+    unset($_SESSION[SESS]);
     unset($_SESSION[USER_TYPE]);
     session_destroy();
-    setcookie('MainMenu', "",  time() - 10, "/"); 
+    setcookie('MainMenu', "",  time() - 10, "/");
     header("Location: http://localhost/OSE-skynet/ose/ManagerLogin");
     exit;
   }

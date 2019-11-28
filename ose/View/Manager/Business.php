@@ -48,12 +48,12 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6">
-                                <label for="businessUser">Usuario</label>
-                                <input type="text" class="form-control" id="businessUser" name="businessUser">
+                                <label for="userName">Usuario</label>
+                                <input type="text" class="form-control" id="userName" name="userName">
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="businessPassword">Contraseña</label>
-                                <input type="password" class="form-control" id="businessPassword" name="businessPassword">
+                                <label for="userPassword">Contraseña</label>
+                                <input type="password" class="form-control" id="userPassword" name="userPassword">
                             </div>
                         </div>
                         <div class="form-group">
