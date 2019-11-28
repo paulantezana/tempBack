@@ -182,6 +182,7 @@ CREATE TABLE business_local(
     pdf_header varchar(255),
     description varchar(255),
     business_id INT NOT NULL,
+
     CONSTRAINT pk_business_local PRIMARY KEY (business_local_id),
     CONSTRAINT fk_business_local_business FOREIGN KEY (business_id) REFERENCES business (business_id)
         ON UPDATE RESTRICT ON DELETE RESTRICT
@@ -411,9 +412,9 @@ CREATE TABLE invoice_sunat(
     invoice_state_id SMALLINT,
     invoice_id INT NOT NULL,
     send BOOLEAN,
-    response_code BOOLEAN,
-    response_message VARCHAR(15),
-    other_message TEXT,
+    response_code VARCHAR(6),
+    response_message VARCHAR(255),
+    other_message VARCHAR(255),
     pdf_url varchar(255),
     xml_url VARCHAR(255),
     cdr_url varchar(255),
@@ -610,9 +611,6 @@ CREATE TABLE invoice_note (
     operation_code VARCHAR(8),              # CODIGO TIPO DE OPERACION
     customer_id INT NOT NULL,               # ID del cliente
 
-    sunat_state SMALLINT,
-    sunat_error_message VARCHAR(255),
-
     total_prepayment FLOAT,                 # total_anticipos
     total_free FLOAT,                       # total_operaciones_gratuitas
     total_exportation FLOAT,                # total_exportacion
@@ -708,9 +706,9 @@ CREATE TABLE invoice_note_sunat(
     invoice_state_id SMALLINT,
     invoice_note_id INT NOT NULL,
     send BOOLEAN,
-    response_code BOOLEAN,
-    response_message VARCHAR(15),
-    other_message TEXT,
+    response_code VARCHAR(6),
+    response_message VARCHAR(255),
+    other_message VARCHAR(255),
     pdf_url varchar(255),
     xml_url VARCHAR(255),
     cdr_url varchar(255),
@@ -720,24 +718,6 @@ CREATE TABLE invoice_note_sunat(
       ON UPDATE RESTRICT ON DELETE RESTRICT,
     CONSTRAINT fk_invoice_note_sunat_invoice_note FOREIGN KEY (invoice_note_id) REFERENCES invoice_note (invoice_note_id)
       ON UPDATE RESTRICT ON DELETE RESTRICT
-);
-
-CREATE TABLE invoice_note_customer(
-    invoice_note_customer_id INT AUTO_INCREMENT NOT NULL,
-    invoice_note_id INT NOT NULL,
-    document_number VARCHAR(16) NOT NULL,
-    identity_document_code VARCHAR(64) NOT NULL,
-    social_reason VARCHAR(255),
-    fiscal_address VARCHAR(255),
-    email VARCHAR(64),
-    telephone VARCHAR(255),
-    sent_to_client BOOLEAN,
-    CONSTRAINT pk_invoice_note_customer PRIMARY KEY (invoice_note_customer_id),
-    CONSTRAINT uk_invoice_note_customer_sunat UNIQUE KEY (invoice_note_id),
-    CONSTRAINT fk_invoice_note_customer_identity_document_type_code FOREIGN KEY (identity_document_code) REFERENCES cat_identity_document_type_code (code)
-    ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_invoice_note_customer_invoice FOREIGN KEY (invoice_note_id) REFERENCES invoice_note (invoice_note_id)
-    ON UPDATE RESTRICT ON DELETE RESTRICT
 );
 
 CREATE TABLE invoice_note_customer(

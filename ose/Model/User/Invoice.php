@@ -13,26 +13,26 @@ class Invoice extends BaseModel
         try{
             $filterNumber = 0;
             $sqlFilter = '';
-            if ($filter['documentCode']){
+            if (isset($filter['documentCode']) && $filter['documentCode']){
                 $sqlFilter .= " WHERE invoice.document_code = {$filter['documentCode']}";
                 $filterNumber++;
             }
-            if ($filter['customerID']){
+            if (isset($filter['customerID']) && $filter['customerID']){
                 $sqlFilter .= $filterNumber >= 1 ? ' AND ' : ' WHERE ';
                 $sqlFilter .= "invoice.customer_id = {$filter['customerID']}";
                 $filterNumber++;
             }
-            if ($filter['startDate']){
+            if (isset($filter['startDate']) && $filter['startDate']){
                 $sqlFilter .= $filterNumber >= 1 ? ' AND ' : ' WHERE ';
                 $sqlFilter .= "invoice.date_of_issue >= '{$filter['startDate']}'";
                 $filterNumber++;
             }
-            if ($filter['invoiceSearch']){
+            if (isset($filter['invoiceSearch']) && $filter['invoiceSearch']){
                 $sqlFilter .= $filterNumber >= 1 ? ' AND ' : ' WHERE ';
                 $sqlFilter .= "invoice.invoice_id = '{$filter['invoiceSearch']}'";
                 $filterNumber++;
             }
-            if ($filter['endDate']){
+            if (isset($filter['endDate']) && $filter['endDate']){
                 $sqlFilter .= $filterNumber >= 1 ? ' AND ' : ' WHERE ';
                 $sqlFilter .= "invoice.date_of_issue <= '{$filter['endDate']}'";
             }
@@ -47,23 +47,16 @@ class Invoice extends BaseModel
             $sql = "SELECT invoice.*, cat_document_type_code.description as document_type_code_description, cat_operation_type_code.description as operation_type_code_description,
                            ic.social_reason as customer_social_reason, ic.document_number as customer_document_number, ic.sent_to_client as customer_sent_to_client,
                            cat_currency_type_code.symbol as currency_symbol,
-                           isn.invoice_state_id,  isn.send, isn.response_code, isn.response_message, isn.other_message, isn.pdf_url, isn.xml_url, isn.cdr_url,
-                           sunat_comunicate.sunat_response_description, sunat_response_code, creation_date as sunat_creation_date
+                           isn.invoice_state_id,  isn.send, isn.response_code, isn.response_message, isn.other_message, isn.pdf_url, isn.xml_url, isn.cdr_url
                     FROM invoice
                         INNER JOIN invoice_customer ic on invoice.invoice_id = ic.invoice_id
                         INNER JOIN invoice_sunat isn on invoice.invoice_id = isn.invoice_id
                         INNER JOIN cat_document_type_code ON invoice.document_code = cat_document_type_code.code
                         INNER JOIN cat_currency_type_code ON invoice.currency_code = cat_currency_type_code.code
-                        INNER JOIN cat_operation_type_code ON invoice.operation_code = cat_operation_type_code.code
-                        LEFT JOIN (
-                            SELECT sunat_communication.reference_id, sunat_response.sunat_response_description, sunat_response.sunat_response_code, sunat_communication.creation_date FROM sunat_communication
-                            INNER JOIN sunat_response on sunat_communication.sunat_communication_id = sunat_response.sunat_communication_id
-                        ) as sunat_comunicate ON sunat_comunicate.reference_id = invoice.invoice_id
-                    ";
+                        INNER JOIN cat_operation_type_code ON invoice.operation_code = cat_operation_type_code.code ";
 
             $sql .= $sqlFilter;
             $sql .= " ORDER BY invoice.invoice_id DESC LIMIT $offset, $limit";
-
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
             $data = $stmt->fetchAll();

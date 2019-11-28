@@ -385,6 +385,7 @@ class InvoiceBuild
 
 //        if ($sale['document_code'] === '01'){
         $resInvoice = $billingManager->SendInvoice($sale['invoice_id'], $invoice, $_SESSION[SESS]);
+        var_dump($resInvoice);
         if ($resInvoice->success){
             $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
                 'xml_url' => $directoryXmlPath . $fileName,
@@ -393,17 +394,25 @@ class InvoiceBuild
             $res->digestValue = $resInvoice->digestValue;
             $res->success = true;
         }else{
-//                $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
-//                    'other_message' => $resInvoice->errorMessage,
-//                ]);
+            $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
+                'other_message' => $resInvoice->errorMessage,
+            ]);
             $res->errorMessage .= $resInvoice->errorMessage;
             $res->success = false;
             return $res;
         }
 
         if ($resInvoice->sunatComunicationSuccess){
+            $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
+                'response_message' => $resInvoice->sunatDescription,
+                'response_code' => $resInvoice->sunatResponseCode,
+                'other_message' => '',
+            ]);
             $res->success = true;
         } else {
+            $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
+                'response_message' => $resInvoice->sunatCommuniationError,
+            ]);
             $res->errorMessage .= $resInvoice->sunatCommuniationError;
             $res->success = false;
             return $res;
@@ -413,7 +422,6 @@ class InvoiceBuild
             $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
                 'cdr_url' => $directoryXmlPath . 'R-' . $fileName,
                 'invoice_state_id' => 3,
-                'response_message' => '',
             ]);
             $res->success = true;
         } else {

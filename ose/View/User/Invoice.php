@@ -69,10 +69,10 @@
                         </div>
 
                         <div class="form-group col-lg-12">
-                            <label for="filterSaleSearch">Buscar documento por serie / número</label>
-                            <select class="selectpicker with-ajax filterSaleSearch" id="filterSaleSearch" name="filter[saleSearch]" data-live-search="true" data-width="100%">
-                                <?php if($parameter['filter']['saleSearch']['invoice_id'] ?? false) :  ?>
-                                    <option value="<?= $parameter['filter']['saleSearch']['invoice_id'] ?? 0?>" selected><?= $parameter['filter']['saleSearch']['description'] ?? ''?></option>
+                            <label for="filterInvoiceSearch">Buscar documento por serie / número</label>
+                            <select class="selectpicker with-ajax filterInvoiceSearch" id="filterInvoiceSearch" name="filter[invoiceSearch]" data-live-search="true" data-width="100%">
+                                <?php if($parameter['filter']['invoiceSearch']['invoice_id'] ?? false) :  ?>
+                                    <option value="<?= $parameter['filter']['invoiceSearch']['invoice_id'] ?? 0?>" selected><?= $parameter['filter']['invoiceSearch']['description'] ?? ''?></option>
                                 <?php endif; ?>
                             </select>
                         </div>
@@ -121,13 +121,10 @@
                     </thead>
                     <tbody>
                         <?php
-                        $totalInvoice = 0;
-                        $totalTicket = 0;
-                        $totalDebitNote = 0;
-                        $totalCreditNote = 0;
+                            $totalInvoice = 0;
+                            $totalTicket = 0;
 
-
-                        foreach ($parameter['sale']['data'] ?? [] as $row):
+                        foreach ($parameter['invoice']['data'] ?? [] as $row):
                             $cDate = date_create($row['date_of_issue']);
                             $cDate = date_format($cDate, 'Y-m-d');
 
@@ -142,8 +139,7 @@
                                     break;
                             }
 
-                            $sunatResponseCode = ($row['sunat_response_code'] ?? '');
-                            $textColor = $sunatResponseCode === '0' ? 'success' : 'danger';
+                            $textColor = $row['response_code'] === '0' ? 'success' : 'danger';
                         ?>
                             <tr class="<?= ($row['invoice_state_id'] ?? 0) == 4 ? 'table-danger' : '' ?>">
                                 <td><?= $cDate ?></td>
@@ -184,7 +180,7 @@
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <?php if ($row['document_code'] === '01' && $sunatResponseCode == '0' && $row['cdr_url'] != '' ) : ?>
+                                    <?php if ($row['document_code'] === '01' && $row['response_code'] == '0' && $row['cdr_url'] != '' ) : ?>
                                         <a
                                             href="<?= $row['cdr_url'] ?? '' ?>"
                                             download="<?php $fileName = explode('/', $row['cdr_url'] ?? ''); echo  'CDR-'. $fileName[count($fileName) - 1]?>"
@@ -208,7 +204,7 @@
                                                     <div class="spinner-border spinner-border-sm text-warning" role="status">
                                                         <span class="sr-only">Loading...</span>
                                                     </div>
-                                                <?php elseif ($sunatResponseCode === '0' && $row['invoice_state_id'] == 3): ?>
+                                                <?php elseif ($row['response_code'] === '0' && $row['invoice_state_id'] == 3): ?>
                                                     <i class="fas fa-check text-success"></i>
                                                 <?php elseif ($row['invoice_state_id'] == 4): ?>
                                                     <i class="fas fa-times-circle text-danger"></i>
@@ -241,15 +237,15 @@
                                                             <tbody class="text-<?= $textColor ?>">
                                                                 <tr>
                                                                     <td>Enviado A Sunat:</td>
-                                                                    <td><?php echo $sunatResponseCode == '0' ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>' ?></td>
+                                                                    <td><?php echo $row['response_code'] == '0' ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>' ?></td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td>Aceptada por la SUNAT:</td>
-                                                                    <td><?php echo $sunatResponseCode == '0' ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>' ?></td>
+                                                                    <td><?php echo $row['response_code'] == '0' ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>' ?></td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td>Código:</td>
-                                                                    <td><?= $sunatResponseCode ?></td>
+                                                                    <td><?= $row['response_code'] ?></td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td>Descripción:</td>
@@ -291,16 +287,16 @@
                                             <i class="fas fa-bars"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="<?= FOLDER_NAME . '/Invoice/View?SaleId=' . $row['invoice_id'] ?>"> <i class="fas fa-eye"></i> Ver detalles</a>
+                                            <a class="dropdown-item" href="<?= FOLDER_NAME . '/Invoice/View?InvoiceId=' . $row['invoice_id'] ?>"> <i class="fas fa-eye"></i> Ver detalles</a>
                                             <?php if (($row['invoice_state_id'] == 1 || $row['invoice_state_id'] == 2) && $row['document_code'] === '01' ): ?>
-                                                <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/Invoice/ResendInvoice?SaleId=' . $row['invoice_id'] ?>"> <i class="fas fa-file-alt"></i> Consultar o recuperar constancia</a>
+                                                <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/Invoice/ResendInvoice?InvoiceId=' . $row['invoice_id'] ?>"> <i class="fas fa-file-alt"></i> Consultar o recuperar constancia</a>
                                             <?php endif; if (($row['invoice_state_id'] ?? 0) >= 1 && ($row['invoice_state_id'] ?? 0) < 4): ?>
-                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#saleSendEmailModal"> <i class="fas fa-envelope"></i>  Enviar a un email personalizado</a>
-                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote/NewCreditNote?SaleId=' . $row['invoice_id'] ?>"> <i class="fas fa-file-alt"></i> Generar NOTA DE CREDITO</a>
-                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote/NewDebitNote?SaleId=' . $row['invoice_id'] ?>"> <i class="fas fa-file-alt"></i> Generar NOTA DE DEBITO</a>
-                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/ReferralGuide/NewGuide?SaleId=' . $row['invoice_id']  ?>"> <i class="fas fa-file-alt"></i> Generar GUIA DE REMISIÓN</a>
+                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#invoiceSendEmailModal"> <i class="fas fa-envelope"></i>  Enviar a un email personalizado</a>
+                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote/NewCreditNote?InvoiceId=' . $row['invoice_id'] ?>"> <i class="fas fa-file-alt"></i> Generar NOTA DE CREDITO</a>
+                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote/NewDebitNote?InvoiceId=' . $row['invoice_id'] ?>"> <i class="fas fa-file-alt"></i> Generar NOTA DE DEBITO</a>
+                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/ReferralGuide/NewGuide?InvoiceId=' . $row['invoice_id']  ?>"> <i class="fas fa-file-alt"></i> Generar GUIA DE REMISIÓN</a>
                                             <?php endif; if (($row['invoice_state_id'] == 3 && $row['document_code'] == '01') || (($row['invoice_state_id'] == 2 || $row['invoice_state_id'] == 3) && $row['document_code'] == '03')): ?>
-                                                <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/InvoiceVoided/NewSaleVoided?SaleId=' . $row['invoice_id'] ?>"> <i class="fas fa-times-circle"></i> ANULAR o COMUNICAR DE BAJA</a>
+                                                <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/InvoiceVoided/NewInvoiceVoided?InvoiceId=' . $row['invoice_id'] ?>"> <i class="fas fa-times-circle"></i> ANULAR o COMUNICAR DE BAJA</a>
                                             <?php endIf;?>
                                             <a class="dropdown-item text-success" href="http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?E=20490086278&T=03&R=16766987&S=B003&N=47&F=15/08/2019&T=260.0" target="_blank"> <i class="fas fa-check"></i> Verificar en la SUNAT la validéz del CPE</a>
                                             <a class="dropdown-item text-success" href="http://www.sunat.gob.pe/ol-ti-itconsverixml/ConsVeriXml.htm" target="_blank"> <i class="fas fa-check"></i> Verificar XML en la SUNAT</a>
@@ -326,9 +322,9 @@
             </div>
 
             <?php
-                $currentPage = $parameter['sale']['current'] ?? 1;
-                $totalPage = $parameter['sale']['pages'] ?? 1;
-                $limitPage = $parameter['sale']['limit'] ?? 10;
+                $currentPage = $parameter['invoice']['current'] ?? 1;
+                $totalPage = $parameter['invoice']['pages'] ?? 1;
+                $limitPage = $parameter['invoice']['limit'] ?? 10;
                 $additionalQuery = '';
                 $linksQuantity = 3;
 
@@ -372,6 +368,6 @@
 
 
 <?php
-    require_once __DIR__ . '/Partials/SaleSendEmailModal.php';
+    require_once __DIR__ . '/Partials/InvoiceSendEmailModal.php';
     require_once __DIR__ . '/Partials/DocumentPrinterModal.php';
 ?>

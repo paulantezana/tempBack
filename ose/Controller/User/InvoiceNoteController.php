@@ -19,7 +19,6 @@ require_once MODEL_PATH . 'User/BusinessSerie.php';
 
 require_once CONTROLLER_PATH . 'Helper/DocumentManager.php';
 require_once CONTROLLER_PATH . 'Helper/InvoiceTemplate.php';
-require_once CONTROLLER_PATH . 'Helper/InvoiceCalculate.php';
 require_once CONTROLLER_PATH . 'Helper/InvoiceValidate.php';
 
 require_once CONTROLLER_PATH . 'Helper/BillingManager.php';
@@ -28,8 +27,8 @@ class InvoiceNoteController
 {
     private $connection;
     private $param;
-    private $saleNoteModel;
-    private $detailSaleNoteModel;
+    private $invoiceNoteModel;
+    private $detailInvoiceNoteModel;
     private $customerModel;
     private $businessModel;
     private $creditNoteTypeCodeModel;
@@ -40,8 +39,8 @@ class InvoiceNoteController
         $this->connection = $connection;
         $this->param = $param;
 
-        $this->saleNoteModel = new InvoiceNote($this->connection);
-        $this->detailSaleNoteModel = new InvoiceNoteItem($this->connection);
+        $this->invoiceNoteModel = new InvoiceNote($this->connection);
+        $this->detailInvoiceNoteModel = new InvoiceNoteItem($this->connection);
         $this->customerModel = new Customer($this->connection);
         $this->businessModel = new Business($this->connection);
 
@@ -60,9 +59,9 @@ class InvoiceNoteController
             $filterCustomer = $_GET['filter']['customer'] ?? 0;
             $filterStartDate = $_GET['filter']['startDate'] ?? '';
             $filterEndDate = $_GET['filter']['endDate'] ?? '';
-            $filterSaleNoteSearch = $_GET['filter']['saleNoteSearch'] ?? 0;
+            $filterInvoiceNoteSearch = $_GET['filter']['invoiceNoteSearch'] ?? 0;
 
-            $saleNoteModel = new InvoiceNote($this->connection);
+            $invoiceNoteModel = new InvoiceNote($this->connection);
             $documentTypeCodeModel = new CatDocumentTypeCode($this->connection);
             $customerModel = new Customer($this->connection);
 
@@ -75,11 +74,11 @@ class InvoiceNoteController
                 $customerDescription = $data['document_number'] . ' ' . $data['social_reason'];
             }
 
-            $saleDescription = '';
-            if ($filterSaleNoteSearch){
-                $data = $saleNoteModel->GetById($filterSaleNoteSearch);
+            $invoiceDescription = '';
+            if ($filterInvoiceNoteSearch){
+                $data = $invoiceNoteModel->GetById($filterInvoiceNoteSearch);
                 $index = array_search($data['document_code'], array_column($documentTypeCode, 'code'));
-                $saleDescription = "{$data['serie']}-{$data['correlative']} ( {$documentTypeCode[$index]['description']} ) {$data['date_of_issue']}";
+                $invoiceDescription = "{$data['serie']}-{$data['correlative']} ( {$documentTypeCode[$index]['description']} ) {$data['date_of_issue']}";
             }
 
             $parameter['filter'] = [
@@ -90,13 +89,13 @@ class InvoiceNoteController
                 ],
                 'startDate' => $filterStartDate,
                 'endDate' => $filterEndDate,
-                'saleSearch' => [
-                    'sale_id' => $filterSaleNoteSearch,
-                    'description' => $saleDescription,
+                'invoiceSearch' => [
+                    'invoice_id' => $filterInvoiceNoteSearch,
+                    'description' => $invoiceDescription,
                 ]
             ];
 
-            $parameter['saleNote'] = $saleNoteModel->paginate(
+            $parameter['invoiceNote'] = $invoiceNoteModel->paginate(
                 $page,
                 10,
                 [
@@ -104,7 +103,7 @@ class InvoiceNoteController
                     'customerID' => $filterCustomer,
                     'startDate' => $filterStartDate,
                     'endDate' => $filterEndDate,
-                    'saleSearch' => $filterSaleNoteSearch,
+                    'invoiceSearch' => $filterInvoiceNoteSearch,
                 ]
             );
             $parameter['documentTypeCode'] = $documentTypeCode;
@@ -118,8 +117,8 @@ class InvoiceNoteController
 
     private function GeneratePdf(array $documentData ) {
         $business = $documentData['business'];
-        $sale =  $documentData['sale'];
-        $detailSale =  $documentData['detailSale'];
+        $invoice =  $documentData['invoice'];
+        $detailInvoice =  $documentData['detailInvoice'];
         $customer =  $documentData['customer'];
 
         $business = array_merge($business,[
@@ -130,14 +129,14 @@ class InvoiceNoteController
         ]);
 
         $invoice['headerContact'] = 'Teléfono: 084601425 | Celular: 979706609 | www.skynetcusco.com | info@skynetcusco.com';
-        $invoice['documentType'] = $sale['document_type_code_description'];
-        $invoice['documentCode'] = $sale['document_code'];
-        $invoice['serie'] = $sale['serie'];
-        $invoice['correlative'] = $sale['correlative'];
-        $invoice['vehiclePlate'] = $sale['vehicle_plate'];
-        $invoice['term'] = $sale['term'];
-        $invoice['purchaseOrder'] = $sale['purchase_order'];
-        $invoice['observation'] = $sale['observation'];
+        $invoice['documentType'] = $invoice['document_type_code_description'];
+        $invoice['documentCode'] = $invoice['document_code'];
+        $invoice['serie'] = $invoice['serie'];
+        $invoice['correlative'] = $invoice['correlative'];
+        $invoice['vehiclePlate'] = $invoice['vehicle_plate'];
+        $invoice['term'] = $invoice['term'];
+        $invoice['purchaseOrder'] = $invoice['purchase_order'];
+        $invoice['observation'] = $invoice['observation'];
         $invoice['logo'] = $business['logo'];
 
         $invoice['businessRuc'] = $business['ruc'];
@@ -150,30 +149,30 @@ class InvoiceNoteController
         $invoice['customerDocumentCode'] = $customer['document_number'];
         $invoice['customerSocialReason'] = $customer['social_reason'];
         $invoice['customerFiscalAddress'] = $customer['fiscal_address'];
-        $invoice['digestValue'] = $sale['digestValue'];
-        $invoice['dateOfIssue'] = $sale['date_of_issue'];
-        $invoice['dateOfDue'] = $sale['date_of_due'];
-        $invoice['currencySymbol'] = $sale['currency_type_code_symbol'];
-        $invoice['currencyDescription'] = $sale['currency_type_code_description'];
-        $invoice['totalDiscount'] = $sale['total_discount'];
-        $invoice['totalPrepayment'] = $sale['total_prepayment'];
-        $invoice['totalExonerated'] = $sale['total_exonerated'];
-        $invoice['totalUnaffected'] = $sale['total_unaffected'];
-        $invoice['totalTaxed'] = $sale['total_taxed'];
-        $invoice['totalIsc'] = $sale['total_isc'];
-        $invoice['totalIgv'] = $sale['total_igv'];
-        $invoice['totalFree'] = $sale['total_free'];
-        $invoice['totalCharge'] = $sale['total_charge'];
-        $invoice['totalPlasticBagTax'] = $sale['total_plastic_bag_tax'];
-        $invoice['total'] = $sale['total'];
-        $invoice['totalInWord'] = NumberFunction::StringFormat((int)$sale['total']) . ' ' .$sale['currency_type_code_description'];
-        $invoice['percentageIgv'] = $sale['percentage_igv'];
+        $invoice['digestValue'] = $invoice['digestValue'];
+        $invoice['dateOfIssue'] = $invoice['date_of_issue'];
+        $invoice['dateOfDue'] = $invoice['date_of_due'];
+        $invoice['currencySymbol'] = $invoice['currency_type_code_symbol'];
+        $invoice['currencyDescription'] = $invoice['currency_type_code_description'];
+        $invoice['totalDiscount'] = $invoice['total_discount'];
+        $invoice['totalPrepayment'] = $invoice['total_prepayment'];
+        $invoice['totalExonerated'] = $invoice['total_exonerated'];
+        $invoice['totalUnaffected'] = $invoice['total_unaffected'];
+        $invoice['totalTaxed'] = $invoice['total_taxed'];
+        $invoice['totalIsc'] = $invoice['total_isc'];
+        $invoice['totalIgv'] = $invoice['total_igv'];
+        $invoice['totalFree'] = $invoice['total_free'];
+        $invoice['totalCharge'] = $invoice['total_charge'];
+        $invoice['totalPlasticBagTax'] = $invoice['total_plastic_bag_tax'];
+        $invoice['total'] = $invoice['total'];
+        $invoice['totalInWord'] = NumberFunction::StringFormat((int)$invoice['total']) . ' ' .$invoice['currency_type_code_description'];
+        $invoice['percentageIgv'] = $invoice['percentage_igv'];
 
-        $invoice['reasonUpdate'] = $sale['reason_update_code'] . ' - ' . $sale['reason_update_code_description'];
-        $invoice['reasonUpdateDocument'] = $sale['sale_document_code'] . '-' . $sale['sale_serie'] . '-' .$sale['sale_correlative'];
+        $invoice['reasonUpdate'] = $invoice['reason_update_code'] . ' - ' . $invoice['reason_update_code_description'];
+        $invoice['reasonUpdateDocument'] = $invoice['invoice_document_code'] . '-' . $invoice['invoice_serie'] . '-' .$invoice['invoice_correlative'];
 
         $invoice['itemList'] = [];
-        foreach ($detailSale as $row){
+        foreach ($detailInvoice as $row){
             $item['discount'] = $row['discount'];
             $item['quantity'] = $row['quantity'];
             $item['unitMeasureCode'] = $row['unit_measure'];
@@ -186,10 +185,10 @@ class InvoiceNoteController
         }
 
         $documentManager = new DocumentManager();
-        $resPdf = $documentManager->InvoiceNCND($invoice,$sale['pdf_format'] !== '' ? $sale['pdf_format'] : 'A4',$_SESSION[ENVIRONMENT]);
+        $resPdf = $documentManager->InvoiceNCND($invoice,$invoice['pdf_format'] !== '' ? $invoice['pdf_format'] : 'A4',$_SESSION[ENVIRONMENT]);
 
         if ($resPdf->success){
-            $this->saleNoteModel->UpdateById($sale['sale_note_id'],[
+            $this->invoiceNoteModel->UpdateById($invoice['invoice_note_id'],[
                 'pdf_url'=> '..' . $resPdf->pdfPath
             ]);
         }
@@ -199,11 +198,11 @@ class InvoiceNoteController
     private function GenerateXML(array $documentData)
     {
         $business = $documentData['business'];
-        $saleNote =  $documentData['sale'];
-        $detailSaleNote =  $documentData['detailSale'];
+        $invoiceNote =  $documentData['invoice'];
+        $detailInvoiceNote =  $documentData['detailInvoice'];
         $customer =  $documentData['customer'];
 
-        $detailSaleNote = array_map(function ($item) use ($saleNote, $business){
+        $detailInvoiceNote = array_map(function ($item) use ($invoiceNote, $business){
             $discountBase = $item['total_value'] + $item['discount'];
             $discountPercentage = 0;
             if ($item['discount'] > 0){
@@ -216,12 +215,12 @@ class InvoiceNoteController
             if ($ac == '20' || $ac == '30' || $ac == '31' || $ac == '32' || $ac == '33' || $ac == '34' || $ac == '35' || $ac == '36'){
                 $percentageIgv = 0;
             } else {
-                $percentageIgv = $saleNote['percentage_igv'];
+                $percentageIgv = $invoiceNote['percentage_igv'];
             }
 
             // Total base igv
             if ($ac == '11' || $ac == '12' || $ac == '13' || $ac == '14' || $ac == '15' || $ac == '16'){
-                $percentageIgvDecimal = $saleNote['percentage_igv'] / 100;
+                $percentageIgvDecimal = $invoiceNote['percentage_igv'] / 100;
                 $item['total_base_igv'] = $item['total_value'] / (1 + $percentageIgvDecimal);
                 $item['igv'] = $item['total_base_igv'] * $percentageIgvDecimal;
                 $item['total'] = $item['igv'] + $item['total_value'];
@@ -243,34 +242,34 @@ class InvoiceNoteController
                     'total_taxed' => $item['total_taxed'],
                 ]
             );
-        },$detailSaleNote);
-        $saleNote['guide'] = json_decode($saleNote['guide'],true);
+        },$detailInvoiceNote);
+        $invoiceNote['guide'] = json_decode($invoiceNote['guide'],true);
 
-        $saleNote['total_discount_base'] = 0;
-        $saleNote['total_discount_percentage'] = 0;
-        if($saleNote['total_discount'] > 0){
-            $saleNote['total_discount_base'] = $saleNote['total_value'] + $saleNote['total_discount'];
-            $saleNote['total_discount_percentage'] = ($saleNote['total_discount'] * 100 ) / $saleNote['total_discount_base'];
+        $invoiceNote['total_discount_base'] = 0;
+        $invoiceNote['total_discount_percentage'] = 0;
+        if($invoiceNote['total_discount'] > 0){
+            $invoiceNote['total_discount_base'] = $invoiceNote['total_value'] + $invoiceNote['total_discount'];
+            $invoiceNote['total_discount_percentage'] = ($invoiceNote['total_discount'] * 100 ) / $invoiceNote['total_discount_base'];
         }
 
         // NOTA DE CREDITO - DEBITO
         $invoice = array();
-        $invoice['serie'] = $saleNote['serie'];
-        $invoice['number'] = $saleNote['correlative'];
-        $invoice['issueDate'] = $saleNote['date_of_issue'];
-        $invoice['issueTime'] = $saleNote['time_of_issue'];
+        $invoice['serie'] = $invoiceNote['serie'];
+        $invoice['number'] = $invoiceNote['correlative'];
+        $invoice['issueDate'] = $invoiceNote['date_of_issue'];
+        $invoice['issueTime'] = $invoiceNote['time_of_issue'];
 
-        $invoice['invoiceTypeCode'] = $saleNote['document_code']; //---------------- TEMP
-        $invoice['operationTypeCode'] = $saleNote['operation_code'];	//---------------- TEMP
+        $invoice['invoiceTypeCode'] = $invoiceNote['document_code']; //---------------- TEMP
+        $invoice['operationTypeCode'] = $invoiceNote['operation_code'];	//---------------- TEMP
 
-        $invoice['amounInWord'] = NumberFunction::StringFormat((int)$saleNote['total'] ?? 0);
-        if ($saleNote['document_code'] === '07'){
-            $invoice['creditNoteTypeCode'] = $saleNote['reason_update_code'];
-            $invoice['creditNoteTypeDescription'] = $saleNote['reason_update_code_description'];
+        $invoice['amounInWord'] = NumberFunction::StringFormat((int)$invoiceNote['total'] ?? 0);
+        if ($invoiceNote['document_code'] === '07'){
+            $invoice['creditNoteTypeCode'] = $invoiceNote['reason_update_code'];
+            $invoice['creditNoteTypeDescription'] = $invoiceNote['reason_update_code_description'];
         }
-        if ($saleNote['document_code'] === '08'){
-            $invoice['debitNoteTypeCode'] = $saleNote['reason_update_code'];
-            $invoice['debitNoteTypeDescription'] = htmlspecialchars($saleNote['reason_update_code_description']);
+        if ($invoiceNote['document_code'] === '08'){
+            $invoice['debitNoteTypeCode'] = $invoiceNote['reason_update_code'];
+            $invoice['debitNoteTypeDescription'] = htmlspecialchars($invoiceNote['reason_update_code_description']);
         }
         $invoice['supplierRuc'] = $business['ruc'];
         $invoice['defaultUrl'] = 'WWW.SKYFACT.COM';
@@ -279,50 +278,50 @@ class InvoiceNoteController
         $invoice['customerDocumentType'] = $customer['identity_document_code'];					// TIPO DE DOCUMENTO CLIENTE
         $invoice['customerDocument'] = $customer['document_number'];			// DOCUMENTO DEL CLIENTE
         $invoice['customerName'] =  htmlspecialchars($customer['social_reason']);
-        $invoice['totalTaxAmount'] = RoundCurrency($saleNote['total_tax']);					// TOTAL DE IMPUESTOS
-        $invoice['totalBaseAmount'] = RoundCurrency($saleNote['total_value']);					// VALOR TOTAL DE LA VENTA
-        $invoice['totalSaleAmount'] = RoundCurrency($saleNote['total']);					// VALOR TOTAL DE LA VENTA + IMPUESTOS
+        $invoice['totalTaxAmount'] = RoundCurrency($invoiceNote['total_tax']);					// TOTAL DE IMPUESTOS
+        $invoice['totalBaseAmount'] = RoundCurrency($invoiceNote['total_value']);					// VALOR TOTAL DE LA VENTA
+        $invoice['totalInvoiceAmount'] = RoundCurrency($invoiceNote['total']);					// VALOR TOTAL DE LA VENTA + IMPUESTOS
 
-        $invoice['totalDiscountAmount'] = RoundCurrency($saleNote['total_discount']);				// VALOR TOTAL DE LOS DESCUENTOS
-        $invoice['globalDiscountPercent'] = RoundCurrency($saleNote['total_discount_percentage'] / 100,5);				// DESCUENTO EN PORCENTAJE
-        $invoice['globalDiscountAmount'] = RoundCurrency($saleNote['total_discount']);				// VALOR TOTAL DE LOS DESCUENTOS                            // ---------------- Cambiar la variable  -- total_discount_base
+        $invoice['totalDiscountAmount'] = RoundCurrency($invoiceNote['total_discount']);				// VALOR TOTAL DE LOS DESCUENTOS
+        $invoice['globalDiscountPercent'] = RoundCurrency($invoiceNote['total_discount_percentage'] / 100,5);				// DESCUENTO EN PORCENTAJE
+        $invoice['globalDiscountAmount'] = RoundCurrency($invoiceNote['total_discount']);				// VALOR TOTAL DE LOS DESCUENTOS                            // ---------------- Cambiar la variable  -- total_discount_base
 
-        $invoice['totalExtraChargeAmount'] = RoundCurrency($saleNote['total_charge']);			// VALOR TOTAL DE LOS CARGOS EXTRA
-        $invoice['totalPrepaidAmount'] = RoundCurrency($saleNote['total_prepayment']);				// VALOR TOTAL DE LOS MONTOS PAGADOS COMO ADELANTO
-        $invoice['totalPayableAmount'] = RoundCurrency($saleNote['total']);				// MONTO TOTAL QUE SE COBRA
+        $invoice['totalExtraChargeAmount'] = RoundCurrency($invoiceNote['total_charge']);			// VALOR TOTAL DE LOS CARGOS EXTRA
+        $invoice['totalPrepaidAmount'] = RoundCurrency($invoiceNote['total_prepayment']);				// VALOR TOTAL DE LOS MONTOS PAGADOS COMO ADELANTO
+        $invoice['totalPayableAmount'] = RoundCurrency($invoiceNote['total']);				// MONTO TOTAL QUE SE COBRA
 
-        $invoice['totalIgvAmount'] = RoundCurrency($saleNote['total_igv']);					// VALOR TOTAL DEL IGV
-        $invoice['totalIgvTaxableAmount'] = RoundCurrency($saleNote['total_taxed']);			// VALOR TOTAL DE LA VENTA GRABADA
-        $invoice['totalIscAmount'] = RoundCurrency($saleNote['total_isc']);				// VALOR TOTAL DEL ISC
+        $invoice['totalIgvAmount'] = RoundCurrency($invoiceNote['total_igv']);					// VALOR TOTAL DEL IGV
+        $invoice['totalIgvTaxableAmount'] = RoundCurrency($invoiceNote['total_taxed']);			// VALOR TOTAL DE LA VENTA GRABADA
+        $invoice['totalIscAmount'] = RoundCurrency($invoiceNote['total_isc']);				// VALOR TOTAL DEL ISC
         $invoice['totalIscTaxableAmount'] = 0.00;				// VALOR TOTAL AL CUAL SE APLICA EL ISC.
-        $invoice['totalFreeAmount'] = RoundCurrency($saleNote['total_free']);				// VALOR TOTAL INAFECTO A INPUESTOS
-        $invoice['totalExoneratedAmount'] = RoundCurrency($saleNote['total_exonerated']);				// VALOR TOTAL INAFECTO A INPUESTOS
-        $invoice['totalInafectedAmount'] = RoundCurrency($saleNote['total_unaffected']);				// VALOR TOTAL INAFECTO A INPUESTOS
-        $invoice['totalOtherTaxAmount'] = RoundCurrency($saleNote['total_other_taxed']);				// VALOR TOTAL DE otros impuestos
-        $invoice['totalOtherTaxableAmount'] = RoundCurrency($saleNote['total_base_other_taxed']);				// VALOR TOTAL AL CUAL SE APLICA otros impuestos.
+        $invoice['totalFreeAmount'] = RoundCurrency($invoiceNote['total_free']);				// VALOR TOTAL INAFECTO A INPUESTOS
+        $invoice['totalExoneratedAmount'] = RoundCurrency($invoiceNote['total_exonerated']);				// VALOR TOTAL INAFECTO A INPUESTOS
+        $invoice['totalInafectedAmount'] = RoundCurrency($invoiceNote['total_unaffected']);				// VALOR TOTAL INAFECTO A INPUESTOS
+        $invoice['totalOtherTaxAmount'] = RoundCurrency($invoiceNote['total_other_taxed']);				// VALOR TOTAL DE otros impuestos
+        $invoice['totalOtherTaxableAmount'] = RoundCurrency($invoiceNote['total_base_other_taxed']);				// VALOR TOTAL AL CUAL SE APLICA otros impuestos.
 
-        $invoice['totalBagTaxAmount'] = RoundCurrency($saleNote['total_plastic_bag_tax']);				// VALOR TOTAL del impuesto a las bolsas
-        $invoice['bagTaxAmountPerUnit'] = RoundCurrency($saleNote['percentage_plastic_bag_tax']);				// VALOR TOTAL del impuesto a las bolsas
+        $invoice['totalBagTaxAmount'] = RoundCurrency($invoiceNote['total_plastic_bag_tax']);				// VALOR TOTAL del impuesto a las bolsas
+        $invoice['bagTaxAmountPerUnit'] = RoundCurrency($invoiceNote['percentage_plastic_bag_tax']);				// VALOR TOTAL del impuesto a las bolsas
         $invoice['bagTaxAmount'] = 0.00;				// Monto del impuesto a las bolsas
 
         $invoice['invoiceReferenceList'] = array();				//Array con la lista de facturas que afecta la nota de credito
 
         $referencedInvoice = array();
-        $referencedInvoice['billingReferenceSerie'] = $saleNote['sale_serie'];				// Serie de la factura afectada
-        $referencedInvoice['billingReferenceNumber'] = $saleNote['sale_correlative'];					// Numero de la factura afectada
-        $referencedInvoice['billingReferenceTypeCode'] = $saleNote['sale_document_code'];				// Codigo del tipo de comprobante afectado | 01 para facturas
+        $referencedInvoice['billingReferenceSerie'] = $invoiceNote['invoice_serie'];				// Serie de la factura afectada
+        $referencedInvoice['billingReferenceNumber'] = $invoiceNote['invoice_correlative'];					// Numero de la factura afectada
+        $referencedInvoice['billingReferenceTypeCode'] = $invoiceNote['invoice_document_code'];				// Codigo del tipo de comprobante afectado | 01 para facturas
 
         array_push($invoice['invoiceReferenceList'], $referencedInvoice);
 
-        $invoice['codigoMoneda'] = $saleNote['currency_code'];							// CODIGO DE LA MONEDA
+        $invoice['codigoMoneda'] = $invoiceNote['currency_code'];							// CODIGO DE LA MONEDA
 
         $invoice['amazoniaGoods'] = 1;							// BIENES EN LA AMAZONIA
         $invoice['amazoniaService'] = 1;						// SERVICIOS EN LA AMAZONIA
-        $invoice['orderReference'] = $saleNote['purchase_order'];							// Referencia de la orden de compra o servicio
+        $invoice['orderReference'] = $invoiceNote['purchase_order'];							// Referencia de la orden de compra o servicio
 
         //REFERENCIA A GUIAS DE REMISION
         $invoice['referenceDocumentList'] = array();
-        foreach ($saleNote['guide'] as $row){
+        foreach ($invoiceNote['guide'] as $row){
             $referencedDocument = array();
             $referencedDocument['referencedDocument'] = $row['serie'];							// SERIE Y NUMERO DEL DOCUMENTO
             $referencedDocument['referencedDocumentTypeCode'] = $row['document_code'];						// TIPO DOCUMENTO CAT 01
@@ -330,7 +329,7 @@ class InvoiceNoteController
         }
 
         $invoice['itemList'] = array();
-        foreach ($detailSaleNote as $row){
+        foreach ($detailInvoiceNote as $row){
             $item = array();
             $item['itemUnitCode'] = $row['unit_measure'];			            // CODIGO UNIDAD
             $item['itemCuantity'] = $row['quantity'];							            // CANTIDAD
@@ -368,7 +367,7 @@ class InvoiceNoteController
 
         $billingManager = new BillingManager($this->connection);
         $directoryXmlPath = '..' . XML_FOLDER_PATH . date('Ym') . '/' . $business['ruc'] . '/';
-        $fileName = $business['ruc'] . '-' . $saleNote['document_code'] . '-' . $saleNote['serie'] . '-' . $saleNote['correlative'] . '.xml';
+        $fileName = $business['ruc'] . '-' . $invoiceNote['document_code'] . '-' . $invoiceNote['serie'] . '-' . $invoiceNote['correlative'] . '.xml';
 
 
 
@@ -376,16 +375,16 @@ class InvoiceNoteController
         $res->digestValue = '';
 
         $resInvoice = null;
-        if ($saleNote['document_code'] === '07'){
-            $resInvoice = $billingManager->SendCreditNote($saleNote['sale_note_id'], $invoice, $_SESSION[SESS]);
+        if ($invoiceNote['document_code'] === '07'){
+            $resInvoice = $billingManager->SendCreditNote($invoiceNote['invoice_note_id'], $invoice, $_SESSION[SESS]);
         }
 
-        if ($saleNote['document_code'] === '08'){
-            $resInvoice = $billingManager->SendDebitNote($saleNote['sale_note_id'], $invoice, $_SESSION[SESS]);
+        if ($invoiceNote['document_code'] === '08'){
+            $resInvoice = $billingManager->SendDebitNote($invoiceNote['invoice_note_id'], $invoice, $_SESSION[SESS]);
         }
 
         if ($resInvoice->success){
-            $this->saleNoteModel->UpdateById($saleNote['sale_note_id'],[
+            $this->invoiceNoteModel->UpdateById($invoiceNote['invoice_note_id'],[
                 'xml_url' => $directoryXmlPath . $fileName,
                 'sunat_state' => 2,
             ]);
@@ -406,7 +405,7 @@ class InvoiceNoteController
         }
 
         if ($resInvoice->readerSuccess){
-            $this->saleNoteModel->UpdateById($saleNote['sale_note_id'],[
+            $this->invoiceNoteModel->UpdateById($invoiceNote['invoice_note_id'],[
                 'cdr_url' => $directoryXmlPath . 'R-' . $fileName,
                 'sunat_state' => 3,
                 'sunat_error_message' => '',
@@ -420,36 +419,36 @@ class InvoiceNoteController
         return $res;
     }
 
-    private function BuildDocument($saleNoteId){
+    private function BuildDocument($invoiceNoteId){
         $res = new Result();
         $res->error = [];
-        $res->saleId = 0;
+        $res->invoiceId = 0;
 
         try{
             $business = $this->businessModel->GetByUserId($_SESSION[SESS]);
-            $saleNote = $this->saleNoteModel->summaryById($saleNoteId);
-            $detailSale = $this->detailSaleNoteModel->BySaleNoteIdXML($saleNoteId);
-            $customer = $this->customerModel->GetById($saleNote['customer_id']);
+            $invoiceNote = $this->invoiceNoteModel->summaryById($invoiceNoteId);
+            $detailInvoice = $this->detailInvoiceNoteModel->ByInvoiceNoteIdXML($invoiceNoteId);
+            $customer = $this->customerModel->GetById($invoiceNote['customer_id']);
 
-            if ($saleNote['sunat_state'] == '3'){
+            if ($invoiceNote['sunat_state'] == '3'){
                 throw new Exception('Este documento ya fue informado ante la sunat');
-            } elseif (($saleNote['sunat_state'] == '4' && $saleNote['document_code'] == '01')){
+            } elseif (($invoiceNote['sunat_state'] == '4' && $invoiceNote['document_code'] == '01')){
                 throw new Exception('Este documento esta anulado');
             }
 
-            if ($saleNote['document_code'] === '07'){
-                $creditNote = $this->creditNoteTypeCodeModel->GetBy('code',$saleNote['reason_update_code']);
-                $saleNote['reason_update_code_description'] = $creditNote['description'];
+            if ($invoiceNote['document_code'] === '07'){
+                $creditNote = $this->creditNoteTypeCodeModel->GetBy('code',$invoiceNote['reason_update_code']);
+                $invoiceNote['reason_update_code_description'] = $creditNote['description'];
             }
-            if ($saleNote['document_code'] === '08'){
-                $debitNote = $this->debitNoteTypeCodeModel->GetBy('code',$saleNote['reason_update_code']);
-                $saleNote['reason_update_code_description'] = $debitNote['description'];
+            if ($invoiceNote['document_code'] === '08'){
+                $debitNote = $this->debitNoteTypeCodeModel->GetBy('code',$invoiceNote['reason_update_code']);
+                $invoiceNote['reason_update_code_description'] = $debitNote['description'];
             }
 
             // XML
             $documentData = [
-                'sale' => $saleNote,
-                'detailSale' => $detailSale,
+                'invoice' => $invoiceNote,
+                'detailInvoice' => $detailInvoice,
                 'customer' => $customer,
                 'business' => $business,
             ];
@@ -458,15 +457,15 @@ class InvoiceNoteController
             $res->errorMessage = $resXml->errorMessage;
             $res->success = $resXml->success;
             if (!$resXml->success){
-                $this->saleNoteModel->UpdateById($saleNoteId,[
+                $this->invoiceNoteModel->UpdateById($invoiceNoteId,[
                     'sunat_error_message' =>  $resXml->errorMessage,
                 ]);
             }
 
             // PDF
-            $documentData['sale']['digestValue'] = '';
+            $documentData['invoice']['digestValue'] = '';
             if ($resXml->success){
-                $documentData['sale']['digestValue'] = $resXml->digestValue;
+                $documentData['invoice']['digestValue'] = $resXml->digestValue;
             }
             $resPdf = $this->GeneratePdf($documentData);
             if (!$resPdf->success){
@@ -484,16 +483,16 @@ class InvoiceNoteController
 
     public function ResendInvoice(){
         try{
-            $saleNoteId = $_GET['SaleNoteId'] ?? 0;
-            if(!$saleNoteId){
+            $invoiceNoteId = $_GET['InvoiceNoteId'] ?? 0;
+            if(!$invoiceNoteId){
                 header('Location: ' . FOLDER_NAME . '/InvoiceNote');
             }
 
-            $resRunDoc = $this->BuildDocument($saleNoteId);
+            $resRunDoc = $this->BuildDocument($invoiceNoteId);
             if ($resRunDoc->success){
-                header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleNoteId=' . $saleNoteId . '&message=' . 'El documento se guardó y se envió a la SUNAT exitosamente' . '&messageType=success');
+                header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?InvoiceNoteId=' . $invoiceNoteId . '&message=' . 'El documento se guardó y se envió a la SUNAT exitosamente' . '&messageType=success');
             }else{
-                header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleNoteId=' . $saleNoteId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
+                header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?InvoiceNoteId=' . $invoiceNoteId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
             }
         } catch (Exception $e) {
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
@@ -503,7 +502,7 @@ class InvoiceNoteController
     public function JsonSearch(){
         $search = $_POST['q'] ?? '';
 
-        $data = $this->saleNoteModel->searchBySerieCorrelative($search);
+        $data = $this->invoiceNoteModel->searchBySerieCorrelative($search);
 
         echo json_encode([
             'success' => true,
@@ -516,27 +515,27 @@ class InvoiceNoteController
         $error = [];
         $invoice = $_POST['invoice'] ?? [];
 
-        $saleModel = new Invoice($this->connection);
+        $invoiceModel = new Invoice($this->connection);
         $customerModel = new Customer($this->connection);
 
-        // cuando se envia un parametro SaleId desde la url
-        $saleId = $_GET['SaleId'] ?? 0;
-        if ($saleId && is_numeric($saleId) ){
-            $sale = $saleModel -> GetById($saleId);
-            if ($sale){
-                $saleId = $sale['sale_id'];
-                $serie = $sale['serie'];
-                $correlative = $sale['correlative'];
-                $documentCode = $sale['document_code'];
+        // cuando se envia un parametro InvoiceId desde la url
+        $invoiceId = $_GET['InvoiceId'] ?? 0;
+        if ($invoiceId && is_numeric($invoiceId) ){
+            $invoice = $invoiceModel -> GetById($invoiceId);
+            if ($invoice){
+                $invoiceId = $invoice['invoice_id'];
+                $serie = $invoice['serie'];
+                $correlative = $invoice['correlative'];
+                $documentCode = $invoice['document_code'];
 
-                unset($sale['sale_id']);
-                unset($sale['serie']);
-                unset($sale['correlative']);
-                unset($sale['document_code']);
+                unset($invoice['invoice_id']);
+                unset($invoice['serie']);
+                unset($invoice['correlative']);
+                unset($invoice['document_code']);
 
-                $invoice = $sale;
-                $invoice['sale_update'] = [
-                    'sale_id' => $saleId,
+                $invoice = $invoice;
+                $invoice['invoice_update'] = [
+                    'invoice_id' => $invoiceId,
                     'serie' => $serie,
                     'correlative' => $correlative,
                     'document_code' => $documentCode,
@@ -544,8 +543,8 @@ class InvoiceNoteController
 
                 $invoice['guide'] = json_decode($invoice['guide'],true);
 
-                $detailSaleModel = new InvoiceItem($this->connection);
-                $invoice['item'] = $detailSaleModel->BySaleIdSummary($saleId);
+                $detailInvoiceModel = new InvoiceItem($this->connection);
+                $invoice['item'] = $detailInvoiceModel->ByInvoiceIdSummary($invoiceId);
 
                 $customer = $customerModel->GetById($invoice['customer_id']);
                 $invoice['customer'] = [
@@ -562,18 +561,18 @@ class InvoiceNoteController
                     throw new Exception('No hay ningun campo');
                 }
 
-                $saleModel = new Invoice($this->connection);
-                $saleId  = $saleModel -> ExistDocument(
-                    $invoice['sale_update']['correlative'],
-                    $invoice['sale_update']['serie'],
-                    $invoice['sale_update']['document_code']
+                $invoiceModel = new Invoice($this->connection);
+                $invoiceId  = $invoiceModel -> ExistDocument(
+                    $invoice['invoice_update']['correlative'],
+                    $invoice['invoice_update']['serie'],
+                    $invoice['invoice_update']['document_code']
                 );
-                if (!$saleId){
+                if (!$invoiceId){
                     throw new Exception('El documento que hace referecnia no existe');
                 }
 
-                $invoice['reason_update_code'] = $invoice['sale_update']['credit_note_code'];
-                $invoice['sale_id'] = $saleId;
+                $invoice['reason_update_code'] = $invoice['invoice_update']['credit_note_code'];
+                $invoice['invoice_id'] = $invoiceId;
 
                 $invoice['percentage_igv'] = 18.00;
                 $invoice['total_value'] = $invoice['total_unaffected'] + $invoice['total_taxed'] + $invoice['total_exonerated'];
@@ -584,20 +583,20 @@ class InvoiceNoteController
 //                    throw new Exception($validateInput->errorMessage);
 //                }
 
-                $saleNoteId = $this->saleNoteModel->Insert($invoice);
+                $invoiceNoteId = $this->invoiceNoteModel->Insert($invoice);
 
-                $resRunDoc = $this->BuildDocument($saleNoteId);
+                $resRunDoc = $this->BuildDocument($invoiceNoteId);
                 $error = $resRunDoc->error;
                 if (!$resRunDoc->success){
                     throw new Exception($resRunDoc->errorMessage);
                 }
 
                 // ALL SUCCESS
-                if ($saleNoteId >= 1 && $resRunDoc->errorMessage === ''){
-                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleNoteId=' . $saleNoteId . '&message=' . urlencode('El documento se guardó exitosamente') . '&messageType=success');
+                if ($invoiceNoteId >= 1 && $resRunDoc->errorMessage === ''){
+                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?InvoiceNoteId=' . $invoiceNoteId . '&message=' . urlencode('El documento se guardó exitosamente') . '&messageType=success');
                     return;
                 } else{
-                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleId=' . $saleNoteId . '&message=' . urlencode($resRunDoc->errorMessag) . '&messageType=error');
+                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?InvoiceId=' . $invoiceNoteId . '&message=' . urlencode($resRunDoc->errorMessag) . '&messageType=error');
                     return;
                 }
             }catch (Exception $exception){
@@ -646,7 +645,7 @@ class InvoiceNoteController
         $parameter['itemTemplate'] = InvoiceTemplate::Item($parameter['business'],$parameter['affectationIgvTypeCode']);
         $parameter['referralGuideTemplate'] = $this->GetReferralGuideTemplate();
 
-        $content = requireToVar(VIEW_PATH . "User/SaleCreditNote.php", $parameter);
+        $content = requireToVar(VIEW_PATH . "User/InvoiceCreditNote.php", $parameter);
         require_once(VIEW_PATH. "User/Layout/main.php");
     }
 
@@ -655,27 +654,27 @@ class InvoiceNoteController
         $error = [];
         $invoice = $_POST['invoice'] ?? [];
 
-        $saleModel = new Invoice($this->connection);
+        $invoiceModel = new Invoice($this->connection);
         $customerModel = new Customer($this->connection);
 
-        // cuando se envia un parametro SaleId desde la url
-        $saleId = $_GET['SaleId'] ?? 0;
-        if ($saleId && is_numeric($saleId) ){
-            $sale = $saleModel -> GetById($saleId);
-            if ($sale){
-                $saleId = $sale['sale_id'];
-                $serie = $sale['serie'];
-                $correlative = $sale['correlative'];
-                $voucherCode = $sale['document_code'];
+        // cuando se envia un parametro InvoiceId desde la url
+        $invoiceId = $_GET['InvoiceId'] ?? 0;
+        if ($invoiceId && is_numeric($invoiceId) ){
+            $invoice = $invoiceModel -> GetById($invoiceId);
+            if ($invoice){
+                $invoiceId = $invoice['invoice_id'];
+                $serie = $invoice['serie'];
+                $correlative = $invoice['correlative'];
+                $voucherCode = $invoice['document_code'];
 
-                unset($sale['sale_id']);
-                unset($sale['serie']);
-                unset($sale['correlative']);
-                unset($sale['document_code']);
+                unset($invoice['invoice_id']);
+                unset($invoice['serie']);
+                unset($invoice['correlative']);
+                unset($invoice['document_code']);
 
-                $invoice = $sale;
-                $invoice['sale_update'] = [
-                    'sale_id' => $saleId,
+                $invoice = $invoice;
+                $invoice['invoice_update'] = [
+                    'invoice_id' => $invoiceId,
                     'serie' => $serie,
                     'correlative' => $correlative,
                     'document_code' => $voucherCode,
@@ -683,8 +682,8 @@ class InvoiceNoteController
 
                 $invoice['guide'] = json_decode($invoice['guide'],true);
 
-                $detailSaleModel = new InvoiceItem($this->connection);
-                $invoice['item'] = $detailSaleModel->BySaleIdSummary($saleId);
+                $detailInvoiceModel = new InvoiceItem($this->connection);
+                $invoice['item'] = $detailInvoiceModel->ByInvoiceIdSummary($invoiceId);
 
                 $customer = $customerModel->GetById($invoice['customer_id']);
                 $invoice['customer'] = [
@@ -701,18 +700,18 @@ class InvoiceNoteController
                     throw new Exception('No hay ningun campo');
                 }
 
-                $saleModel = new Invoice($this->connection);
-                $saleId  = $saleModel -> ExistDocument(
-                    $invoice['sale_update']['correlative'],
-                    $invoice['sale_update']['serie'],
-                    $invoice['sale_update']['document_code']
+                $invoiceModel = new Invoice($this->connection);
+                $invoiceId  = $invoiceModel -> ExistDocument(
+                    $invoice['invoice_update']['correlative'],
+                    $invoice['invoice_update']['serie'],
+                    $invoice['invoice_update']['document_code']
                 );
-                if (!$saleId){
+                if (!$invoiceId){
                     throw new Exception('El documento que hace referecnia no existe');
                 }
 
-                $invoice['reason_update_code'] = $invoice['sale_update']['credit_note_code'];
-                $invoice['sale_id'] = $saleId;
+                $invoice['reason_update_code'] = $invoice['invoice_update']['credit_note_code'];
+                $invoice['invoice_id'] = $invoiceId;
 
                 $invoice['percentage_igv'] = 18.00;
                 $invoice['total_value'] = $invoice['total_unaffected'] + $invoice['total_taxed'] + $invoice['total_exonerated'];
@@ -723,9 +722,9 @@ class InvoiceNoteController
 //                    throw new Exception($validateInput->errorMessage);
 //                }
 
-                $saleNoteId = $this->saleNoteModel->Insert($invoice);
+                $invoiceNoteId = $this->invoiceNoteModel->Insert($invoice);
 
-                $resRunDoc = $this->BuildDocument($saleNoteId);
+                $resRunDoc = $this->BuildDocument($invoiceNoteId);
                 $error = $resRunDoc->error;
 
                 if (!$resRunDoc->success){
@@ -733,11 +732,11 @@ class InvoiceNoteController
                 }
 
                 // ALL SUCCESS
-                if ($saleNoteId >= 1 && $resRunDoc->errorMessage === ''){
-                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleNoteId=' . $saleNoteId . '&message=' . urlencode('El documento se guardó exitosamente') . '&messageType=success');
+                if ($invoiceNoteId >= 1 && $resRunDoc->errorMessage === ''){
+                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?InvoiceNoteId=' . $invoiceNoteId . '&message=' . urlencode('El documento se guardó exitosamente') . '&messageType=success');
                     return;
                 } else{
-                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?SaleId=' . $saleNoteId . '&message=' . urlencode($resRunDoc->errorMessag) . '&messageType=error');
+                    header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?InvoiceId=' . $invoiceNoteId . '&message=' . urlencode($resRunDoc->errorMessag) . '&messageType=error');
                     return;
                 }
             }catch (Exception $exception){
@@ -786,27 +785,27 @@ class InvoiceNoteController
         $parameter['itemTemplate'] = InvoiceTemplate::Item($parameter['business'],$parameter['affectationIgvTypeCode']);
         $parameter['referralGuideTemplate'] = $this->GetReferralGuideTemplate();
 
-        $content = requireToVar(VIEW_PATH . "User/SaleDebitNote.php", $parameter);
+        $content = requireToVar(VIEW_PATH . "User/InvoiceDebitNote.php", $parameter);
         require_once(VIEW_PATH. "User/Layout/main.php");
     }
 
     public function View(){
-        $saleNoteId = $_GET['SaleNoteId'] ?? 0;
-        if(!$saleNoteId){
+        $invoiceNoteId = $_GET['InvoiceNoteId'] ?? 0;
+        if(!$invoiceNoteId){
             return;
         }
         $message = $_GET['message'] ?? '';
         $messageType = $_GET['messageType'] ?? '';
         $messageType = ($messageType == 'success') ? 'success' : ($messageType == 'error' ? 'danger' : '');
 
-        $invoice = $this->saleNoteModel->SummaryById($saleNoteId);
-        $parameter['detailSaleNote'] = $this->detailSaleNoteModel->BySaleNoteIdSummary($saleNoteId);
+        $invoice = $this->invoiceNoteModel->SummaryById($invoiceNoteId);
+        $parameter['detailInvoiceNote'] = $this->detailInvoiceNoteModel->ByInvoiceNoteIdSummary($invoiceNoteId);
         $parameter['customer'] = $this->customerModel->GetById($invoice['customer_id']);
         $parameter['invoice'] = $invoice;
         $parameter['message'] = $message;
         $parameter['messageType'] = $messageType;
 
-        $content = requireToVar(VIEW_PATH . "User/SaleNoteView.php", $parameter);
+        $content = requireToVar(VIEW_PATH . "User/InvoiceNoteView.php", $parameter);
         require_once(VIEW_PATH. "User/Layout/main.php");
     }
 

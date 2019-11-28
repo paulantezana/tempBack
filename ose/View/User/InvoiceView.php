@@ -90,7 +90,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($parameter['detailSale'] ?? [] as $key => $row): ?>
+                        <?php foreach ($parameter['invoiceItem'] ?? [] as $key => $row): ?>
                             <tr id="invoiceItem<?= $key ?>" data-uniqueId="<?= $key ?>">
                                 <td><?= $row['unit_measure'] ?></td>
                                 <td><?= $row['description'] ?></td>
