@@ -16,8 +16,13 @@ class ApiRequestController
     }
 
     public function Exec(){
+        header('Content-Type: application/json; charset=utf-8');
+        header('Access-Control-Allow-Origin: *');
+
         $res = new Result();
         try{
+
+
             $postData = file_get_contents("php://input");
             $invoice = json_decode($postData, true);
 
@@ -29,10 +34,12 @@ class ApiRequestController
 
             $invoice = $this->ValidateInput($invoice);
             $response = $this->BuildDocument($invoice,$authorization);
+            //var_dump($response);
             if (!$response->success){
-                throw new Exception($res->errorMessage);
+                throw new Exception($response->errorMessage);
             }
             $res->result = $response->result;
+            $res->success = true;
 
         } catch (Exception $e){
             $res->errorMessage = $e->getMessage();
@@ -56,9 +63,8 @@ class ApiRequestController
         $invoice['vehicle_plate'] = $invoiceApi['placa_vehiculo'];
         $invoice['term'] = $invoiceApi['terminos'];
         $invoice['perception_code'] = $invoiceApi['codigo_tipo_percepcion'];
-//        $invoice['related_array'] = $invoiceApi['documentos_relacionados'];
         $invoice['related_array'] = [];
-
+        // $invoice['related_array'] = $invoiceApi['documentos_relacionados'];
 
         $invoice['pdf_format'] = $invoiceApi['formato_de_pdf'];
         $invoice['percentage_igv'] = $invoiceApi['porcentaje_igv'];
@@ -202,7 +208,7 @@ class ApiRequestController
 
                 $protocol = stripos($_SERVER['REQUEST_SCHEME'], 'https') === 0 ? 'https://' : 'http://';
                 $hostName = $_SERVER['SERVER_NAME'];
-                $currentUrl = $protocol . $hostName . FOLDER_NAME;
+                $currentUrl = $protocol . $hostName . str_replace('/ose','',FOLDER_NAME);
 
                 $invoiceResponse = $this->invoiceModel->GetApiResponseById($invoiceId);
                 $invoiceResponse['enlace_del_pdf'] = $currentUrl . $invoiceResponse['enlace_del_pdf'];
@@ -213,7 +219,26 @@ class ApiRequestController
                 $res->success = true;
                 return $res;
             } elseif($invoice['document_code'] === '03'){
+                $invoiceBuild = new InvoiceBuild($this->connection);
+                $invoiceId = $this->invoiceModel->Insert($invoice,$authorization['userId'],$authorization['localId']);
 
+                $response = $invoiceBuild->BuildDocument($invoiceId, $authorization['userId']);
+                if (!$response->success){
+                    throw new Exception($res->errorMessage);
+                }
+
+                $protocol = stripos($_SERVER['REQUEST_SCHEME'], 'https') === 0 ? 'https://' : 'http://';
+                $hostName = $_SERVER['SERVER_NAME'];
+                $currentUrl = $protocol . $hostName . str_replace('/ose','',FOLDER_NAME);
+
+                $invoiceResponse = $this->invoiceModel->GetApiResponseById($invoiceId);
+                $invoiceResponse['enlace_del_pdf'] = $currentUrl . $invoiceResponse['enlace_del_pdf'];
+                $invoiceResponse['enlace_del_xml'] = $currentUrl . $invoiceResponse['enlace_del_xml'];
+                $invoiceResponse['enlace_del_cdr'] = $currentUrl . $invoiceResponse['enlace_del_cdr'];
+
+                $res->result = $invoiceResponse;
+                $res->success = true;
+                return $res;
             } elseif($invoice['document_code'] === '07'){
 
             } elseif($invoice['document_code'] === '08'){

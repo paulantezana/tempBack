@@ -132,7 +132,7 @@ class InvoiceBuild
 
         if ($resPdf->success){
             $this->saleModel->UpdateInvoiceSunatByInvoiceId($sale['invoice_id'],[
-                'pdf_url'=> '..' . $resPdf->pdfPath
+                'pdf_url'=> $resPdf->pdfPath
             ]);
         }
         return $resPdf;
@@ -379,7 +379,7 @@ class InvoiceBuild
         }
 
         $billingManager = new BillingManager($this->connection);
-        $directoryXmlPath = '..' . XML_FOLDER_PATH . date('Ym') . '/' . $business['ruc'] . '/';
+        $directoryXmlPath = XML_FOLDER_PATH . date('Ym') . '/' . $business['ruc'] . '/';
         $fileName = $business['ruc'] . '-' . $sale['document_code'] . '-' . $sale['serie'] . '-' . $sale['correlative'] . '.xml';
 
         $res = new Result();

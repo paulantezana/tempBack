@@ -5,6 +5,8 @@ require_once MODEL_PATH . 'User/BusinessLocal.php';
 require_once MODEL_PATH . 'User/BusinessSerie.php';
 require_once MODEL_PATH . 'User/CatDocumentTypeCode.php';
 
+require_once CONTROLLER_PATH . 'Helper/ApiSign.php';
+
 class BusinessLocalController
 {
     private $connection;
@@ -25,8 +27,45 @@ class BusinessLocalController
     public function Exec()
     {
         try{
-            $parameter['businessLocal'] = $this->businessLocalModel->GetAll();
+            $business = $this->businessModel->GetByUserId($_SESSION[SESS]);
+
+            $parameter['businessLocal'] = $this->businessLocalModel->GetAllByBusinessId($business['business_id']);
             $content = requireToVar(VIEW_PATH . "User/BusinessLocal.php", $parameter);
+            require_once(VIEW_PATH. "User/Layout/main.php");
+        } catch (Exception $e){
+            echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
+        }
+    }
+
+    public function Api()
+    {
+        try{
+            $business = $this->businessModel->GetByUserId($_SESSION[SESS]);
+            if(isset($_POST['commit'])){
+                $payload = [
+                    'localId' => $business['business_id'],
+                    'userId' => $_SESSION[SESS],
+                    'businessId' => $_POST['businessLocalId'],
+                ];
+
+                $token = ApiSign::encode($payload);
+                $this->businessLocalModel->UpdateById($_POST['businessLocalId'],[
+                    'api_token' => $token
+                ]);
+            }
+
+            $businessLocal = $this->businessLocalModel->GetAllByBusinessId($business['business_id']);
+            $businessLocalApi = [];
+            foreach ($businessLocal as $row) {
+                $protocol = stripos($_SERVER['REQUEST_SCHEME'], 'https') === 0 ? 'https://' : 'http://';
+                $hostName = $_SERVER['SERVER_NAME'];
+                $currentUrl = $protocol . $hostName . FOLDER_NAME;
+                $row['api_url'] = $currentUrl . '/ApiRequest?token=' . $row['api_token'];
+                array_push($businessLocalApi,$row);
+            }
+            $parameter['businessLocalApi'] = $businessLocalApi;
+
+            $content = requireToVar(VIEW_PATH . "User/BusinessLocalApi.php", $parameter);
             require_once(VIEW_PATH. "User/Layout/main.php");
         } catch (Exception $e){
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();

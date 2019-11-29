@@ -117,7 +117,7 @@ class InvoiceController
             }
 
             $invoiceBuild = new InvoiceBuild($this->connection);
-            $resRunDoc = $invoiceBuild->BuildDocument($invoiceId);
+            $resRunDoc = $invoiceBuild->BuildDocument($invoiceId,$_SESSION[SESS]);
             if ($resRunDoc->success){
                 header('Location: ' . FOLDER_NAME . '/Invoice/View?InvoiceId=' . $invoiceId . '&message=' . 'El documento se guardó y se envió a la SUNAT exitosamente' . '&messageType=success');
             } else {

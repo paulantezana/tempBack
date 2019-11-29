@@ -159,18 +159,18 @@
                                 </td>
                                 <td>
                                     <?php if ($row['pdf_url'] != ''): ?>
-                                        <button class="btn btn-sm btn-light" onclick="DocumentPrinter.showModal('<?= $row['pdf_url'] ?? '' ?>', true)" title="Imprimir PDF">Imprimir</button>
+                                        <button class="btn btn-sm btn-light" onclick="DocumentPrinter.showModal('..<?= $row['pdf_url'] ?? '' ?>', true)" title="Imprimir PDF">Imprimir</button>
                                     <?php endif; ?>
                                 </td>
                                 <td>
                                     <?php if ($row['pdf_url'] != ''): ?>
-                                        <button class="btn btn-sm btn-light" onclick="DocumentPrinter.showModal('<?= $row['pdf_url'] ?? '' ?>', false)" title="PDF"><i class="fas fa-file-pdf text-danger"></i></button>
+                                        <button class="btn btn-sm btn-light" onclick="DocumentPrinter.showModal('..<?= $row['pdf_url'] ?? '' ?>', false)" title="PDF"><i class="fas fa-file-pdf text-danger"></i></button>
                                     <?php endif; ?>
                                 </td>
                                 <td>
                                     <?php if ($row['xml_url'] != ''): ?>
                                         <a
-                                            href="<?= $row['xml_url'] ?? '' ?>"
+                                            href="..<?= $row['xml_url'] ?? '' ?>"
                                             download="<?php $fileName = explode('/', $row['xml_url'] ?? ''); echo  'XML-'. $fileName[count($fileName) - 1]?>"
                                             class="btn btn-sm btn-light"
                                             title="XML"
@@ -182,7 +182,7 @@
                                 <td>
                                     <?php if ($row['document_code'] === '01' && $row['response_code'] == '0' && $row['cdr_url'] != '' ) : ?>
                                         <a
-                                            href="<?= $row['cdr_url'] ?? '' ?>"
+                                            href="..<?= $row['cdr_url'] ?? '' ?>"
                                             download="<?php $fileName = explode('/', $row['cdr_url'] ?? ''); echo  'CDR-'. $fileName[count($fileName) - 1]?>"
                                             class="btn btn-sm btn-light"
                                             title="CDR"

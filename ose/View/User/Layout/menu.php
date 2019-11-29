@@ -77,6 +77,7 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="<?= FOLDER_NAME  . '/User/Profile'?>"><i class="fas fa-user"></i> Mi Perfil</a>
                             <a class="dropdown-item" href="<?= FOLDER_NAME  . '/BusinessLocal'?>"><i class="fas fa-home"></i> Locales y Series</a>
+                            <a class="dropdown-item" href="<?= FOLDER_NAME  . '/BusinessLocal/Api'?>"><i class="fas fa-home"></i> API</a>
                             <a class="dropdown-item" href="<?= FOLDER_NAME  . '/User/Profile'?>"><i class="fas fa-cog"></i> Soporte</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="<?= FOLDER_NAME . '/Business/update' ?>"> <i class="fas fa-cog"></i> Configurar empresa</a>

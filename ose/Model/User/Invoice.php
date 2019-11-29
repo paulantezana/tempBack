@@ -172,7 +172,7 @@ class Invoice extends BaseModel
         try{
             $sql = 'SELECT invoice.document_code as tipo_de_comprobante, invoice.serie, invoice.correlative as correlativo,  
                             isn.pdf_url as enlace_del_pdf, isn.xml_url as enlace_del_xml, isn.cdr_url as enlace_del_cdr, 
-                            isn.response_code as codigo_respuesta_sunat,  isn.invoice_state_id
+                            isn.response_code as codigo_respuesta_sunat,  isn.invoice_state_id as estado_comprobante
                     FROM invoice
                     INNER JOIN invoice_sunat isn on invoice.invoice_id = isn.invoice_id  
                     WHERE invoice.invoice_id = :invoice_id LIMIT 1';
