@@ -1,5 +1,5 @@
 <div class="container pb-3 pt-3">
-    <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
+    <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
 
     <form action="<?= FOLDER_NAME . '/Business/Update' ?>" method="POST" class="mb-4" enctype="multipart/form-data">
         <input type="hidden" value="<?= $parameter['business']['business_id'] ?? 0 ?>" name="business[business_id]">

@@ -1,6 +1,6 @@
 <div class="container pt-4 pb-4">
 
-    <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
+    <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
 
     <div class="row mb-4">
         <div class="col-auto mr-auto">
@@ -9,7 +9,6 @@
                 <span>Ventas</span>
             </h1>
         </div>
-
         <div class="col-auto d-flex align-items-center">
             <div class="btn-group">
                 <a href="#" class="btn btn-light">Exportar</a>
@@ -36,8 +35,8 @@
                 <form action="<?= FOLDER_NAME . '/Invoice'?>" method="GET" class="mt-4">
                     <div class="form-row">
                         <div class="form-group col-lg-3">
-                            <label for="filterDocumentCode">Tipo de comprobante</label>
-                            <select class="form-control" id="filterDocumentCode" name="filter[documentCode]">
+                            <label for="filterDocumentCode"><i class="icon-file-text mr-2"></i> Tipo de comprobante</label>
+                            <select class="form-control select2" id="filterDocumentCode" name="filter[documentCode]">
                                 <option value="">Filtrar por tipo</option>
                                 <?php foreach ($parameter['documentTypeCode'] ?? [] as $row): ?>
                                     <?php if ( ($parameter['filter']['documentCode'] ?? '') == $row['code'] ) :  ?>
@@ -48,36 +47,32 @@
                                 <?php endforeach; ?>
                             </select>
                         </div>
-
                         <div class="form-group col-lg-3">
-                            <label for="filterCustomer">Entidad</label>
-                            <select class="selectpicker with-ajax searchCustomer" id="filterCustomer" name="filter[customer]" data-live-search="true" data-width="100%">
-                                <?php if(($parameter['filter']['customer']['customer_id'] ?? false)) :  ?>
-                                    <option value="<?= $parameter['filter']['customer']['customer_id'] ?? 0?>" selected><?= $parameter['filter']['customer']['description'] ?? ''?></option>
+                            <label for="filterCustomer"><i class="icon-users mr-2"></i> Cliente</label>
+                            <select class="searchCustomer" id="filterCustomer" name="filter[customer]" data-live-search="true" data-width="100%">
+                                <?php if(($parameter['filter']['customer']['documentNumber'] ?? false)) :  ?>
+                                    <option value="<?= $parameter['filter']['customer']['documentNumber'] ?? 0?>" selected><?= $parameter['filter']['customer']['description'] ?? ''?></option>
                                 <?php endif; ?>
                             </select>
                         </div>
-
                         <div class="form-group col-lg-3">
-                            <label for="filterStartDate">Fecha inicio</label>
+                            <label for="filterStartDate"><i class="icon-calendar mr-2"></i> Rango de Fechas</label>
                             <input type="date" class="form-control" name="filter[startDate]" id="filterStartDate" value="<?= $parameter['filter']['startDate'] ?? null ?>">
                         </div>
-
                         <div class="form-group col-lg-3">
                             <label for="filterEndDate">Fecha final</label>
                             <input type="date" class="form-control" name="filter[endDate]" id="filterEndDate" value="<?= $parameter['filter']['endDate'] ?? null ?>">
                         </div>
-
                         <div class="form-group col-lg-12">
-                            <label for="filterInvoiceSearch">Buscar documento por serie / número</label>
-                            <select class="selectpicker with-ajax filterInvoiceSearch" id="filterInvoiceSearch" name="filter[invoiceSearch]" data-live-search="true" data-width="100%">
-                                <?php if($parameter['filter']['invoiceSearch']['invoice_id'] ?? false) :  ?>
-                                    <option value="<?= $parameter['filter']['invoiceSearch']['invoice_id'] ?? 0?>" selected><?= $parameter['filter']['invoiceSearch']['description'] ?? ''?></option>
+                            <label for="filterInvoiceSearch"><i class="icon-barcode2 mr-2"></i> Buscar documento por serie / número</label>
+                            <select class="invoiceSearch" id="filterInvoiceSearch" name="filter[invoiceSearch]" data-live-search="true" data-width="100%">
+                                <?php if($parameter['filter']['invoiceSearch']['invoiceId'] ?? false) :  ?>
+                                    <option value="<?= $parameter['filter']['invoiceSearch']['invoiceId'] ?? 0?>" selected><?= $parameter['filter']['invoiceSearch']['description'] ?? ''?></option>
                                 <?php endif; ?>
                             </select>
                         </div>
                         <div class="btn-group col-lg-4">
-                            <button type="submit" class="btn btn-primary">Filtrar</button>
+                            <button type="submit" class="btn btn-primary"><i class="icon-filter4 mr-2"></i> Filtrar</button>
                             <a href="<?= FOLDER_NAME . '/Invoice'?>" class="btn btn-light">Mostrar Todo</a>
                         </div>
                     </div>
@@ -86,36 +81,32 @@
         </div>
     </div>
 
-
-
     <div class="card">
         <div class="card-body">
             <div class="breadcrumb-line breadcrumb-line-component mb-2">
                 <ul class="breadcrumb bg-light">
-                    <li><img style="max-width: 30px;" src="<?= FOLDER_NAME . '/Asset/Images/sunat_logo.png'?>" class="position-left"><span class="text-semibold">Estados SUNAT: </span></li>
-                    <li class="ml-3"> <i class="fas fa-check text-success"></i> Aceptado</li>
-                    <li class="ml-3"> <i class="fas fa-chevron-circle-right text-primary"></i> Resumen </li>
-                    <li class="ml-3"> <i class="fas fa-sync-alt text-warning"></i> Pendiente de Envío</li>
-                    <li class="ml-3"> <i class="fas fa-times-circle text-danger"></i> Comunicación de Baja (Anulado)</li>
+                    <li><img style="max-width: 30px;" src="<?= FOLDER_NAME . '/Asset/Images/sunat_logo.png'?>" class="mr-2"><span class="text-semibold">Estados SUNAT: </span></li>
+                    <li class="ml-3"> <i class="icon-checkmark font-weight-bold text-success mr-2"></i> Aceptado</li>
+                    <li class="ml-3"> <i class="icon-spinner4 text-primary font-weight-bold mr-2"></i> Resumen </li>
+                    <li class="ml-3"> <i class="icon-spinner11 text-success font-weight-bold  mr-2"></i>  Pendiente de Envío</li>
+                    <li class="ml-3"> <i class="icon-cancel-circle2 text-danger font-weight-bold  mr-2"></i> Comunicación de Baja (Anulado)</li>
                 </ul>
             </div>
             <div class="table-responsive mb-4">
-                <table class="table table-striped table-sm">
+                <table class="table table-striped ">
                     <thead>
                         <tr style="font-size: 14px">
-                            <th style="width: 100px" >FECHA</th>
-                            <th>SERIE</th>
-                            <th>NUM.</th>
-                            <th style="width: 400px">DENOMINACIÓN</th>
+                            <th>FECHA</th>
+                            <th>Comprovante</th>
+                            <th>Cliente</th>
                             <th>M</th>
-                            <th>TOTAL ONEROSA</th>
-                            <th>TOTAL GRATUITA</th>
-                            <th>ENVIADO AL CLIENTE?</th>
-                            <th>IMPRIMIR</th>
+                            <th>Total Onerosa</th>
+                            <th>Total Gratuita</th>
+                            <th>Enviado al cliente</th>
                             <th>PDF</th>
                             <th>XML</th>
                             <th>CDR</th>
-                            <th>ESTADO EN LA SUNAT</th>
+                            <th>Estado en la Sunat</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -143,8 +134,7 @@
                         ?>
                             <tr class="<?= ($row['invoice_state_id'] ?? 0) == 4 ? 'table-danger' : '' ?>">
                                 <td><?= $cDate ?></td>
-                                <td><?= $row['serie'] ?? '' ?></td>
-                                <td><?= $row['correlative'] ?? '' ?></td>
+                                <td><?php echo  "{$row['document_type_code_description']}: {$row['serie']} - {$row['correlative'] }" ?></td>
                                 <td>
                                     <div><?= $row['customer_document_number'] ?? '' ?></div>
                                     <div><?= $row['customer_social_reason'] ?? '' ?></div>
@@ -159,12 +149,7 @@
                                 </td>
                                 <td>
                                     <?php if ($row['pdf_url'] != ''): ?>
-                                        <button class="btn btn-sm btn-light" onclick="DocumentPrinter.showModal('..<?= $row['pdf_url'] ?? '' ?>', true)" title="Imprimir PDF">Imprimir</button>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if ($row['pdf_url'] != ''): ?>
-                                        <button class="btn btn-sm btn-light" onclick="DocumentPrinter.showModal('..<?= $row['pdf_url'] ?? '' ?>', false)" title="PDF"><i class="fas fa-file-pdf text-danger"></i></button>
+                                        <button class="btn btn-sm btn-light" onclick="DocumentPrinter.showModal('..<?= $row['pdf_url'] ?? '' ?>', false)" title="PDF"><i class="icon-file-pdf text-danger"></i></button>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -175,7 +160,7 @@
                                             class="btn btn-sm btn-light"
                                             title="XML"
                                         >
-                                            <i class="fas fa-file-code text-success"></i>
+                                            <i class="icon-file-xml text-success"></i>
                                         </a>
                                     <?php endif; ?>
                                 </td>
@@ -283,8 +268,8 @@
                                 </td>
                                 <td>
                                     <div class="btn-group ">
-                                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Opciones" >
-                                            <i class="fas fa-bars"></i>
+                                        <button class="btn btn-light btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Opciones" >
+                                            <i class="icon-menu9"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                             <a class="dropdown-item" href="<?= FOLDER_NAME . '/Invoice/View?InvoiceId=' . $row['invoice_id'] ?>"> <i class="fas fa-eye"></i> Ver detalles</a>
@@ -366,8 +351,7 @@
 
 </div>
 
-
 <?php
-    require_once __DIR__ . '/Partials/InvoiceSendEmailModal.php';
-    require_once __DIR__ . '/Partials/DocumentPrinterModal.php';
+    require_once __DIR__ . '/Partial/InvoiceSendEmailModal.php';
+    require_once __DIR__ . '/Partial/DocumentPrinterModal.php';
 ?>

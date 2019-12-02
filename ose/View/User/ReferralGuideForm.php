@@ -1,5 +1,5 @@
     <div class="container">
-        <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
+        <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
 
         <form action="<?= FOLDER_NAME . '/ReferralGuide/NewGuide'?>" method="POST" class="mb-4 mt-4">
             <div class="mb-4">
@@ -347,5 +347,5 @@
         </form>
     </div>
 <?php
-    require_once __DIR__ . '/Partials/ProductForm.php';
+    require_once __DIR__ . '/Partial/ProductForm.php';
 ?>

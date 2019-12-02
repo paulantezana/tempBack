@@ -6,23 +6,26 @@ class ProductCodeController
 {
     private $connection;
     private $param;
+    private $catProductCode;
 
     public function __construct($connection, $param)
     {
         $this->connection = $connection;
         $this->param = $param;
+        $this->catProductCode = new CatProductCode($this->connection);
     }
 
     public function Search(){
-        header('Content-Type: application/json; charset=UTF-8');
+        $res = new Result();
+        try{
+            $search = $_POST['q'] ?? '';
+            $response = $this->catProductCode->Search($search);
 
-        $search = $_POST['q'] ?? '';
-        $productCode = new CatProductCode($this->connection);
-        $data = $productCode->Search($search);
-
-        echo json_encode([
-            'data' => $data,
-            'success' => true
-        ]);
+            $res->result = $response;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
     }
 }

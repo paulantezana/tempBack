@@ -17,9 +17,9 @@ class Invoice extends BaseModel
                 $sqlFilter .= " WHERE invoice.document_code = {$filter['documentCode']}";
                 $filterNumber++;
             }
-            if (isset($filter['customerID']) && $filter['customerID']){
+            if (isset($filter['customerDocumentNumber']) && $filter['customerDocumentNumber']){
                 $sqlFilter .= $filterNumber >= 1 ? ' AND ' : ' WHERE ';
-                $sqlFilter .= "invoice.customer_id = {$filter['customerID']}";
+                $sqlFilter .= "ic.document_number = {$filter['customerDocumentNumber']}";
                 $filterNumber++;
             }
             if (isset($filter['startDate']) && $filter['startDate']){
@@ -41,7 +41,7 @@ class Invoice extends BaseModel
 
             $limit = 10;
             $offset = ($page - 1) * $limit;
-            $total_rows = $this->db->query("SELECT COUNT(invoice_id) FROM invoice {$sqlFilter}")->fetchColumn();
+            $total_rows = $this->db->query("SELECT COUNT(invoice.invoice_id) FROM invoice INNER JOIN invoice_customer ic on invoice.invoice_id = ic.invoice_id {$sqlFilter}")->fetchColumn();
             $total_pages = ceil($total_rows / $limit);
 
             $sql = "SELECT invoice.*, cat_document_type_code.description as document_type_code_description, cat_operation_type_code.description as operation_type_code_description,
@@ -200,7 +200,7 @@ class Invoice extends BaseModel
                                         total_value, total, global_discount_percentage, purchase_order, vehicle_plate, term,
                                         perception_code, related, guide, legend,
                                         pdf_format, percentage_igv, percentage_plastic_bag_tax, total_plastic_bag_tax,
-                                        created_at,updated_at,creation_user_id,modification_user_id, itinerant_enable, itinerant_location, itinerant_address, itinerant_urbanization)
+                                        created_at,updated_at,created_user_id,updated_user_id, itinerant_enable, itinerant_location, itinerant_address, itinerant_urbanization)
                     VALUES (:local_id, :invoice_key, :date_of_issue, :time_of_issue, :date_of_due, :serie, :correlative, :observation, :change_type,
                                         :document_code, :currency_code, :operation_code, :total_prepayment,
                                         :total_free, :total_exportation, :total_other_charged, :total_discount, :total_exonerated, :total_unaffected,
@@ -208,7 +208,7 @@ class Invoice extends BaseModel
                                         :total_value, :total, :global_discount_percentage, :purchase_order, :vehicle_plate, :term,
                                         :perception_code, :related, :guide, :legend,
                                         :pdf_format, :percentage_igv, :percentage_plastic_bag_tax, :total_plastic_bag_tax,
-                                        :created_at,:updated_at,:creation_user_id,:modification_user_id, :itinerant_enable, :itinerant_location, :itinerant_address, :itinerant_urbanization)";
+                                        :created_at,:updated_at,:created_user_id,:updated_user_id, :itinerant_enable, :itinerant_location, :itinerant_address, :itinerant_urbanization)";
             $stmt = $this->db->prepare($sql);
             if(!$stmt->execute([
                 ':local_id' => $localId,
@@ -254,8 +254,8 @@ class Invoice extends BaseModel
 
                 ":created_at" => $currentDate,
                 ":updated_at" => $currentDate,
-                ":creation_user_id" => $userReferId,
-                ":modification_user_id" => $userReferId,
+                ":created_user_id" => $userReferId,
+                ":updated_user_id" => $userReferId,
                 ":itinerant_enable" => $invoice['itinerant_enable'] ?? 0,
                 ":itinerant_location" => $invoice['itinerant_location'] ?? '',
                 ":itinerant_address" => $invoice['itinerant_address'] ?? '',
@@ -276,7 +276,7 @@ class Invoice extends BaseModel
                 ':social_reason' => $invoice['customer']['social_reason'],
                 ':fiscal_address' => $invoice['customer']['fiscal_address'],
                 ':email' => $invoice['customer']['email'],
-                ':telephone' => $invoice['customer']['telephone'],
+                ':telephone' => $invoice['customer']['telephone'] ?? '',
                 ':sent_to_client' => 0,
             ])){
                 throw new Exception('No se pudo insertar el registro');
@@ -467,15 +467,16 @@ class Invoice extends BaseModel
         }
     }
 
-    public function SearchBySerieCorrelative(string $search) {
+    public function SearchBySerieCorrelative(array $search) {
         try{
-            $sql = 'SELECT  invoice.invoice_id, invoice.serie, invoice.correlative, invoice.total, invoice.date_of_issue, cat_document_type_code.description as document_type_code_description FROM invoice
-                    INNER JOIN cat_document_type_code ON invoice.document_code = cat_document_type_code.code
-                    WHERE serie LIKE :serie OR correlative LIKE :correlative  LIMIT 8';
+            $sql = 'SELECT  invoice.invoice_id, invoice.serie, invoice.correlative, invoice.total, invoice.date_of_issue, cdtc.description as document_type_code_description FROM invoice
+                    INNER JOIN cat_document_type_code cdtc on invoice.document_code = cdtc.code
+                    WHERE serie LIKE :serie OR correlative LIKE :correlative AND invoice.local_id = :local_id LIMIT 8';
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
-                ':serie' => '%' . $search . '%',
-                ':correlative' => '%' . $search . '%',
+                ':serie' => '%' . $search['search'] . '%',
+                ':correlative' => '%' . $search['search'] . '%',
+                ':local_id' => $search['localId'],
             ]);
             return $stmt->fetchAll();
         } catch (Exception $e) {

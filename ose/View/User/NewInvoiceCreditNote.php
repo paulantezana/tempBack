@@ -1,6 +1,6 @@
 <div class="container">
 
-    <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
+    <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
 
     <form action="<?= FOLDER_NAME . '/InvoiceNote/NewCreditNote' ?>" method="POST" id="invoiceForm" class="mt-5 mb-5">
         <div class="mb-4">
@@ -55,9 +55,9 @@
         <div class="card mb-5 bg-white">
             <div class="card-body">
 
-                <?php require_once __DIR__ . '/Partials/InvoiceHeader.php' ?>
+                <?php require_once __DIR__ . '/Partial/InvoiceHeader.php' ?>
 
-                <?php require_once __DIR__ . '/Partials/InvoiceItem.php' ?>
+                <?php require_once __DIR__ . '/Partial/InvoiceItem.php' ?>
 
                 <div class="row mb-2">
 
@@ -508,7 +508,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <?php require_once __DIR__ . '/Partials/InvoiceTotal.php';?>
+                        <?php require_once __DIR__ . '/Partial/InvoiceTotal.php';?>
                     </div>
                 </div>
 
@@ -533,6 +533,6 @@
 </div>
 
 <?php
-require_once __DIR__ . '/Partials/ProductForm.php';
-require_once __DIR__ . '/Partials/CustomerForm.php';
+require_once __DIR__ . '/Partial/ProductForm.php';
+require_once __DIR__ . '/Partial/CustomerForm.php';
 ?>

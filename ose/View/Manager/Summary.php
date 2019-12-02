@@ -256,7 +256,7 @@
     require_once __DIR__ . '/Partial/SummaryGeneralModal.php';
     require_once __DIR__ . '/Partial/SummaryCustomerModal.php';
     require_once __DIR__ . '/Partial/SummaryCustomModal.php';
-    require_once __DIR__ . '/../User/Partials/DetailTicketSummaryModal.php';
+    require_once __DIR__ . '/../User/Partial/DetailTicketSummaryModal.php';
 ?>
 
 <script src="<?= FOLDER_NAME . '/Asset/Js/Helper/bootstrap-select/bootstrap-select.min.js'?>"></script>

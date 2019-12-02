@@ -1,6 +1,5 @@
 <?php
 
-require_once MODEL_PATH . 'User/Customer.php';
 
 class InvoiceValidate extends ErrorCollector
 {
@@ -13,7 +12,6 @@ class InvoiceValidate extends ErrorCollector
     private $exportCount = 0;
     private $itemCount = 0;
     private $connection;
-    private $customer = null;
 
     public function __construct(array $invoice, PDO $connection)
     {
@@ -29,9 +27,9 @@ class InvoiceValidate extends ErrorCollector
         if (empty($this->invoice['item'] ?? [])){
             $this->addError('global','No hay productos en la lista');
         }
-        if (!$this->invoice['customer_id']){
-            $this->addError('customer_id','No se seleccionó ningún cliente');
-        }
+//        if (!$this->invoice['customer_id']){
+//            $this->addError('customer_id','No se seleccionó ningún cliente');
+//        }
         if (!$this->invoice['serie']){
             $this->addError('serie','No se seleccionó ningúna serie');
         }
@@ -110,21 +108,18 @@ class InvoiceValidate extends ErrorCollector
         }
 
         // Database validate
-        $customerModel = new Customer($this->connection);
-        $this->customer = $customerModel->GetById($this->invoice['customer_id']);
-
-        $identityDocValidate = ValidateIdentityDocumentNumber($this->customer['document_number'],$this->customer['identity_document_code']);
+        $identityDocValidate = ValidateIdentityDocumentNumber($this->invoice['customer']['document_number'],$this->invoice['customer']['identity_document_code']);
         if (!$identityDocValidate->success){
-            $this->addError('customer_id',$identityDocValidate->errorMessage);
+            $this->addError('document_number',$identityDocValidate->errorMessage);
         }
 
-        switch ($this->customer['identity_document_code']){
+        switch ($this->invoice['customer']['identity_document_code']){
             case '-':
                 if ($this->invoice['document_code'] == '01'){
-                    $this->addError('customer_id','No puedes emitir Facturas a esta entidad');
+                    $this->addError('identity_document_code','No puedes emitir Facturas a esta entidad');
                 }
                 if ($this->invoice['total'] > 700){
-                    $this->addError('customer_id','la entidad no puede ser VARIOS por ser una venta mayor a S/700.00');
+                    $this->addError('identity_document_code','la entidad no puede ser VARIOS por ser una venta mayor a S/700.00');
                 }
                 break;
             case '0': // No domiliado
@@ -134,7 +129,7 @@ class InvoiceValidate extends ErrorCollector
                 break;
             case '1': // DNI
                 if ($this->invoice['document_code'] == '01'){
-                    $this->addError('customer_id',sprintf("No puedes emitir Facturas a esta entidad \"%s\"",$this->customer['social_reason']));
+                    $this->addError('identity_document_code',sprintf("No puedes emitir Facturas a esta entidad \"%s\"",$this->invoice['customer']['social_reason']));
                 }
                 break;
             case '6': // RUC
@@ -332,13 +327,12 @@ class InvoiceValidate extends ErrorCollector
         foreach ($this->invoice['item'] as $index => $row){
 
             // Validate required
-            if ($row['product_id'] == ''){
-                $this->addErrorRowChildren('item',$index,'product_id','Producto o servicio no puede estar en blanco');
-                $this->addErrorRowChildren('item',$index,'description','La descripcion no puede estar en blanco');
+            if ($row['description'] == ''){
+                $this->addErrorRowChildren('item',$index,'description','Producto o servicio no puede estar en blanco');
             }
 
             if ($row['quantity'] == ''){
-                $this->addErrorRowChildren('item',$index,'description','La cantidad no puede estar en blanco');
+                $this->addErrorRowChildren('item',$index,'quantity','La cantidad no puede estar en blanco');
             }
 
             if ($row['affectation_code'] == ''){
@@ -358,7 +352,7 @@ class InvoiceValidate extends ErrorCollector
                 $this->addErrorRowChildren('item',$index,'quantity','cantidad debe ser mayor que 0');
             }
 
-            switch ($this->customer['identity_document_code']){
+            switch ($this->invoice['customer']['identity_document_code']){
                 case '-':
                     break;
                 case '0': // No domiliado

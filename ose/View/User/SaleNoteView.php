@@ -1,6 +1,6 @@
 
     <div class="container">
-        <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
+        <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
         <div class="mt-5 mb-5">
             <h5 class="mb-3"><?= $parameter['invoice']['voucher_type_description'] ?? '' ?></h5>
             <div class="btn btn-group" style="padding: 0">
@@ -201,6 +201,6 @@
 </div>
 
 <?php
-require_once __DIR__ . '/Partials/DocumentPrinterModal.php';
-require_once __DIR__ . '/Partials/SaleSendEmailModal.php'
+require_once __DIR__ . '/Partial/DocumentPrinterModal.php';
+require_once __DIR__ . '/Partial/SaleSendEmailModal.php'
 ?>

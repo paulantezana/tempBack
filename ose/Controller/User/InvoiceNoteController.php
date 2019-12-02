@@ -542,16 +542,10 @@ class InvoiceNoteController
                 ];
 
                 $invoice['guide'] = json_decode($invoice['guide'],true);
+                var_dump($invoice);
 
                 $detailInvoiceModel = new InvoiceItem($this->connection);
                 $invoice['item'] = $detailInvoiceModel->ByInvoiceIdSummary($invoiceId);
-
-                $customer = $customerModel->GetById($invoice['customer_id']);
-                $invoice['customer'] = [
-                    'customer_id' => $customer['customer_id'],
-                    'social_reason' => $customer['social_reason'],
-                    'document_number' => $customer['document_number'],
-                ];
             }
         }
 
@@ -567,6 +561,8 @@ class InvoiceNoteController
                     $invoice['invoice_update']['serie'],
                     $invoice['invoice_update']['document_code']
                 );
+
+
                 if (!$invoiceId){
                     throw new Exception('El documento que hace referecnia no existe');
                 }
@@ -601,15 +597,6 @@ class InvoiceNoteController
                 }
             }catch (Exception $exception){
                 $errorMessage .= $exception->getMessage();
-
-                if ((int)$invoice['customer_id']){
-                    $customer = $customerModel->GetById($invoice['customer_id']);
-                    $invoice['customer'] = [
-                        'customer_id' => $customer['customer_id'],
-                        'social_reason' => $customer['social_reason'],
-                        'document_number' => $customer['document_number'],
-                    ];
-                }
             }
         }
 
@@ -645,7 +632,7 @@ class InvoiceNoteController
         $parameter['itemTemplate'] = InvoiceTemplate::Item($parameter['business'],$parameter['affectationIgvTypeCode']);
         $parameter['referralGuideTemplate'] = $this->GetReferralGuideTemplate();
 
-        $content = requireToVar(VIEW_PATH . "User/InvoiceCreditNote.php", $parameter);
+        $content = requireToVar(VIEW_PATH . "User/NewInvoiceCreditNote.php", $parameter);
         require_once(VIEW_PATH. "User/Layout/main.php");
     }
 
@@ -680,17 +667,17 @@ class InvoiceNoteController
                     'document_code' => $voucherCode,
                 ];
 
+//                $invoice['customer'] = [
+//                    'invoice_id' => $invoiceId,
+//                    'serie' => $serie,
+//                    'correlative' => $correlative,
+//                    'document_code' => $voucherCode,
+//                ];
+
                 $invoice['guide'] = json_decode($invoice['guide'],true);
 
                 $detailInvoiceModel = new InvoiceItem($this->connection);
                 $invoice['item'] = $detailInvoiceModel->ByInvoiceIdSummary($invoiceId);
-
-                $customer = $customerModel->GetById($invoice['customer_id']);
-                $invoice['customer'] = [
-                    'customer_id' => $customer['customer_id'],
-                    'social_reason' => $customer['social_reason'],
-                    'document_number' => $customer['document_number'],
-                ];
             }
         }
 
@@ -741,15 +728,6 @@ class InvoiceNoteController
                 }
             }catch (Exception $exception){
                 $errorMessage .= $exception->getMessage();
-
-                if ((int)$invoice['customer_id']){
-                    $customer = $customerModel->GetById($invoice['customer_id']);
-                    $invoice['customer'] = [
-                        'customer_id' => $customer['customer_id'],
-                        'social_reason' => $customer['social_reason'],
-                        'document_number' => $customer['document_number'],
-                    ];
-                }
             }
         }
 
@@ -785,7 +763,7 @@ class InvoiceNoteController
         $parameter['itemTemplate'] = InvoiceTemplate::Item($parameter['business'],$parameter['affectationIgvTypeCode']);
         $parameter['referralGuideTemplate'] = $this->GetReferralGuideTemplate();
 
-        $content = requireToVar(VIEW_PATH . "User/InvoiceDebitNote.php", $parameter);
+        $content = requireToVar(VIEW_PATH . "User/NewInvoiceDebitNote.php", $parameter);
         require_once(VIEW_PATH. "User/Layout/main.php");
     }
 

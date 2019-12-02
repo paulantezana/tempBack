@@ -1,9 +1,8 @@
-<div class="table-responsive mb-5">
+<div class="table-responsive">
     <table class="table">
         <thead>
-            <tr style="font-size: 14px">
-                <th>Producto / Servicio</th>
-                <th>Detalle</th>
+            <tr>
+                <th style="width: 300px">Producto / Servicio</th>
                 <th> <?php echo ($parameter['business']['include_igv'] ?? false) ? 'Precio Unit.' : 'VALOR Unit.' ?> </th>
                 <th>Cantidad</th>
                 <th>Afectación</th>
@@ -12,24 +11,23 @@
                 <th></th>
             </tr>
         </thead>
+        <tfoot>
+            <tr>
+                <td colspan="10">
+                    <div class="btn btn-primary btn-sm" id="addItemInvoice" data-itemtemplate="<?php echo htmlspecialchars(($parameter['itemTemplate'] ?? ''),ENT_QUOTES) ?>">
+                        <i class="icon-plus-circle2 mr-2"></i> Agregar Item
+                    </div>
+                </td>
+            </tr>
+        </tfoot>
         <tbody id="detailSaleTableBody">
 
         <?php foreach ($parameter['invoice']['item'] ?? [] as $key => $row): ?>
             <tr id="invoiceItem<?= $key ?>" data-uniqueId="<?= $key ?>">
                 <td>
-                    <div class="input-group" style="flex-wrap: nowrap">
-                        <div class="input-group-prepend">
-                            <div class="btn btn-secondary btn-sm" id="newProduct<?= $key ?>">+</div>
-                        </div>
-                        <select class="selectpicker with-ajax" data-live-search="true" id="selectProduct<?= $key ?>" name="invoice[item][<?= $key ?>][product_id]" required>
-                            <option value="<?= $row['product_code']?>" selected><?= $row['description'] ?></option>
-                        </select>
-                    </div>
+                    <input type="text" id="description<?= $key ?>" name="invoice[item][<?= $key ?>][description]" value="<?= $row['description'] ?>" class="form-control form-control-sm">
                     <input type="hidden" id="productCode<?= $key ?>" name="invoice[item][<?= $key ?>][product_code]" value="<?= $row['product_code'] ?>">
                     <input type="hidden" id="unitMeasure<?= $key ?>" name="invoice[item][<?= $key ?>][unit_measure]" value="<?= $row['unit_measure'] ?>">
-                </td>
-                <td>
-                    <textarea cols="30" rows="1" class="form-control form-control-sm" name="invoice[item][<?= $key ?>][description]"><?= $row['description'] ?></textarea>
                 </td>
                 <td>
                     <input type="<?php echo ($parameter['business']['include_igv'] ?? false) ? 'hidden' : 'number' ?>" step="any" min="0" class="form-control form-control-sm <?= ($parameter['error']['item']['children'][$key]['unit_value'] ?? false) ? 'is-invalid' : '' ?>"
@@ -65,10 +63,10 @@
                 <td>
                     <div style="display: flex;">
                         <button type="button" class="btn btn-sm btn-light" id="remove<?= $key ?>" title="Quitar item">
-                            <i class="fas fa-times text-danger"></i>
+                            <i class="icon-cross text-danger"></i>
                         </button>
                         <button type="button" class="btn ml-1 btn-sm btn-light" id="dropdownMenuInvoiceItem" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent" title="Más opciones">
-                            <i class="fas fa-ellipsis-v"></i>
+                            <i class="icon-menu9"></i>
                         </button>
                         <div class="dropdown-menu p-4" style="max-width: 350px" aria-labelledby="dropdownMenuInvoiceItem">
                             <div class="form-group">
@@ -134,12 +132,6 @@
         <?php endforeach; ?>
 
         </tbody>
-        <tfoot>
-        <tr>
-            <td colspan="10">
-                <div class="btn btn-primary btn-sm" id="addItemInvoice" data-itemtemplate="<?php echo htmlspecialchars(($parameter['itemTemplate'] ?? ''),ENT_QUOTES) ?>">Agregar Item</div>
-            </td>
-        </tr>
-        </tfoot>
+
     </table>
 </div>

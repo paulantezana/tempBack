@@ -1,5 +1,5 @@
 <div class="container">
-    <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
+    <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
     <div class="card mt-4">
         <div class="card-body">
             <form action="" method="post">

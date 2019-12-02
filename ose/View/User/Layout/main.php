@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>OSE Skynet</title>
 
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="<?=FOLDER_NAME . '/Asset/Css/Icomoon/styles.css'?>">
+
     <link rel="apple-touch-icon" sizes="57x57" href="<?=FOLDER_NAME . '/Asset/Images/appleIcon57x57.png'?>">
     <link rel="apple-touch-icon" sizes="60x60" href="<?=FOLDER_NAME . '/Asset/Images/appleIcon60x60.png'?>">
     <link rel="apple-touch-icon" sizes="72x72" href="<?=FOLDER_NAME . '/Asset/Images/appleIcon72x72.png'?>">
@@ -30,12 +33,13 @@
     <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/StyleSheet.css'?>">
 
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/jquery.min.js'?>"></script>
-    <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/bootstrap.bundle.js'?>"></script>
+    <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/bootstrap.bundle.min.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/flexdatalist.min.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/select2.min.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/sweetalert2.min.js'?>"></script>
+    <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/blockui.min.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/Common.js'?>"></script>
-    <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/all.js'?>"></script>
+    <script src="<?=FOLDER_NAME . '/Asset/Js/User/UserCore.js'?>"></script>
 </head>
 <body style="background: #F9FAFD">
     <div class="layout-container">
@@ -47,7 +51,7 @@
         </div>
         <div class="layout-footer"> 
             <div class="container">
-                Copyright  © <?= date('Y') ?> Skynet cusco
+
             </div>
         </div>
     </div>

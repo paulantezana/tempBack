@@ -13,6 +13,7 @@ class CustomerController
     private $param;
     private $customerModel;
     private $businessModel;
+    private $catIdentityDocumentTypeCodeModel;
 
     public function __construct($connection, $param)
     {
@@ -20,19 +21,12 @@ class CustomerController
         $this->param = $param;
         $this->customerModel = new Customer($this->connection);
         $this->businessModel = new Business($this->connection);
+        $this->catIdentityDocumentTypeCodeModel = new CatIdentityDocumentTypeCode($this->connection);
     }
 
     public function Exec(){
         try{
-            $page = $_GET['page'] ?? 0;
-            if (!$page){
-                $page = 1;
-            }
-
-            $identityDocumentTypeCodeModel = new CatIdentityDocumentTypeCode($this->connection);
-            $businessId = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
-            $parameter['customers'] = $this->customerModel->Paginate($page,10,$businessId);
-            $parameter['identityDocumentTypeCode'] = $identityDocumentTypeCodeModel->GetAll();
+            $parameter['identityDocumentTypeCode'] = $this->catIdentityDocumentTypeCodeModel->getAll();
 
             $content = requireToVar(VIEW_PATH . "User/Customer.php", $parameter);
             require_once(VIEW_PATH. "User/Layout/main.php");
@@ -41,172 +35,159 @@ class CustomerController
         }
     }
 
-    public function Update(){
-        $postData = file_get_contents("php://input");
-        $customer = json_decode($postData, true);
+    public function Table(){
+        try {
+            $page = isset($_GET['page']) ? $_GET['page'] : 1;
+            $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
+            $search = isset($_GET['search']) ? $_GET['search'] : '';
 
-        $validate = $this->ValidateCustomer($customer);
-
-        if ($validate->success){
-            $response = $this->customerModel->UpdateById($customer['customerId'],[
-                'document_number'=>$customer['documentNumber'],
-                'identity_document_code'=>$customer['identityDocumentCode'],
-                'social_reason'=>$customer['socialReason'],
-                'commercial_reason'=>$customer['commercialReason'],
-                'fiscal_address'=>$customer['fiscalAddress'],
-                'main_email'=>$customer['mainEmail'] ?? '',
-                'optional_email_1'=>$customer['optionalEmail1'] ?? '',
-                'optional_email_2'=>$customer['optionalEmail2'] ?? '',
-                'telephone'=>$customer['telephone'] ?? '',
-            ]);
-            echo json_encode([
-                'success' => true,
-                'data' => $response,
-            ]);
-        }else{
-            echo json_encode([
-                'success' => false,
-                'message' => $validate->errorMessage,
-                'error' => $validate->error,
-            ]);
+            $business = $this->businessModel->GetByUserId($_SESSION[SESS]);
+            $customer = $this->customerModel->Paginate($page, $limit, $search, $business['business_id']);
+            $parameter['customer'] = $customer;
+            echo requireToVar(VIEW_PATH . "User/Partial/CustomerTable.php", $parameter);
+        } catch (Exception $e) {
+            echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
         }
+    }
+
+    public function Update(){
+        $res = new Result();
+        try{
+            $currentDate = date('Y-m-d H:i:s');
+            $body = $_POST ?? [];
+
+            $validate = $this->ValidateInput($body);
+            if (!$validate->success){
+                throw new Exception($validate->errorMessage);
+            }
+
+            $customerId = $this->customerModel->UpdateById($body['customerId'],[
+                'updated_at' => $currentDate,
+                'updated_user_id' => $_SESSION[SESS],
+
+                'description' => $body['description'],
+                'unit_price_sale' => $body['unitPriceSale'],
+                'unit_price_sale_igv' => $body['unitPriceSaleIgv'],
+                'customer_code' => $body['customerCode'],
+                'unit_measure_code' => $body['unitMeasureCode'],
+                'affectation_code' => $body['affectationCode'],
+                'system_isc_code' => $body['systemIscCode'],
+                'isc' => $body['isc'],
+            ]);
+
+            $res->result = $customerId;
+            $res->successMessage = "El customero se actualizo exitosamente";
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
     }
 
     public function Create(){
-        $postData = file_get_contents("php://input");
-        $customer = json_decode($postData, true);
+        $res = new Result();
+        try{
+            $body = $_POST ?? [];
+            $validate = $this->ValidateInput($body);
+            if (!$validate->success){
+                throw new Exception($validate->errorMessage);
+            }
 
-        $validate = $this->ValidateCustomer($customer);
+            $body['businessId'] = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
+            $customerId = $this->customerModel->Insert($body);
 
-        if ($validate->success){
-            $customer['business_id'] = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
-            $response = $this->customerModel->Insert($customer);
-            echo json_encode([
-                'success' => true,
-                'data' => $response,
-            ]);
-        }else{
-            echo json_encode([
-                'success' => false,
-                'message' => $validate->errorMessage,
-                'error' => $validate->error,
-            ]);
+            $res->result = $customerId;
+            $res->successMessage = "El customero se creó exitosamente";
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
         }
+        echo json_encode($res);
     }
 
-    public function ByID(){
-        $postData = file_get_contents("php://input");
-        $body = json_decode($postData, true);
-
-        $customerId = $body['customer_id'];
-        $customerModel = new Customer($this->connection);
-        $data = $customerModel->GetById($customerId);
-
-        echo json_encode([
-            'success' => true,
-            'data' => $data,
-        ]);
+    public function ById(){
+        $res = new Result();
+        try{
+            $customerId = $_POST['customerId'] ?? 0;
+            $customer = $this->customerModel->GetById($customerId);
+            $res->result = $customer;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
     }
 
-    public function Delete(){
-        $postData = file_get_contents("php://input");
-        $body = json_decode($postData, true);
-
-        $customerId = $body['customer_id'];
-        $customerModel = new Customer($this->connection);
-        $response = $customerModel->DeleteById($customerId);
-
-        echo json_encode([
-            'success' => true,
-            'data' => $response,
-        ]);
-    }
-
-    public function Search(){
-        $q = $_POST['q'] ?? '';
-        $search['search'] = $q;
-        $search['business_id'] = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
-        $data = $this->customerModel->Search($search);
-
-        echo json_encode([
-            'success' => true,
-            'data' => $data,
-        ]);
-    }
-
-    public function SearchPublicDocumentExtractor(){
-        $postData = file_get_contents("php://input");
-        $body = json_decode($postData, true);
-
-        $validate = $this->ValidateSearchPublicDocument($body ?? []);
-        if ($validate->success){
-            $customer = [];
-            $documentNumber = trim(htmlspecialchars($body['documentNumber']));
-
-            if (strlen($documentNumber) == 8){
-                $jneDNI = new JneDNI();
-                $responseDni = $jneDNI->Query($documentNumber);
-                if ($responseDni->success){
-                    $customer = [
-                        'documentNumber' => $documentNumber,
-                        'socialReason' => $responseDni->result['fullName'],
-                        'identityDocumentCode' => '1',
-                    ];
-                }else{
-                    echo json_encode([
-                        'success' => false,
-                        'message' => $responseDni['message']
-                    ]);
-                    return;
-                }
-            }elseif (strlen($documentNumber) == 11){
+    public function ByDocumentNumber(){
+        $res = new Result();
+        try{
+            $customer['documentNumber'] = $_POST['documentNumber'] ?? '';
+            $customer['businessId'] = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
+            $customer = $this->customerModel->GetByDocumentNumber($customer);
+            if (empty($customer)){
                 $sunatRUC = new SunatRUC();
-                $response = $sunatRUC->Query( $documentNumber );
-                if( $response -> success == true ) {
-                    $customer = [
-                        'documentNumber' => $response->result['ruc'],
-                        'socialReason' => $response->result['razon_social'],
-                        'commercialReason' => $response->result['nombre_comercial'],
-                        'identityDocumentCode' => '6',
-                        'condition' => $response->result['condicion'],
-                        'fiscalAddress' => $response->result['direccion'],
-                    ];
-                }else{
-                    echo json_encode([
-                        'success' => false,
-                        'message' => $response->errorMessage
-                    ]);
-                    return;
+                $response = $sunatRUC->Query( $customer['documentNumber'] );
+                if (!$response->success){
+                    throw new Exception($response->errorMessage);
                 }
-            }else{
                 $customer = [
-                    'documentNumber' => $documentNumber,
+                    'documentNumber' => $response->result['ruc'],
+                    'socialReason' => $response->result['razon_social'],
+                    'commercialReason' => $response->result['nombre_comercial'],
+                    'identityDocumentCode' => '6',
+                    'condition' => $response->result['condicion'],
+                    'fiscalAddress' => $response->result['direccion'],
                 ];
             }
 
-            echo json_encode([
-                'success' => true,
-                'data' => $customer
-            ]);
-        }else{
-            echo json_encode([
-                'success' => false,
-                'message' => $validate->errorMessage,
-                'error' => $validate->error,
-            ]);
+            $res->result = $customer;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
         }
+        echo json_encode($res);
     }
 
-    private function ValidateSearchPublicDocument($customer){
-        $collector = new ErrorCollector();
-        $collector->setSeparator('</br>');
-        if (trim($customer['documentNumber'] ?? '') == ''){
-            $collector->addError('documentNumber','El número del documento es inválido');
+    public function Delete(){
+        $res = new Result();
+        try{
+            $customerId = $_POST['customerId'] ?? 0;
+            $customerId = $this->customerModel->DeleteById($customerId);
+            $res->result = $customerId;
+            $res->successMessage = "El customero se eliminó exitosamente";
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
         }
-        return $collector->getResult();
+        echo json_encode($res);
     }
 
-    private function ValidateCustomer(array $customer) {
+    public function Search(){
+        $res = new Result();
+        try{
+            $q = $_POST['q'] ?? '';
+
+            $search['search'] = $q;
+            $search['businessId'] = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
+            $response = $this->customerModel->Search($search);
+
+            $res->result = $response;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
+    }
+
+    public function SearchByDocumentNumber(){
+        $search['search'] = $_POST['q'] ?? '';
+        $search['businessId'] = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
+        $response = $this->customerModel->SearchByDocumentNumber($search);
+
+        echo json_encode($response ?? []);
+    }
+
+    private function ValidateInput(array $customer) {
         $collector = new ErrorCollector();
         $collector->setSeparator('</br>');
         if (trim($customer['documentNumber'] ?? '') == ''){
@@ -224,6 +205,64 @@ class CustomerController
             $collector->addError('documentNumber',$identityDocValidate->errorMessage);
         }
 
+        return $collector->getResult();
+    }
+
+    public function SearchPublicDocumentExtractor(){
+        $res = new Result();
+        try{
+            $body = $_POST ?? [];
+            $validate = $this->ValidateSearchPublicDocument($body ?? []);
+            if (!$validate->success){
+                throw new Exception($validate->errorMessage);
+            }
+
+            $customer = [];
+            $documentNumber = trim(htmlspecialchars($body['documentNumber']));
+            if (strlen($documentNumber) == 8){
+                $jneDNI = new JneDNI();
+                $response = $jneDNI->Query($documentNumber);
+                if (!$response->success){
+                    throw new Exception($response->errorMessage);
+                }
+
+                $customer = [
+                    'documentNumber' => $documentNumber,
+                    'socialReason' => $response->result['fullName'],
+                    'identityDocumentCode' => '1',
+                ];
+            }elseif (strlen($documentNumber) == 11){
+                $sunatRUC = new SunatRUC();
+                $response = $sunatRUC->Query( $documentNumber );
+                if (!$response->success){
+                    throw new Exception($response->errorMessage);
+                }
+                $customer = [
+                    'documentNumber' => $response->result['ruc'],
+                    'socialReason' => $response->result['razon_social'],
+                    'commercialReason' => $response->result['nombre_comercial'],
+                    'identityDocumentCode' => '6',
+                    'condition' => $response->result['condicion'],
+                    'fiscalAddress' => $response->result['direccion'],
+                ];
+            }else{
+                $customer = [ 'documentNumber' => $documentNumber ];
+            }
+
+            $res->result = $customer;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
+    }
+
+    private function ValidateSearchPublicDocument($customer){
+        $collector = new ErrorCollector();
+        $collector->setSeparator('</br>');
+        if (trim($customer['documentNumber'] ?? '') == ''){
+            $collector->addError('documentNumber','El número del documento es inválido');
+        }
         return $collector->getResult();
     }
 }

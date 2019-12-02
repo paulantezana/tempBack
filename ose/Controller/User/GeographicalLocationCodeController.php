@@ -6,25 +6,26 @@ class GeographicalLocationCodeController
 {
     private $connection;
     private $param;
+    private $catGeographicalLocationCodeModel;
 
     public function __construct($connection, $param)
     {
         $this->connection = $connection;
         $this->param = $param;
+        $this->catGeographicalLocationCodeModel = new CatGeographicalLocationCode($this->connection);
     }
 
     public function Search(){
-        header('Content-Type: application/json; charset=UTF-8');
+        $res = new Result();
+        try{
+            $search = $_POST['q'] ?? '';
+            $response = $this->catGeographicalLocationCodeModel->Search($search);
 
-        $search = $_POST['q'] ?? '';
-
-        $geographicalLocationCodeModel = new CatGeographicalLocationCode($this->connection);
-        $data = $geographicalLocationCodeModel->Search($search);
-
-        // Response data
-        echo json_encode([
-            'success' => true,
-            'data' => $data,
-        ]);
+            $res->result = $response;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
     }
 }

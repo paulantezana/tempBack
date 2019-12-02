@@ -1,5 +1,5 @@
 <div class="container">
-    <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
+    <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
     <div class="mt-5 mb-5">
         <h5 class="mb-3"><?= $parameter['guide']['voucher_type_description'] ?? '' ?></h5>
         <div class="btn btn-group" style="padding: 0">
@@ -127,6 +127,6 @@
 </div>
 
 <?php
-    require_once __DIR__ . '/Partials/ReferralGuideSendEmailModal.php';
-    require_once __DIR__ . '/Partials/ReferralGuideModal.php';
+    require_once __DIR__ . '/Partial/ReferralGuideSendEmailModal.php';
+    require_once __DIR__ . '/Partial/ReferralGuideModal.php';
 ?>

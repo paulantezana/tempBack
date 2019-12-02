@@ -6,22 +6,26 @@ class UnitMeasureTypeCodeController
 {
     private $connection;
     private $param;
+    private $catUnitMeasureTypeCodeModel;
 
     public function __construct($connection, $param)
     {
         $this->connection = $connection;
         $this->param = $param;
+        $this->catUnitMeasureTypeCodeModel = new CatUnitMeasureTypeCode($this->connection);
     }
 
     public function Search(){
-        header('Content-Type: application/json; charset=UTF-8');
-        $search = $_POST['q'] ?? '';
+        $res = new Result();
+        try{
+            $search = $_POST['q'] ?? '';
+            $response = $this->catUnitMeasureTypeCodeModel->SearchBy('description',$search);
 
-        $unitMeasureModel = new CatUnitMeasureTypeCode($this->connection);
-        $data = $unitMeasureModel->SearchBy('description',$search);
-        echo json_encode([
-            'data' => $data,
-            'success' => true
-        ]);
+            $res->result = $response;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
     }
 }

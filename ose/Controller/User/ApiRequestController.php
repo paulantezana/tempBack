@@ -1,18 +1,22 @@
 <?php
 
 require_once MODEL_PATH . 'User/Invoice.php';
+require_once MODEL_PATH . 'User/InvoiceNote.php';
 require_once CONTROLLER_PATH . 'Helper/InvoiceBuild.php';
+require_once CONTROLLER_PATH . 'Helper/InvoiceNoteBuild.php';
 require_once CONTROLLER_PATH . 'Helper/ApiSign.php';
 
 class ApiRequestController
 {
     private $connection;
     private $invoiceModel;
+    private $invoiceNoteModel;
 
     public function __construct($connection)
     {
         $this->connection = $connection;
         $this->invoiceModel = new Invoice($this->connection);
+        $this->invoiceNoteModel = new InvoiceNote($this->connection);
     }
 
     public function Exec(){
@@ -21,8 +25,6 @@ class ApiRequestController
 
         $res = new Result();
         try{
-
-
             $postData = file_get_contents("php://input");
             $invoice = json_decode($postData, true);
 
@@ -173,6 +175,18 @@ class ApiRequestController
             $invoice['referral_guide']['address_arrival_point'] = $invoiceApi['factura_guia']['dureccion_punto_llegada'];
         }
 
+        // Credit Note And Debit Note
+        if ($invoice['document_code'] == '07' && $invoice['document_code'] == '08'){
+            $invoiceId  = $this->invoiceModel->ExistDocument(
+                $invoiceApi['documento_afectado']['numero_documento'],
+                $invoiceApi['documento_afectado']['serie_documento'],
+                $invoiceApi['documento_afectado']['codigo_tipo_documento']
+            );
+            if (!$invoiceId){
+                throw new Exception('El documento que hace referecnia no existe');
+            }
+        }
+
         return $invoice;
 
         // Detraction
@@ -240,9 +254,47 @@ class ApiRequestController
                 $res->success = true;
                 return $res;
             } elseif($invoice['document_code'] === '07'){
+                $invoiceBuild = new InvoiceNoteBuild($this->connection);
+                $invoiceId = $this->invoiceModel->Insert($invoice,$authorization['userId'],$authorization['localId']);
 
+                $response = $invoiceBuild->BuildDocument($invoiceId, $authorization['userId']);
+                if (!$response->success){
+                    throw new Exception($res->errorMessage);
+                }
+
+                $protocol = stripos($_SERVER['REQUEST_SCHEME'], 'https') === 0 ? 'https://' : 'http://';
+                $hostName = $_SERVER['SERVER_NAME'];
+                $currentUrl = $protocol . $hostName . str_replace('/ose','',FOLDER_NAME);
+
+                $invoiceResponse = $this->invoiceModel->GetApiResponseById($invoiceId);
+                $invoiceResponse['enlace_del_pdf'] = $currentUrl . $invoiceResponse['enlace_del_pdf'];
+                $invoiceResponse['enlace_del_xml'] = $currentUrl . $invoiceResponse['enlace_del_xml'];
+                $invoiceResponse['enlace_del_cdr'] = $currentUrl . $invoiceResponse['enlace_del_cdr'];
+
+                $res->result = $invoiceResponse;
+                $res->success = true;
+                return $res;
             } elseif($invoice['document_code'] === '08'){
+                $invoiceBuild = new InvoiceNoteBuild($this->connection);
+                $invoiceId = $this->invoiceModel->Insert($invoice,$authorization['userId'],$authorization['localId']);
 
+                $response = $invoiceBuild->BuildDocument($invoiceId, $authorization['userId']);
+                if (!$response->success){
+                    throw new Exception($res->errorMessage);
+                }
+
+                $protocol = stripos($_SERVER['REQUEST_SCHEME'], 'https') === 0 ? 'https://' : 'http://';
+                $hostName = $_SERVER['SERVER_NAME'];
+                $currentUrl = $protocol . $hostName . str_replace('/ose','',FOLDER_NAME);
+
+                $invoiceResponse = $this->invoiceModel->GetApiResponseById($invoiceId);
+                $invoiceResponse['enlace_del_pdf'] = $currentUrl . $invoiceResponse['enlace_del_pdf'];
+                $invoiceResponse['enlace_del_xml'] = $currentUrl . $invoiceResponse['enlace_del_xml'];
+                $invoiceResponse['enlace_del_cdr'] = $currentUrl . $invoiceResponse['enlace_del_cdr'];
+
+                $res->result = $invoiceResponse;
+                $res->success = true;
+                return $res;
             } else {
                 throw new Exception("Tipo de documento no soportado");
             }

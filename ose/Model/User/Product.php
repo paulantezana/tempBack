@@ -9,18 +9,56 @@ class Product extends BaseModel
         parent::__construct("product","product_id",$db);
     }
 
-    public function Paginate($page = 1, $limit = 10, $businessId = 0) {
+    public function GetById($id)
+    {
+        try {
+            $sql = "SELECT product.*, cumtc.description as  unit_measure_code_description, cpc.description as  product_code_description,
+                        caitc.description as affectation_code_description
+                        FROM product
+                        INNER JOIN cat_unit_measure_type_code cumtc on product.unit_measure_code = cumtc.code
+                        INNER JOIN cat_product_code cpc on product.product_code = cpc.code
+                        INNER JOIN cat_affectation_igv_type_code caitc on product.affectation_code = caitc.code
+                        WHERE product_id = :product_id LIMIT 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([":product_id" => $id]);
+            return $stmt->fetch();
+        } catch (Exception $e) {
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+        }
+    }
+
+    public function GetAllByBusinessId($businessId)
+    {
+        try {
+            $sql = "SELECT product.*, cumtc.description as  unit_measure_code_description, cpc.description as  product_code_description,
+                        caitc.description as affectation_code_description
+                        FROM product
+                        INNER JOIN cat_unit_measure_type_code cumtc on product.unit_measure_code = cumtc.code
+                        INNER JOIN cat_product_code cpc on product.product_code = cpc.code
+                        INNER JOIN cat_affectation_igv_type_code caitc on product.affectation_code = caitc.code
+                        WHERE business_id = :business_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([":business_id" => $businessId]);
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+        }
+    }
+
+    public function Paginate($page, $limit = 10, $search = '', $businessId = 0) {
         try{
             $offset = ($page - 1) * $limit;
             $totalRows = $this->db->query('SELECT COUNT(*) FROM product WHERE business_id = ' . $businessId)->fetchColumn();
             $totalPages = ceil($totalRows / $limit);
 
-            $sql = "SELECT product.*, cat_unit_measure_type_code.description as unit_measure_type_code_description, cat_product_code.description as product_code_description, cat_affectation_igv_type_code.description as affectation_igv_type_code_description  FROM product 
-                INNER JOIN cat_unit_measure_type_code ON product.unit_measure_code = cat_unit_measure_type_code.code
-                INNER JOIN cat_product_code ON product.product_code = cat_product_code.code
-                INNER JOIN cat_affectation_igv_type_code ON product.affectation_code = cat_affectation_igv_type_code.code
-                WHERE product.business_id = :business_id
-                ORDER BY product.product_id DESC LIMIT $offset, $limit";
+            $sql = "SELECT product.*, cumtc.description as  unit_measure_code_description, cpc.description as  product_code_description,
+                        caitc.description as affectation_code_description
+                        FROM product
+                        INNER JOIN cat_unit_measure_type_code cumtc on product.unit_measure_code = cumtc.code
+                        INNER JOIN cat_product_code cpc on product.product_code = cpc.code
+                        INNER JOIN cat_affectation_igv_type_code caitc on product.affectation_code = caitc.code
+                        WHERE product.business_id = :business_id
+                        ORDER BY product.product_id DESC LIMIT $offset, $limit";
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam(':business_id',$businessId);
             $stmt->execute();
@@ -42,36 +80,28 @@ class Product extends BaseModel
         try{
             $currentDate = date('Y-m-d H:i:s');
 
-            $sql = "INSERT INTO product (description, unit_price_purchase, unit_price_sale, unit_price_purchase_igv, unit_price_sale_igv, 
-                                            product_code, product_code_inner, unit_measure_code, affectation_code, stock, currency_code, system_isc_code, isc,
-                                        business_id, created_at,updated_at,creation_user_id,modification_user_id)
-                    VALUES (:description, :unit_price_purchase, :unit_price_sale, :unit_price_purchase_igv, :unit_price_sale_igv, 
-                            :product_code, :product_code_inner, :unit_measure_code, :affectation_code, :stock, :currency_code, :system_isc_code, :isc,
-                            :business_id, :created_at,:updated_at,:creation_user_id,:modification_user_id)";
-
+            $sql = "INSERT INTO product (updated_at, created_at, created_user_id, updated_user_id, business_id, description,
+                                        unit_price_sale, unit_price_sale_igv, product_code, unit_measure_code, affectation_code, system_isc_code, isc)
+                    VALUES (:updated_at, :created_at, :created_user_id, :updated_user_id, :business_id, :description,
+                                        :unit_price_sale, :unit_price_sale_igv, :product_code, :unit_measure_code, :affectation_code, :system_isc_code, :isc)";
             $stmt = $this->db->prepare($sql);
 
             // Execute query
             if(!$stmt->execute([
-                ':description' => $product['description'] ?? '',
-                ':unit_price_purchase' => (float)($product['unitPricePurchase'] ?? 0),
-                ':unit_price_sale' => (float)($product['unitPriceSale'] ?? 0),
-                ':unit_price_purchase_igv' => (float)($product['unitPricePurchaseIgv'] ?? 0),
-                ':unit_price_sale_igv' => (float)($product['unitPriceSaleIgv'] ?? 0),
+                ':updated_at' => $currentDate,
+                ':created_at' => $currentDate,
+                ':created_user_id' => $_SESSION[SESS],
+                ':updated_user_id' => $_SESSION[SESS],
+
+                ':business_id' => $product['businessId'],
+                ':description' => $product['description'],
+                ':unit_price_sale' => $product['unitPriceSale'],
+                ':unit_price_sale_igv' => $product['unitPriceSaleIgv'],
                 ':product_code' => $product['productCode'],
-                ':product_code_inner' => $product['productCodeInner'] ?? '',
                 ':unit_measure_code' => $product['unitMeasureCode'],
                 ':affectation_code' => $product['affectationCode'],
-                ':stock' => (float)($product['stock'] ?? 0),
-                ':currency_code' => $product['currencyCode'] ?? '',
-                ':system_isc_code' => $product['systemIscCode'] ?? '',
-                ':isc' => (float)($product['isc'] ?? 0),
-                ':business_id' => $product['business_id'],
-
-                ":created_at" => $currentDate,
-                ":updated_at" => $currentDate,
-                ":creation_user_id" => $_SESSION[SESS],
-                ":modification_user_id" => $_SESSION[SESS],
+                ':system_isc_code' => $product['systemIscCode'],
+                ':isc' => $product['isc'],
             ])){
                 throw new Exception("Error al insertar el producto.");
             }

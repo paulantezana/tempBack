@@ -2,9 +2,7 @@
 
 require_once MODEL_PATH . 'User/Product.php';
 require_once MODEL_PATH . 'User/Business.php';
-require_once MODEL_PATH . 'User/CatProductCode.php';
 require_once MODEL_PATH . 'User/CatAffectationIgvTypeCode.php';
-require_once MODEL_PATH . 'User/CatCurrencyTypeCode.php';
 require_once MODEL_PATH . 'User/CatUnitMeasureTypeCode.php';
 require_once MODEL_PATH . 'User/CatSystemIscTypeCode.php';
 
@@ -13,30 +11,22 @@ class ProductController
     private $connection;
     private $param;
     private $businessModel;
+    private $productModel;
 
     public function __construct($connection, $param)
     {
         $this->connection = $connection;
         $this->param = $param;
         $this->businessModel = new Business($this->connection);
+        $this->productModel = new Product($this->connection);
     }
 
     public function Exec(){
         try{
-            $page = $_GET['page'] ?? 0;
-            if (!$page){
-                $page = 1;
-            }
-
-            $productModel = new Product($this->connection);
             $affectationIgvTypeCodeModel = new CatAffectationIgvTypeCode($this->connection);
-            $currencyTypeCodeModel = new CatCurrencyTypeCode($this->connection);
             $systemIscTypeCodeModel = new CatSystemIscTypeCode($this->connection);
 
-            $businessId = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
-            $parameter['products'] = $productModel->paginate($page,10, $businessId);
             $parameter['affectationIgvTypeCode'] = $affectationIgvTypeCodeModel->getAll();
-            $parameter['currencyTypeCode'] = $currencyTypeCodeModel->getAll();
             $parameter['systemIscTypeCode'] = $systemIscTypeCodeModel->getAll();
 
             $content = requireToVar(VIEW_PATH . "User/Product.php", $parameter);
@@ -46,123 +36,121 @@ class ProductController
         }
     }
 
-    public function Update(){
-        $postData = file_get_contents("php://input");
-        $product = json_decode($postData, true);
+    public function Table(){
+        try {
+            $page = isset($_GET['page']) ? $_GET['page'] : 1;
+            $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
+            $search = isset($_GET['search']) ? $_GET['search'] : '';
 
-        $validate = $this->ValidateProduct($product);
-
-        if ($validate->success){
-            $product_model = new Product($this->connection);
-            $response = $product_model->UpdateById($product['productId'],[
-                'description' => $product['description'] ?? '',
-                'unit_price_purchase' => $product['unitPricePurchase'] ?? 0.0,
-                'unit_price_sale' => $product['unitPriceSale'] ?? 0.0,
-                'unit_price_purchase_igv' => $product['unitPricePurchaseIgv'] ?? 0.0,
-                'unit_price_sale_igv' => $product['unitPriceSaleIgv'] ?? 0.0,
-                'product_code' => $product['productCode'],
-                'unit_measure_code' => $product['unitMeasureCode'],
-                'affectation_code' => $product['affectationCode'],
-                'currency_code' => $product['currencyCode'],
-                'system_isc_code' => $product['systemIscCode'] ?? '',
-                'isc' => $product['isc'] ?? 0,
-            ]);
-            echo json_encode([
-                'success' => true,
-                'data' => $response,
-            ]);
-        }else{
-            echo json_encode([
-                'success' => false,
-                'message' => $validate->errorMessage,
-                'error' => $validate->error,
-            ]);
+            $business = $this->businessModel->GetByUserId($_SESSION[SESS]);
+            $product = $this->productModel->Paginate($page, $limit, $search, $business['business_id']);
+            $parameter['product'] = $product;
+            echo requireToVar(VIEW_PATH . "User/Partial/ProductTable.php", $parameter);
+        } catch (Exception $e) {
+            echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
         }
+    }
+
+    public function Update(){
+        $res = new Result();
+        try{
+            $currentDate = date('Y-m-d H:i:s');
+            $body = $_POST ?? [];
+
+            $validate = $this->ValidateInput($body);
+            if (!$validate->success){
+                throw new Exception($validate->errorMessage);
+            }
+
+            $productId = $this->productModel->UpdateById($body['productId'],[
+                'updated_at' => $currentDate,
+                'updated_user_id' => $_SESSION[SESS],
+
+                'description' => $body['description'],
+                'unit_price_sale' => $body['unitPriceSale'],
+                'unit_price_sale_igv' => $body['unitPriceSaleIgv'],
+                'product_code' => $body['productCode'],
+                'unit_measure_code' => $body['unitMeasureCode'],
+                'affectation_code' => $body['affectationCode'],
+                'system_isc_code' => $body['systemIscCode'],
+                'isc' => $body['isc'],
+            ]);
+
+            $res->result = $productId;
+            $res->successMessage = "El producto se actualizo exitosamente";
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
     }
 
     public function Create(){
-        $postData = file_get_contents("php://input");
-        $product = json_decode($postData, true);
+        $res = new Result();
+        try{
+            $body = $_POST ?? [];
+            $validate = $this->ValidateInput($body);
+            if (!$validate->success){
+                throw new Exception($validate->errorMessage);
+            }
 
-        $validate = $this->ValidateProduct($product);
+            $body['businessId'] = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
+            $productId = $this->productModel->Insert($body);
 
-        if ($validate->success){
-            $productModel = new Product($this->connection);
-            $product['business_id'] = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
-            $response = $productModel->Insert($product);
-            echo json_encode([
-                'success' => true,
-                'data' => $response,
-            ]);
-        }else{
-            echo json_encode([
-                'success' => false,
-                'message' => $validate->errorMessage,
-                'error' => $validate->error,
-            ]);
+            $res->result = $productId;
+            $res->successMessage = "El producto se creó exitosamente";
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
         }
+        echo json_encode($res);
     }
 
     public function ById(){
-        $postData = file_get_contents("php://input");
-        $body = json_decode($postData, true);
-
-        $productId = $body['product_id'];
-
-        $productModel = new Product($this->connection);
-        $productCodeModel = new CatProductCode($this->connection);
-        $unitMeasureTypeCodeModel =  new CatUnitMeasureTypeCode($this->connection);
-        $affectationIgvTypeModel = new CatAffectationIgvTypeCode($this->connection);
-
-        $product = $productModel->GetById($productId);
-        $unitMeasureTypeCode = $unitMeasureTypeCodeModel->GetBy('code',$product['unit_measure_code']);
-        $affectationIgvType = $affectationIgvTypeModel->GetBy('code',$product['affectation_code']);
-        $productCode = $productCodeModel->GetBy('code',$product['product_code']);
-
-        echo json_encode([
-            'success' => true,
-            'data' => array_merge(
-                $product,
-                [
-                    'affectation' => $affectationIgvType,
-                    'product_code' => $productCode,
-                    'unit_measure_code' => $unitMeasureTypeCode,
-                ]
-            ),
-            'message' => 'Los datos se obtenieron exitosamente',
-        ]);
+        $res = new Result();
+        try{
+            $productId = $_POST['productId'] ?? 0;
+            $product = $this->productModel->GetById($productId);
+            $res->result = $product;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
     }
 
     public function Delete(){
-
-        $postData = file_get_contents("php://input");
-        $body = json_decode($postData, true);
-
-        $productId = $body['product_id'];
-        $productModel = new Product($this->connection);
-        $data = $productModel->DeleteById($productId);
-
-        echo json_encode([
-            'success' => true,
-            'data' => $data,
-        ]);
+        $res = new Result();
+        try{
+            $productId = $_POST['productId'] ?? 0;
+            $productId = $this->productModel->DeleteById($productId);
+            $res->result = $productId;
+            $res->successMessage = "El producto se eliminó exitosamente";
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
     }
 
     public function Search(){
+        $res = new Result();
+        try{
+            $q = $_POST['q'] ?? '';
 
-        $q = $_POST['q'] ?? '';
+            $search['search'] = $q;
+            $search['business_id'] = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
+            $response = $this->productModel->Search($search);
 
-        $productModel = new Product($this->connection);
-        $search['search'] = $q;
-        $search['business_id'] = $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'];
-        $data = $productModel->Search($search);
-        echo json_encode([
-            'success' => true,
-            'data' => $data,
-        ]);
+            $res->result = $response;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
     }
 
-    private function ValidateProduct(array $product) {
+    private function ValidateInput(array $product) {
         $collector = new ErrorCollector();
         if (trim($product['unitMeasureCode'] ?? '') == ""){
             $collector->addError('unitMeasureCode','No se especificó el código de unidad de medida SUNAT');

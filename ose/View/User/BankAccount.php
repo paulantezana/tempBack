@@ -1,5 +1,5 @@
 <div class="container">
-    <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
+    <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
     <div class="card mt-4">
         <div class="card-body">
             <span><i class="fas fa-list"></i>  Cuentas bancarias</span>
@@ -76,4 +76,4 @@
     </div>
 </div>
 
-<?php require_once __DIR__ . '/Partials/CustomerForm.php'; ?>
+<?php require_once __DIR__ . '/Partial/CustomerForm.php'; ?>

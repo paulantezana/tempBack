@@ -15,17 +15,10 @@ class InvoiceTemplate
         return '
         <tr id="invoiceItem${uniqueId}" data-uniqueId="${uniqueId}">
             <td>
-                <div class="input-group" style="flex-wrap: nowrap">
-                    <div class="input-group-prepend">
-                        <div class="btn btn-secondary btn-sm" id="newProduct${uniqueId}">+</div>
-                    </div>
-                    <select class="selectpicker with-ajax" data-live-search="true" id="selectProduct${uniqueId}" name="invoice[item][${uniqueId}][product_id]" required></select>
-                </div>
+                <select name="" id="productSearch${uniqueId}"></select>
+                <input type="hidden" id="description${uniqueId}" name="invoice[item][${uniqueId}][description]">
                 <input type="hidden" id="productCode${uniqueId}" name="invoice[item][${uniqueId}][product_code]">
                 <input type="hidden" id="unitMeasure${uniqueId}" name="invoice[item][${uniqueId}][unit_measure]">
-            </td>
-            <td>
-                <textarea cols="30" rows="1" class="form-control form-control-sm" id="description${uniqueId}" name="invoice[item][${uniqueId}][description]"></textarea>
             </td>
             <td>
                 <input type="' . $unitValueType . '" step="any" min="0" class="form-control form-control-sm" name="invoice[item][${uniqueId}][unit_value]" id="unitValue${uniqueId}">
@@ -50,10 +43,10 @@ class InvoiceTemplate
             <td>
                 <div style="display: flex;">
                     <button type="button" class="btn btn-sm btn-light" id="remove${uniqueId}" title="Quitar item">
-                        <i class="fas fa-times text-danger"></i>
+                        <i class="icon-cross text-danger"></i>
                     </button>
                     <button type="button" class="btn ml-1 btn-sm btn-light" id="dropdownMenuInvoiceItem" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent" title="Más opciones">
-                        <i class="fas fa-ellipsis-v"></i>
+                        <i class="icon-menu9"></i>
                     </button>
                     <div class="dropdown-menu p-4" style="max-width: 350px" aria-labelledby="dropdownMenuInvoiceItem">
                         <div class="form-group">

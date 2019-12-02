@@ -1,5 +1,5 @@
 <div class="container">
-    <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
+    <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
 
     <form action="<?= FOLDER_NAME . '/InvoiceNote/NewDebitNote' ?>" method="POST" id="invoiceForm" class="mt-5 mb-5">
         <div class="mb-4">
@@ -17,31 +17,31 @@
                 <div class="form-row">
 
                     <div class="form-group col-md-3">
-                        <label for="invoiceSaleDocumentCode">Tipo Doc.Electrónico:</label>
-                        <select class="form-control" id="invoiceSaleDocumentCode" name="invoice[sale_update][document_code]">
-                            <option value="03" <?= ($parameter['invoice']['sale_update']['document_code'] ?? false) == "03" ? 'selected' : '' ?>>BOLETA</option>
-                            <option value="01" <?= ($parameter['invoice']['sale_update']['document_code'] ?? false) == "01" ? 'selected' : '' ?>>FACTURA</option>
+                        <label for="invoiceInvoiceDocumentCode">Tipo Doc.Electrónico:</label>
+                        <select class="form-control" id="invoiceInvoiceDocumentCode" name="invoice[invoice_update][document_code]">
+                            <option value="03" <?= ($parameter['invoice']['invoice_update']['document_code'] ?? false) == "03" ? 'selected' : '' ?>>BOLETA</option>
+                            <option value="01" <?= ($parameter['invoice']['invoice_update']['document_code'] ?? false) == "01" ? 'selected' : '' ?>>FACTURA</option>
                         </select>
                     </div>
 
-                    <!--                    <input type="hidden" name="invoice[sale_update][sale_id]" value="--><?//= $parameter['invoice']['sale_update']['sale_id'] ?? '' ?><!--">-->
+                    <!--                    <input type="hidden" name="invoice[invoice_update][invoice_id]" value="--><?//= $parameter['invoice']['invoice_update']['invoice_id'] ?? '' ?><!--">-->
 
                     <div class="form-group col-md-3">
-                        <label for="invoiceSaleSerie">Serie:</label>
-                        <input type="text" class="form-control" id="invoiceSaleSerie" name="invoice[sale_update][serie]" value="<?= $parameter['invoice']['sale_update']['serie'] ?? '' ?>">
+                        <label for="invoiceInvoiceSerie">Serie:</label>
+                        <input type="text" class="form-control" id="invoiceInvoiceSerie" name="invoice[invoice_update][serie]" value="<?= $parameter['invoice']['invoice_update']['serie'] ?? '' ?>">
                     </div>
 
                     <div class="form-group col-md-3">
-                        <label for="invoiceSaleCorrelative">Correlativo:</label>
-                        <input type="text" class="form-control" id="invoiceSaleCorrelative" name="invoice[sale_update][correlative]" value="<?= $parameter['invoice']['sale_update']['correlative'] ?? '' ?>">
+                        <label for="invoiceInvoiceCorrelative">Correlativo:</label>
+                        <input type="text" class="form-control" id="invoiceInvoiceCorrelative" name="invoice[invoice_update][correlative]" value="<?= $parameter['invoice']['invoice_update']['correlative'] ?? '' ?>">
                     </div>
 
                     <div class="form-group col-md-3">
-                        <label for="invoiceSaleCreditNoteCode">Motivo</label>
-                        <select class="form-control" id="invoiceSaleCreditNoteCode" name="invoice[sale_update][credit_note_code]" >
+                        <label for="invoiceInvoiceCreditNoteCode">Motivo</label>
+                        <select class="form-control" id="invoiceInvoiceCreditNoteCode" name="invoice[invoice_update][credit_note_code]" >
                             <option value="">Elegir</option>
                             <?php foreach ($parameter['creditNoteType'] ?? [] as $row): ?>
-                                <option value="<?= $row['code']?>" <?= ($parameter['invoice']['sale_update']['credit_note_code'] ?? '') == $row['code'] ? 'selected' : '' ?> >
+                                <option value="<?= $row['code']?>" <?= ($parameter['invoice']['invoice_update']['credit_note_code'] ?? '') == $row['code'] ? 'selected' : '' ?> >
                                     <?= $row['description']?>
                                 </option>
                             <?php endforeach; ?>
@@ -54,9 +54,9 @@
         <div class="card mb-5 bg-white">
             <div class="card-body">
 
-                <?php require_once __DIR__ . '/Partials/InvoiceHeader.php' ?>
+                <?php require_once __DIR__ . '/Partial/InvoiceHeader.php' ?>
 
-                <?php require_once __DIR__ . '/Partials/InvoiceItem.php' ?>
+                <?php require_once __DIR__ . '/Partial/InvoiceItem.php' ?>
 
                 <div class="row mb-2">
 
@@ -507,7 +507,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <?php require_once __DIR__ . '/Partials/InvoiceTotal.php';?>
+                        <?php require_once __DIR__ . '/Partial/InvoiceTotal.php';?>
                     </div>
                 </div>
 
@@ -532,6 +532,6 @@
 </div>
 
 <?php
-require_once __DIR__ . '/Partials/ProductForm.php';
-require_once __DIR__ . '/Partials/CustomerForm.php';
+require_once __DIR__ . '/Partial/ProductForm.php';
+require_once __DIR__ . '/Partial/CustomerForm.php';
 ?>

@@ -1,5 +1,5 @@
 <div class="container pt-5 pb-5">
-    <?php require_once __DIR__ . '/Partials/AlertMessage.php' ?>
+    <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
     <div class="row mb-5">
         <div class="col-auto mr-auto">
             <h1>
@@ -259,4 +259,4 @@
     </div>
 </div>
 
-<?php require_once __DIR__ . '/Partials/DocumentPrinterModal.php'; ?>
+<?php require_once __DIR__ . '/Partial/DocumentPrinterModal.php'; ?>

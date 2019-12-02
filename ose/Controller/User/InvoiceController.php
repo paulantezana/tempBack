@@ -33,6 +33,7 @@ class InvoiceController
     private $invoiceItemModel;
     private $customerModel;
     private $businessModel;
+    private $productModel;
 
     public function __construct(PDO $connection, $param)
     {
@@ -43,6 +44,7 @@ class InvoiceController
         $this->invoiceItemModel = new InvoiceItem($this->connection);
         $this->customerModel = new Customer($this->connection);
         $this->businessModel = new Business($this->connection);
+        $this->productModel = new Product($this->connection);
     }
 
     public function Exec(){
@@ -64,27 +66,30 @@ class InvoiceController
             // Filter
             $customerDescription = '';
             if ($filterCustomer){
-                $data = $this->customerModel->GetById($filterCustomer);
-                $customerDescription = $data['document_number'] . ' ' . $data['social_reason'];
+                $data = $this->customerModel->GetByDocumentNumber([
+                    'documentNumber' => $filterCustomer,
+                    'businessId' =>  $this->businessModel->GetByUserId($_SESSION[SESS])['business_id'],
+                ]);
+                $customerDescription = $data['social_reason'];
             }
 
             $invoiceDescription = '';
             if ($filterInvoiceSearch){
                 $data = $this->invoiceModel->GetById($filterInvoiceSearch);
                 $index = array_search($data['document_code'], array_column($documentTypeCode, 'code'));
-                $invoiceDescription = "{$data['serie']}-{$data['correlative']} ( {$documentTypeCode[$index]['description']} ) {$data['date_of_issue']}";
+                $invoiceDescription = "{$documentTypeCode[$index]['description']}: {$data['serie']}-{$data['correlative']}";
             }
 
             $parameter['filter'] = [
                 'documentCode' => $filterDocumentCode,
                 'customer' => [
-                    'customer_id' => $filterCustomer,
+                    'documentNumber' => $filterCustomer,
                     'description' => $customerDescription,
                 ],
                 'startDate' => $filterStartDate,
                 'endDate' => $filterEndDate,
                 'invoiceSearch' => [
-                    'invoice_id' => $filterInvoiceSearch,
+                    'invoiceId' => $filterInvoiceSearch,
                     'description' => $invoiceDescription,
                 ]
             ];
@@ -94,7 +99,7 @@ class InvoiceController
                 10,
                 [
                     'documentCode' => $filterDocumentCode,
-                    'customerID' => $filterCustomer,
+                    'customerDocumentNumber' => $filterCustomer,
                     'startDate' => $filterStartDate,
                     'endDate' => $filterEndDate,
                     'invoiceSearch' => $filterInvoiceSearch,
@@ -128,18 +133,6 @@ class InvoiceController
         }
     }
 
-    public function JsonSearch(){
-        $search = $_POST['q'] ?? '';
-
-        $invoiceModel = new Invoice($this->connection);
-        $data = $invoiceModel->searchBySerieCorrelative($search);
-
-        echo json_encode([
-            'success' => true,
-            'data' => $data,
-        ]);
-    }
-
     public function NewInvoice(){
         try{
             $error = [];
@@ -153,31 +146,21 @@ class InvoiceController
                         throw new Exception('No hay ningun campo');
                     }
 
-                    $jungleProduct = ($invoice['jungle_product'] ?? 0) === 'on' ? true : false;
-                    $jungleService = ($invoice['jungle_service'] ?? 0) === 'on' ? true : false;
                     $invoice['itinerant_enable'] = ($invoice['itinerant_enable'] ?? false) == 'on' ? 1 : 0;
                     $invoice['prepayment_regulation'] = ($invoice['prepayment_regulation'] ?? false) == 'on' ? 1 : 0;
                     $invoice['time_of_issue'] = date('H:i:s');
 
                     $legend = [];
-                    if ($jungleProduct){
+                    if ($invoice['jungle_product'] ?? 0 === 'on'){
                         array_push($legend,2001);
                     }
-                    if ($jungleService){
+                    if ($invoice['jungle_service'] ?? 0){
                         array_push($legend,2002);
                     }
+                    $invoice['legend'] = $legend;
 
                     $invoice['percentage_igv'] = 18.00;
-                    $invoice['legend'] = $legend;
                     $invoice['total_value'] = $invoice['total_unaffected'] + $invoice['total_taxed'] + $invoice['total_exonerated'];
-
-                    $customer = $this->customerModel->GetById($invoice['customer_id']);
-                    $invoice['customer']['document_number'] = $customer['document_number'];
-                    $invoice['customer']['identity_document_code'] = $customer['identity_document_code'];
-                    $invoice['customer']['social_reason'] = $customer['social_reason'];
-                    $invoice['customer']['fiscal_address'] = $customer['fiscal_address'];
-                    $invoice['customer']['email'] = $customer['main_email'];
-                    $invoice['customer']['telephone'] = $customer['telephone'];
 
                     $invoice['guide_array'] = [];
                     if (isset($invoice['guide'])){
@@ -186,32 +169,24 @@ class InvoiceController
                         }
                     }
 
-//                    $validateInput = $this->ValidateInput($invoice);
-//                    $error = $validateInput->error;
-//                    if (!$validateInput->success){
-//                        throw new Exception($validateInput->errorMessage);
-//                    }
+                    $validateInput = $this->ValidateInput($invoice);
+                    $error = $validateInput->error;
+                    if (!$validateInput->success){
+                        throw new Exception($validateInput->errorMessage);
+                    }
                     $invoiceId = $this->invoiceModel->Insert($invoice, $_SESSION[SESS], $_COOKIE['CurrentBusinessLocal']);
 
                     $invoiceBuild = new InvoiceBuild($this->connection);
-                    $resRunDoc = $invoiceBuild->BuildDocument($invoiceId);
-//                   if ($invoiceId >= 1 && $resRunDoc->success){
-//                           header('Location: ' . FOLDER_NAME . '/Invoice/View?InvoiceId=' . $invoiceId . '&message=' . urlencode('El documento se guardó y se envió a la SUNAT exitosamente') . '&messageType=success');
-//                       } else {
-//                           header('Location: ' . FOLDER_NAME . '/Invoice/View?InvoiceId=' . $invoiceId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
-//                       }
-//                    return;
+                    $resRunDoc = $invoiceBuild->BuildDocument($invoiceId,$_SESSION[SESS]);
+                   if ($invoiceId >= 1 && $resRunDoc->success){
+                           header('Location: ' . FOLDER_NAME . '/Invoice/View?InvoiceId=' . $invoiceId . '&message=' . urlencode('El documento se guardó y se envió a la SUNAT exitosamente') . '&messageType=success');
+                       } else {
+                           header('Location: ' . FOLDER_NAME . '/Invoice/View?InvoiceId=' . $invoiceId . '&message=' . urlencode($resRunDoc->errorMessage) . '&messageType=error');
+                       }
+                    return;
                 }catch (Exception $exception){
-                    $message = $exception->getMessage();
+                    $message = $exception->getMessage(). $exception->getTraceAsString();
                     $messageType = 'danger';
-                    if ((int)$invoice['customer_id']){
-                        $customer = $this->customerModel->GetById($invoice['customer_id']);
-                        $invoice['customer'] = [
-                            'customer_id' => $customer['customer_id'],
-                            'social_reason' => $customer['social_reason'],
-                            'document_number' => $customer['document_number'],
-                        ];
-                    }
                 }
             }
 
@@ -237,6 +212,7 @@ class InvoiceController
             $parameter['transportModeCode'] = $transportModeCodeModel->getAll();
             $parameter['subjectDetractionCode'] = $subjectDetractionCode->getAll();
             $parameter['business'] = $this->businessModel->GetByUserId($_SESSION[SESS]);
+            $parameter['productList'] = $this->productModel->GetAllByBusinessId($parameter['business']['business_id']);
 
             $documentCorrelativeModel = new BusinessSerie($this->connection);
             $correlative = $documentCorrelativeModel->GetNextCorrelative([
@@ -273,31 +249,21 @@ class InvoiceController
                         throw new Exception('No hay ningun campo');
                     }
 
-                    $jungleProduct = ($invoice['jungle_product'] ?? 0) === 'on' ? true : false;
-                    $jungleService = ($invoice['jungle_service'] ?? 0) === 'on' ? true : false;
                     $invoice['itinerant_enable'] = ($invoice['itinerant_enable'] ?? false) == 'on' ? 1 : 0;
                     $invoice['prepayment_regulation'] = ($invoice['prepayment_regulation'] ?? false) == 'on' ? 1 : 0;
                     $invoice['time_of_issue'] = date('H:i:s');
 
                     $legend = [];
-                    if ($jungleProduct){
+                    if ($invoice['jungle_product'] ?? 0 === 'on'){
                         array_push($legend,2001);
                     }
-                    if ($jungleService){
+                    if ($invoice['jungle_service'] ?? 0){
                         array_push($legend,2002);
                     }
+                    $invoice['legend'] = $legend;
 
                     $invoice['percentage_igv'] = 18.00;
-                    $invoice['legend'] = $legend;
                     $invoice['total_value'] = $invoice['total_unaffected'] + $invoice['total_taxed'] + $invoice['total_exonerated'];
-
-                    $customer = $this->customerModel->GetById($invoice['customer_id']);
-                    $invoice['customer']['document_number'] = $customer['document_number'];
-                    $invoice['customer']['identity_document_code'] = $customer['identity_document_code'];
-                    $invoice['customer']['social_reason'] = $customer['social_reason'];
-                    $invoice['customer']['fiscal_address'] = $customer['fiscal_address'];
-                    $invoice['customer']['email'] = $customer['main_email'];
-                    $invoice['customer']['telephone'] = $customer['telephone'];
 
                     $invoice['guide_array'] = [];
                     if (isset($invoice['guide'])){
@@ -306,16 +272,16 @@ class InvoiceController
                         }
                     }
 
-//                    $validateInput = $this->ValidateInput($invoice);
-//                    $error = $validateInput->error;
-//                    if (!$validateInput->success){
-//                        throw new Exception($validateInput->errorMessage);
-//                    }
+                    $validateInput = $this->ValidateInput($invoice);
+                    $error = $validateInput->error;
+                    if (!$validateInput->success){
+                        throw new Exception($validateInput->errorMessage);
+                    }
 
                     $invoiceId = $this->invoiceModel->Insert($invoice, $_SESSION[SESS], $_COOKIE['CurrentBusinessLocal']);
 
                     $invoiceBuild = new InvoiceBuild($this->connection);
-                    $resRunDoc = $invoiceBuild->BuildDocument($invoiceId);
+                    $resRunDoc = $invoiceBuild->BuildDocument($invoiceId, $_SESSION[SESS]);
 
                    if ($invoiceId >= 1 && $resRunDoc->success){
                        header('Location: ' . FOLDER_NAME . '/Invoice/View?InvoiceId=' . $invoiceId . '&message=' . urlencode('El documento se guardó y se envió a la SUNAT exitosamente') . '&messageType=success');
@@ -326,16 +292,6 @@ class InvoiceController
                 }catch (Exception $exception){
                     $messageType = 'danger';
                     $message = $exception->getMessage();
-
-                    if ((int)$invoice['customer_id']){
-                        $customerModel = new Customer($this->connection);
-                        $customer = $customerModel->GetById($invoice['customer_id']);
-                        $invoice['customer'] = [
-                            'customer_id' => $customer['customer_id'],
-                            'social_reason' => $customer['social_reason'],
-                            'document_number' => $customer['document_number'],
-                        ];
-                    }
                 }
             }
 
@@ -355,6 +311,7 @@ class InvoiceController
             $parameter['operationTypeCode'] = $operationTypeCodeModel->getAll();
             $parameter['perceptionTypeCode'] = $perceptionTypeCodeModel->getAll();
             $parameter['business'] = $this->businessModel->GetByUserId($_SESSION[SESS]);
+            $parameter['productList'] = $this->productModel->GetAllByBusinessId($parameter['business']['business_id']);
 
             $documentCorrelativeModel = new BusinessSerie($this->connection);
             $correlative = $documentCorrelativeModel->GetNextCorrelative([
@@ -401,6 +358,23 @@ class InvoiceController
         }
     }
 
+    public function Search(){
+        $res = new Result();
+        try{
+            $q = $_POST['q'] ?? '';
+            $search['search'] = $q;
+
+            $search['localId'] = $_COOKIE['CurrentBusinessLocal'];
+            $response = $this->invoiceModel->searchBySerieCorrelative($search);
+
+            $res->result = $response;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
+    }
+
     private function ValidateInput(array $invoice) {
         $invoiceValidate = new InvoiceValidate($invoice, $this->connection);
         return $invoiceValidate->getResult();
@@ -409,18 +383,18 @@ class InvoiceController
     private function GetReferralGuideTemplate(){
         return '<tr id="referralGuideItem${uniqueId}">
             <td>
-                <label for="type${uniqueId}">Tipo</label>
+                <label for="type${uniqueId}"><i class="icon-profile mr-2"></i> Tipo</label>
                 <select class="form-control form-control-sm" id="type${uniqueId}" name="invoice[guide][${uniqueId}][document_code]" required>
                     <option value="09">GUÍA DE REMISIÓN REMITENTE</option>
                     <option value="31">GUÍA DE REMISIÓN TRANSPORTISTA</option>
                 </select>
             </td>
             <td>
-                <label for="serie${uniqueId}">Serie - Número</label>
+                <label for="serie${uniqueId}"><i class="icon-barcode2 mr-2"></i> Serie - Número</label>
                 <input type="text" class="form-control form-control-sm" id="serie${uniqueId}" name="invoice[guide][${uniqueId}][serie]" required>
             </td>
             <td>
-                <div class="btn btn-danger btn-sm mt-4" onclick="ReferralGuidePhysical.removeItem(\'${uniqueId}\')">Quitar</div>
+                <div class="btn btn-danger btn-sm mt-4" onclick="ReferralGuidePhysical.removeItem(\'${uniqueId}\')"><i class="icon-cross2 mr-2"></i>Quitar</div>
             </td>
         </tr>';
     }

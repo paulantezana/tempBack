@@ -170,14 +170,14 @@ class InvoiceNote extends BaseModel
                                             total_isc, total_charge, total_base_other_taxed, total_other_taxed, total_value, total,
                                             global_discount_percentage, purchase_order, vehicle_plate, term, perception_code, detraction,
                                             related, guide, legend, pdf_format, pdf_url, reason_update_code, invoice_id, percentage_igv, percentage_plastic_bag_tax, total_plastic_bag_tax,
-                                            created_at,updated_at,creation_user_id,modification_user_id)
+                                            created_at,updated_at,created_user_id,updated_user_id)
                     VALUES (:local_id, :invoice_note_key, :date_of_issue, :time_of_issue, :date_of_due, :serie, :correlative, :observation, :sunat_state, :change_type,
                             :document_code, :currency_code, :operation_code, :customer_id, :total_prepayment, :total_free, :total_exportation,
                             :total_other_charged, :total_discount, :total_exonerated, :total_unaffected, :total_taxed, :total_igv, :total_base_isc,
                             :total_isc, :total_charge, :total_base_other_taxed, :total_other_taxed, :total_value, :total,
                             :global_discount_percentage, :purchase_order, :vehicle_plate, :term, :perception_code, :detraction, 
                             :related, :guide, :legend, :pdf_format, :pdf_url, :reason_update_code, :invoice_id, :percentage_igv, :percentage_plastic_bag_tax, :total_plastic_bag_tax,
-                            :created_at,:updated_at,:creation_user_id,:modification_user_id)";
+                            :created_at,:updated_at,:created_user_id,:updated_user_id)";
             $stmt = $this->db->prepare($sql);
 
             $localId = (int)$_COOKIE['CurrentBusinessLocal'];
@@ -232,8 +232,8 @@ class InvoiceNote extends BaseModel
 
                 ":created_at" => $currentDate,
                 ":updated_at" => $currentDate,
-                ":creation_user_id" => $_SESSION[SESS],
-                ":modification_user_id" => $_SESSION[SESS],
+                ":created_user_id" => $_SESSION[SESS],
+                ":updated_user_id" => $_SESSION[SESS],
             ])){
                 throw new Exception('No se pudo insertar el registro');
             }
