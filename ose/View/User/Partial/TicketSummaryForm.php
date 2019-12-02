@@ -1,9 +1,9 @@
 <!-- Modal Cliente -->
 <div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="summaryModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="summaryModalLabel">Generar resumen</h5>
+                <h6 class="modal-title" id="exampleModalLabel"><i class="icon-file-plus mr-2"></i> Generar resumen</h6>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -11,12 +11,34 @@
             <div class="modal-body">
                 <form id="summaryForm" action="<?= FOLDER_NAME . '/InvoiceSummary' ?>" method="POST">
                     <div class="form-group">
-                        <label for="dateOfReference">Selecciona cuidadosamente el día.</label>
-                        <input type="date" class="form-control" id="dateOfReference" name="dateOfReference">
+                        <label for="dateOfReference"><i class="icon-calendar2 mr-2"></i> Selecciona una Fecha:<span class="text-danger">*</span></label>
+                        <div class="input-group mb-3">
+                            <input type="date" class="form-control" id="dateOfReference" placeholder="Selecciona una Fecha" aria-label="Selecciona una Fecha" aria-describedby="dateOfReferenceRef">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" id="dateOfReferenceRef" onclick="GetInvoiceNotSummary()"><i class="icon-search4"></i></button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-<!--                        <input type="submit" name="commit" value="Generar comprobante" class="btn btn-primary ml-4">-->
-                        <button type="submit" class="btn btn-primary btn-block" name="dateOfReferenceCommit">GENERAR</button>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Serie</th>
+                                <th>Correlativo</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="text-right">
+                        <button type="button" class="btn btn-link" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Crear Resúmen de Boletas</button>
                     </div>
                 </form>
             </div>

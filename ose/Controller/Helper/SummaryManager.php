@@ -1,7 +1,7 @@
 <?php
-    require_once MODEL_PATH . 'User/InvoiceSummaryy.php';
+    require_once MODEL_PATH . 'User/InvoiceSummary.php';
     require_once MODEL_PATH . 'User/DetailTicketSummary.php';
-    require_once MODEL_PATH . 'User/Invoice.phpphp';
+    require_once MODEL_PATH . 'User/Invoice.php';
     require_once MODEL_PATH . 'User/Business.php';
     require_once MODEL_PATH . 'User/Customer.php';
     require_once MODEL_PATH . 'User/CatPerceptionTypeCode.php';

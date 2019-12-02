@@ -11,11 +11,13 @@ class InvoiceSummaryController
 {
     private $connection;
     private $param;
+    private $invoice;
 
     public function __construct($connection, $param)
     {
         $this->connection = $connection;
         $this->param = $param;
+        $this->invoice = new Invoice($this->connection);
     }
 
     public function Exec(){
@@ -59,7 +61,7 @@ class InvoiceSummaryController
             $parameter['message'] = $message;
             $parameter['messageType'] = $messageType;
 
-            $content = requireToVar(VIEW_PATH . "User/InvoiceSummaryy.php", $parameter);
+            $content = requireToVar(VIEW_PATH . "User/InvoiceSummary.php", $parameter);
             require_once(VIEW_PATH. "User/Layout/main.php");
         } catch (Exception $e) {
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
@@ -77,6 +79,25 @@ class InvoiceSummaryController
         $data = $detailTicketSummaryModel->GetByTicketSummaryId($ticketSummaryId);
 
         echo json_encode($data);
+    }
+
+    public function GetInvoiceNotSummary(){
+        $res = new Result();
+        try{
+            $dateOfIssue = $_POST['dateOfIssue'];
+            $localID = $_COOKIE['CurrentBusinessLocal'];
+
+            $customer = $this->invoice->NotDailySummaryByUserReferenceId($dateOfIssue, $localID);
+            if(count($customer) == 0){
+                throw new Exception('No se encontro ningun documento');
+            }
+            
+            $res->result = $customer;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
     }
 
     private function GeneratePdf(int $ticketSummaryID) : array {

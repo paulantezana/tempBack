@@ -200,6 +200,9 @@
 
     </div>
 
+
+    <script src="<?= FOLDER_NAME . '/Asset/Js/User/InvoiceSummary.js'?>"></script>
+
 <?php
     require_once __DIR__ . '/Partial/TicketSummaryForm.php';
     require_once __DIR__ . '/Partial/DocumentPrinterModal.php';

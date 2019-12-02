@@ -508,7 +508,8 @@
 </div>
 
 <script src="<?= FOLDER_NAME . '/Asset/Js/User/Invoice.js'?>"></script>
+
 <?php
-require_once __DIR__ . '/Partial/ProductForm.php';
-require_once __DIR__ . '/Partial/CustomerForm.php';
+    require_once __DIR__ . '/Partial/ProductForm.php';
+    require_once __DIR__ . '/Partial/CustomerForm.php';
 ?>

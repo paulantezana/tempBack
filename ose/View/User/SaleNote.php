@@ -204,7 +204,7 @@
                                                     <span class="sr-only">Loading...</span>
                                                 </div>
                                             <?php elseif ($sunatResponseCode === '0' && $row['sunat_state'] == 3): ?>
-                                                <i class="fas fa-check text-success"></i>
+                                                <i class="icon-checkmark font-weight-bold text-success mr-2"></i>
                                             <?php elseif ($row['sunat_state'] == 4): ?>
                                                 <i class="fas fa-times-circle text-danger"></i>
                                             <?php else: ?>
@@ -214,12 +214,12 @@
                                             <?php endif;?>
                                         <?php elseif ($row['sale_document_code'] == '03'): ?>
                                             <?php if ($row['sunat_state'] == 1 || $row['sunat_state'] == 2): ?>
-                                                <i class="fas fa-chevron-circle-right text-primary"></i>
+                                                <i class="icon-spinner4 text-primary font-weight-bold mr-2"></i>
                                                 <div class="spinner-border spinner-border-sm text-primary" role="status">
                                                     <span class="sr-only">Loading...</span>
                                                 </div>
                                             <?php elseif ($row['sunat_state'] == 3): ?>
-                                                <i class="fas fa-chevron-circle-right text-primary"></i>
+                                                <i class="icon-spinner4 text-primary font-weight-bold mr-2"></i>
                                             <?php elseif ($row['sunat_state'] == 4): ?>
                                                 <i class="fas fa-times-circle text-danger"></i>
                                             <?php else: ?>

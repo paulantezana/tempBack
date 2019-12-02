@@ -2,6 +2,7 @@
 
     <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
 
+
     <div class="row mb-4">
         <div class="col-auto mr-auto">
             <h1>
@@ -144,7 +145,7 @@
                                 <td><?= $row['total_free'] ?? 0 ?></td>
                                 <td>
                                     <?php if ($row['customer_sent_to_client']): ?>
-                                        <i class="fas fa-check" title="Enviado al cliente"></i>
+                                        <i class="icon-checkmark mr-2" title="Enviado al cliente"></i>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -190,7 +191,7 @@
                                                         <span class="sr-only">Loading...</span>
                                                     </div>
                                                 <?php elseif ($row['response_code'] === '0' && $row['invoice_state_id'] == 3): ?>
-                                                    <i class="fas fa-check text-success"></i>
+                                                    <i class="icon-checkmark mr-2 text-success"></i>
                                                 <?php elseif ($row['invoice_state_id'] == 4): ?>
                                                     <i class="fas fa-times-circle text-danger"></i>
                                                 <?php else: ?>
@@ -222,11 +223,11 @@
                                                             <tbody class="text-<?= $textColor ?>">
                                                                 <tr>
                                                                     <td>Enviado A Sunat:</td>
-                                                                    <td><?php echo $row['response_code'] == '0' ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>' ?></td>
+                                                                    <td><?php echo $row['response_code'] == '0' ? '<i class="icon-checkmark mr-2"></i>' : '<i class="fas fa-times"></i>' ?></td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td>Aceptada por la SUNAT:</td>
-                                                                    <td><?php echo $row['response_code'] == '0' ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>' ?></td>
+                                                                    <td><?php echo $row['response_code'] == '0' ? '<i class="icon-checkmark mr-2"></i>' : '<i class="fas fa-times"></i>' ?></td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td>Código:</td>
@@ -272,19 +273,19 @@
                                             <i class="icon-menu9"></i>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="<?= FOLDER_NAME . '/Invoice/View?InvoiceId=' . $row['invoice_id'] ?>"> <i class="fas fa-eye"></i> Ver detalles</a>
+                                            <a class="dropdown-item" href="<?= FOLDER_NAME . '/Invoice/View?InvoiceId=' . $row['invoice_id'] ?>"> <i class="icon-file-eye mr-2"></i> Ver detalles</a>
                                             <?php if (($row['invoice_state_id'] == 1 || $row['invoice_state_id'] == 2) && $row['document_code'] === '01' ): ?>
-                                                <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/Invoice/ResendInvoice?InvoiceId=' . $row['invoice_id'] ?>"> <i class="fas fa-file-alt"></i> Consultar o recuperar constancia</a>
+                                                <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/Invoice/ResendInvoice?InvoiceId=' . $row['invoice_id'] ?>"><i class="icon-spinner11 text-success  mr-2"></i> Consultar o recuperar constancia</a>
                                             <?php endif; if (($row['invoice_state_id'] ?? 0) >= 1 && ($row['invoice_state_id'] ?? 0) < 4): ?>
-                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#invoiceSendEmailModal"> <i class="fas fa-envelope"></i>  Enviar a un email personalizado</a>
-                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote/NewCreditNote?InvoiceId=' . $row['invoice_id'] ?>"> <i class="fas fa-file-alt"></i> Generar NOTA DE CREDITO</a>
-                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote/NewDebitNote?InvoiceId=' . $row['invoice_id'] ?>"> <i class="fas fa-file-alt"></i> Generar NOTA DE DEBITO</a>
-                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/ReferralGuide/NewGuide?InvoiceId=' . $row['invoice_id']  ?>"> <i class="fas fa-file-alt"></i> Generar GUIA DE REMISIÓN</a>
+                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#invoiceSendEmailModal"><i class="icon-envelop mr-2"></i>  Enviar a un email personalizado</a>
+                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote/NewCreditNote?InvoiceId=' . $row['invoice_id'] ?>"> <i class="icon-file-text mr-2"></i> Generar NOTA DE CREDITO</a>
+                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/InvoiceNote/NewDebitNote?InvoiceId=' . $row['invoice_id'] ?>"> <i class="icon-file-text mr-2"></i> Generar NOTA DE DEBITO</a>
+                                                <a class="dropdown-item" href="<?= FOLDER_NAME . '/ReferralGuide/NewGuide?InvoiceId=' . $row['invoice_id']  ?>"> <i class="icon-file-text mr-2"></i> Generar GUIA DE REMISIÓN</a>
                                             <?php endif; if (($row['invoice_state_id'] == 3 && $row['document_code'] == '01') || (($row['invoice_state_id'] == 2 || $row['invoice_state_id'] == 3) && $row['document_code'] == '03')): ?>
-                                                <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/InvoiceVoided/NewInvoiceVoided?InvoiceId=' . $row['invoice_id'] ?>"> <i class="fas fa-times-circle"></i> ANULAR o COMUNICAR DE BAJA</a>
+                                                <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/InvoiceVoided/NewInvoiceVoided?InvoiceId=' . $row['invoice_id'] ?>"><i class="icon-cancel-circle2 text-danger mr-2"></i> ANULAR o COMUNICAR DE BAJA</a>
                                             <?php endIf;?>
-                                            <a class="dropdown-item text-success" href="http://www.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm?E=20490086278&T=03&R=16766987&S=B003&N=47&F=15/08/2019&T=260.0" target="_blank"> <i class="fas fa-check"></i> Verificar en la SUNAT la validéz del CPE</a>
-                                            <a class="dropdown-item text-success" href="http://www.sunat.gob.pe/ol-ti-itconsverixml/ConsVeriXml.htm" target="_blank"> <i class="fas fa-check"></i> Verificar XML en la SUNAT</a>
+                                            <a class="dropdown-item text-success" href="#" target="_blank"> <img src="<?= FOLDER_NAME . '/Asset/Images/sunat_logo.png'?>" height="16px" class="mr-2"> Verificar en la SUNAT la validéz del CPE</a>
+                                            <a class="dropdown-item text-success" href="#" target="_blank"> <img src="<?= FOLDER_NAME . '/Asset/Images/sunat_logo.png'?>" height="16px" class="mr-2"> Verificar XML en la SUNAT</a>
                                         </div>
                                     </div>
                                 </td>
