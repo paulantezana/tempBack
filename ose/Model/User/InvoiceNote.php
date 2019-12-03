@@ -106,6 +106,8 @@ class InvoiceNote extends BaseModel
                             inc.social_reason as customer_social_reason, inc.document_number as customer_document_number, 
                             inc.identity_document_code as customer_identity_document_code,
                             inc.fiscal_address as customer_fiscal_address,
+
+                            ins.invoice_state_id,
        
                             cat_currency_type_code.symbol as currency_type_code_symbol,
                             cat_currency_type_code.description as currency_type_code_description,
@@ -139,16 +141,17 @@ class InvoiceNote extends BaseModel
         }
     }
 
-    public function SearchBySerieCorrelative(string $search) {
+    public function SearchBySerieCorrelative(array $search) {
         try{
             $sql = 'SELECT  invoice_note.invoice_note_id, invoice_note.serie, invoice_note.correlative, invoice_note.total, invoice_note.date_of_issue, cat_document_type_code.description as document_type_code_description 
                     FROM invoice_note
                     INNER JOIN cat_document_type_code ON invoice_note.document_code = cat_document_type_code.code
-                    WHERE serie LIKE :serie OR correlative LIKE :correlative  LIMIT 8';
+                    WHERE invoice_note.serie LIKE :serie OR invoice_note.correlative LIKE :correlative AND invoice_note.local_id = :local_id LIMIT 8';
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
-                ':serie' => '%' . $search . '%',
-                ':correlative' => '%' . $search . '%',
+                ':serie' => '%' . $search['search'] . '%',
+                ':correlative' => '%' . $search['search'] . '%',
+                ':local_id' => $search['localId'],
             ]);
             return $stmt->fetchAll();
         } catch (Exception $e) {
@@ -309,6 +312,33 @@ class InvoiceNote extends BaseModel
             return $invoiceNoteId;
         } catch (Exception $e) {
             $this->db->rollBack();
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+        }
+    }
+
+
+    public function UpdateInvoiceNoteSunatByInvoiceId($invoiceId, $data)
+    {
+        try {
+            $sql = "UPDATE invoice_note_sunat SET ";
+            foreach ($data as $key => $value) {
+                $sql .= "$key = :$key, ";
+            }
+            $sql = trim(trim($sql), ',');
+            $sql .= " WHERE invoice_note_id = :invoice_note_id";
+
+            $execute = [];
+            foreach ($data as $key => $value) {
+                $execute[":$key"] = $value;
+            }
+            $execute[":invoice_note_id"] = $invoiceId;
+
+            $stmt = $this->db->prepare($sql);
+            if (!$stmt->execute($execute)) {
+                throw new Exception("Error al actualizar el registro");
+            }
+            return $invoiceId;
+        } catch (Exception $e) {
             throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
         }
     }

@@ -104,8 +104,8 @@ class InvoiceNoteBuild
         $resPdf = $documentManager->InvoiceNCND($invoice,$invoiceNote['pdf_format'] !== '' ? $invoiceNote['pdf_format'] : 'A4',$_SESSION[ENVIRONMENT]);
 
         if ($resPdf->success){
-            $this->invoiceNoteModel->UpdateById($invoiceNote['invoice_note_id'],[
-                'pdf_url'=> '..' . $resPdf->pdfPath
+            $this->invoiceNoteModel->UpdateInvoiceNoteSunatByInvoiceId($invoiceNote['invoice_note_id'],[
+                'pdf_url'=> $resPdf->pdfPath
             ]);
         }
         return $resPdf;
@@ -195,7 +195,7 @@ class InvoiceNoteBuild
         $invoice['customerName'] = htmlspecialchars($invoiceNote['customer_social_reason']);
         $invoice['totalTaxAmount'] = RoundCurrency($invoiceNote['total_tax']);					// TOTAL DE IMPUESTOS
         $invoice['totalBaseAmount'] = RoundCurrency($invoiceNote['total_value']);					// VALOR TOTAL DE LA VENTA
-        $invoice['totalInvoiceAmount'] = RoundCurrency($invoiceNote['total']);					// VALOR TOTAL DE LA VENTA + IMPUESTOS
+        $invoice['totalSaleAmount'] = RoundCurrency($invoiceNote['total']);					// VALOR TOTAL DE LA VENTA + IMPUESTOS
 
         $invoice['totalDiscountAmount'] = RoundCurrency($invoiceNote['total_discount']);				// VALOR TOTAL DE LOS DESCUENTOS
         $invoice['globalDiscountPercent'] = RoundCurrency($invoiceNote['total_discount_percentage'] / 100,5);				// DESCUENTO EN PORCENTAJE
@@ -296,34 +296,45 @@ class InvoiceNoteBuild
 
         if ($invoiceNote['document_code'] === '08'){
             $resInvoice = $billingManager->SendDebitNote($invoiceNote['invoice_note_id'], $invoice, $userReferId);
+            var_dump($resInvoice);
         }
 
         if ($resInvoice->success){
-            $this->invoiceNoteModel->UpdateById($invoiceNote['invoice_note_id'],[
+            $this->invoiceNoteModel->UpdateInvoiceNoteSunatByInvoiceId($invoiceNote['invoice_note_id'],[
                 'xml_url' => $directoryXmlPath . $fileName,
-                'sunat_state' => 2,
+                'invoice_state_id' => 2,
             ]);
             $res->digestValue = $resInvoice->digestValue;
             $res->success = true;
         }else{
+            $this->invoiceNoteModel->UpdateInvoiceNoteSunatByInvoiceId($invoiceNote['invoice_note_id'],[
+                'other_message' => $resInvoice->errorMessage,
+            ]);
             $res->errorMessage .= $resInvoice->errorMessage;
             $res->success = false;
             return $res;
         }
 
         if ($resInvoice->sunatComunicationSuccess){
+            $this->invoiceNoteModel->UpdateInvoiceNoteSunatByInvoiceId($invoiceNote['invoice_note_id'],[
+                'response_message' => $resInvoice->sunatDescription,
+                'response_code' => $resInvoice->sunatResponseCode,
+                'other_message' => '',
+            ]);
             $res->success = true;
         } else {
+            $this->invoiceNoteModel->UpdateInvoiceNoteSunatByInvoiceId($invoiceNote['invoice_note_id'],[
+                'response_message' => $resInvoice->sunatCommuniationError,
+            ]);
             $res->errorMessage .= $resInvoice->sunatCommuniationError;
             $res->success = false;
             return $res;
         }
 
         if ($resInvoice->readerSuccess){
-            $this->invoiceNoteModel->UpdateById($invoiceNote['invoice_note_id'],[
+            $this->invoiceNoteModel->UpdateInvoiceNoteSunatByInvoiceId($invoiceNote['invoice_note_id'],[
                 'cdr_url' => $directoryXmlPath . 'R-' . $fileName,
-                'sunat_state' => 3,
-                'sunat_error_message' => '',
+                'invoice_state_id' => 3,
             ]);
             $res->success = true;
         } else {
@@ -404,9 +415,11 @@ class InvoiceNoteBuild
             $res->errorMessage = $resXml->errorMessage;
             $res->success = $resXml->success;
             if (!$resXml->success){
-                $this->invoiceNoteModel->UpdateById($invoiceNoteId,[
-                    'sunat_error_message' =>  $resXml->errorMessage,
-                ]);
+                if (!$resXml->success){
+                    $this->invoiceNoteModel->UpdateInvoiceNoteSunatByInvoiceId($invoiceNoteId,[
+                        'other_message' =>  $resXml->errorMessage,
+                    ]);
+                }
             }
 
             // PDF

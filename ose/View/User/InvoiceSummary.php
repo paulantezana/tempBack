@@ -72,15 +72,16 @@
                         </thead>
                         <tbody>
                         <?php
+                            var_dump($parameter['summary']);
                             foreach ($parameter['summary']['data'] ?? [] as $row):
                                 $sunatResponseCode = ($row['sunat_response_code'] ?? '');
                         ?>
                             <tr>
-                                <td><?= $row['number'] ?? '' ?></td>
-                                <td><?= $row['date_of_issue'] ?? '' ?></td>
-                                <td><?= $row['date_of_reference'] ?? '' ?></td>
+                                <td><?= $row['correlative'] ?></td>
+                                <td><?= $row['date_of_issue'] ?></td>
+                                <td><?= $row['date_of_reference'] ?></td>
                                 <td>
-                                    <button class="btn btn-primary btn-sm" onclick="JsDetailTicketSummaryModal(<?= $row['ticket_summary_id'] ?? 0 ?>)" data-toggle="modal">Ver Boletas</button>
+                                    <button class="btn btn-primary btn-sm" onclick="JsDetailTicketSummaryModal(<?= $row['invoice_summary_id'] ?>)" data-toggle="modal">Ver Boletas</button>
                                 </td>
                                 <td><?= $row[''] ?? ''?></td>
                                 <td>
@@ -108,7 +109,7 @@
                                         >
                                             <span class="text-primary">CDR</span>
                                         </a>
-                                    <?php elseif ($row['sunat_state'] == 3): ?>
+                                    <?php elseif ($row['invoice_state_id'] == 3): ?>
                                         <a href="<?=  FOLDER_NAME . '/InvoiceSummary' ?>">
                                             <i class="fas fa-chevron-circle-right text-primary"></i>
                                         </a>
@@ -117,23 +118,23 @@
                                 <td>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <?php if ($row['sunat_state'] == 1): ?>
-                                                <?php if ($row['document_code'] == '01'): ?>
+                                            <?php if ($row['invoice_state_id'] == 1): ?>
+                                                <?php if ($row['document_code'] ?? 0 == '01'): ?>
                                                     <i class="fas fa-sync-alt text-warning"></i>
                                                     <div class="spinner-border spinner-border-sm text-warning" role="status">
                                                         <span class="sr-only">Loading...</span>
                                                     </div>
-                                                <?php elseif ($row['document_code'] == '03'): ?>
+                                                <?php elseif ($row['document_code'] ?? 0 == '03'): ?>
                                                     <i class="fas fa-chevron-circle-right text-primary"></i>
                                                     <div class="spinner-border spinner-border-sm text-primary" role="status">
                                                         <span class="sr-only">Loading...</span>
                                                     </div>
                                                 <?php endif; ?>
-                                            <?php elseif ($row['sunat_state'] == 2): ?>
+                                            <?php elseif ($row['invoice_state_id'] == 2): ?>
                                                 <i class="fas fa-chevron-circle-right text-primary"></i>
-                                            <?php elseif ($sunatResponseCode === '0' && $row['sunat_state'] == 3): ?>
+                                            <?php elseif ($sunatResponseCode === '0' && $row['invoice_state_id'] == 3): ?>
                                                 <i class="fas fa-check text-success"></i>
-                                            <?php elseif ($row['sunat_state'] == 4): ?>
+                                            <?php elseif ($row['invoice_state_id'] == 4): ?>
                                                 <i class="fas fa-times-circle text-danger"></i>
                                             <?php else: ?>
                                                 <div class="spinner-border spinner-border-sm" role="status">
@@ -141,7 +142,7 @@
                                                 </div>
                                             <?php endif;?>
                                         </button>
-                                        <?php if ($row['sunat_state'] != 4): ?>
+                                        <?php if ($row['invoice_state_id'] != 4): ?>
                                             <ul class="dropdown-menu">
                                                 <li><a href="" class="dropdown-item">Enviado A Sunat: ✔</a></li>
                                                 <li><a href="" class="dropdown-item">Aceptada por la SUNAT: ✔</a></li>

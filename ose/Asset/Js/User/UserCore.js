@@ -29,6 +29,20 @@ $(document).ready(function() {
             }
         }
     });
+
+    $('.invoiceNoteSearch').select2({
+        ajax: {
+            url: service.apiPath + '/InvoiceNote/Search',
+            dataType: 'json',
+            type: "POST",
+            processResults:  res =>  {
+                if (res.success)
+                    return  { results: res.result.map(item => ({ id: item.invoice_note_id, text: `${item.document_type_code_description}: ${item.serie} - ${item.correlative}` }))};
+                else
+                    return {};
+            }
+        }
+    });
 });
 
 let DocumentPrinter = {

@@ -50,12 +50,22 @@
                         </div>
                         <div class="form-group col-lg-3">
                             <label for="filterCustomer"><i class="icon-users mr-2"></i> Cliente</label>
-                            <select class="searchCustomer" id="filterCustomer" name="filter[customer]" data-live-search="true" data-width="100%">
+                            <select class="searchCustomer" id="filterCustomer" name="filter[customer]">
                                 <?php if(($parameter['filter']['customer']['documentNumber'] ?? false)) :  ?>
                                     <option value="<?= $parameter['filter']['customer']['documentNumber'] ?? 0?>" selected><?= $parameter['filter']['customer']['description'] ?? ''?></option>
                                 <?php endif; ?>
                             </select>
                         </div>
+
+                        <div class="form-group col-lg-3">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="icon-calendar3"></i></span>
+                                <input type="hidden" id="fechainicio" name="fechainicio" value="2019-08-01">
+                                <input type="hidden" id="fechafinal" name="fechafinal" value="2019-09-20">
+                                <input name="rangofechas" id="rangofechas" type="text" class="rangofechas form-control daterange-buttons" value="">
+                            </div>
+                        </div>
+
                         <div class="form-group col-lg-3">
                             <label for="filterStartDate"><i class="icon-calendar mr-2"></i> Rango de Fechas</label>
                             <input type="date" class="form-control" name="filter[startDate]" id="filterStartDate" value="<?= $parameter['filter']['startDate'] ?? null ?>">
@@ -66,7 +76,7 @@
                         </div>
                         <div class="form-group col-lg-12">
                             <label for="filterInvoiceSearch"><i class="icon-barcode2 mr-2"></i> Buscar documento por serie / número</label>
-                            <select class="invoiceSearch" id="filterInvoiceSearch" name="filter[invoiceSearch]" data-live-search="true" data-width="100%">
+                            <select class="invoiceSearch" id="filterInvoiceSearch" name="filter[invoiceSearch]">
                                 <?php if($parameter['filter']['invoiceSearch']['invoiceId'] ?? false) :  ?>
                                     <option value="<?= $parameter['filter']['invoiceSearch']['invoiceId'] ?? 0?>" selected><?= $parameter['filter']['invoiceSearch']['description'] ?? ''?></option>
                                 <?php endif; ?>
@@ -351,6 +361,8 @@
     </div>
 
 </div>
+
+<script src="<?= FOLDER_NAME . '/Asset/Js/User/InvoiceNN.js'?>"></script>
 
 <?php
     require_once __DIR__ . '/Partial/InvoiceSendEmailModal.php';

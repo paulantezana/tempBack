@@ -1025,7 +1025,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // function JsDetailTicketSummaryModal(summaryId){
 //     $("#detailTicketSummaryModal").modal('show');
 //     $.ajax({
-//         url: service.apiPath + '/InvoiceSummary/DetailTicketSummary',
+//         url: service.apiPath + '/InvoiceSummary/InvoiceSummaryItem',
 //         type: "POST",
 //         dataType: 'json',
 //         contentType: 'application/json',

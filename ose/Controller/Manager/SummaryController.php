@@ -3,7 +3,7 @@
 require_once MODEL_PATH . 'Manager/Summary.php';
 require_once MODEL_PATH . 'Manager/user.php';
 require_once MODEL_PATH . 'User/Invoiceice.php';
-require_once MODEL_PATH . 'User/DetailTicketSummary.php';
+require_once MODEL_PATH . 'User/InvoiceSummaryItem.php';
 
 require_once CONTROLLER_PATH . 'Helper/SummaryManager.php';
 
@@ -121,7 +121,7 @@ class SummaryController
         $body = json_decode($postData, true);
         $ticketSummaryId = $body['ticket_summary_id'];
 
-        $detailTicketSummaryModel = new DetailTicketSummary($this->connection);
+        $detailTicketSummaryModel = new InvoiceSummaryItem($this->connection);
         $data = $detailTicketSummaryModel->GetByTicketSummaryId($ticketSummaryId);
 
         echo json_encode($data);

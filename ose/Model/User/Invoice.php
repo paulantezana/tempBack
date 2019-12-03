@@ -94,8 +94,10 @@ class Invoice extends BaseModel
 
     public function NotDailySummaryAll($dateOfIssue){
         try{
-            $sql = "SELECT invoice.invoice_id, invoice.date_of_issue, invoice.local_id FROM invoice WHERE invoice.date_of_issue = :date_of_issue AND invoice.document_code = '03'
-                AND invoice.invoice_id NOT IN (SELECT invoice_summary_item.invoice_id FROM invoice_summary_item)";
+            $sql = "SELECT SELECT invoice.invoice_id, invoice.date_of_issue, invoice.local_id, invoice.serie, invoice.correlative, invoice.total, dtc.description as document_description FROM invoice
+                    INNER JOIN cat_document_type_code dtc ON invoice.document_code = dtc.code
+                    WHERE invoice.date_of_issue = :date_of_issue AND invoice.document_code = '03'
+                    AND invoice.invoice_id NOT IN (SELECT invoice_summary_item.invoice_id FROM invoice_summary_item)";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
@@ -107,9 +109,10 @@ class Invoice extends BaseModel
         }
     }
 
-    public function NotDailySummaryByUserReferenceId($dateOfIssue, $localId){
+    public function NotDailySummaryByLocalId($dateOfIssue, $localId){
         try{
-            $sql = "SELECT invoice.invoice_id, invoice.date_of_issue, invoice.local_id, invoice. FROM invoice 
+            $sql = "SELECT invoice.invoice_id, invoice.date_of_issue, invoice.local_id, invoice.serie, invoice.correlative, invoice.total, dtc.description as document_description FROM invoice 
+                    INNER JOIN cat_document_type_code dtc ON invoice.document_code = dtc.code
                     WHERE invoice.date_of_issue = :date_of_issue AND invoice.document_code = '03'
                     AND invoice.local_id = :invoice_local_id
                     AND invoice.invoice_id NOT IN (SELECT invoice_summary_item.invoice_id FROM invoice_summary_item WHERE invoice_summary_item.local_id = :detail_invoice_local_id)";

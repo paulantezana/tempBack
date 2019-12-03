@@ -84,7 +84,7 @@ CustomGenerateSummary();
 function JsDetailTicketSummaryModal(summaryId){
     $("#detailTicketSummaryModal").modal('show');
     $.ajax({
-        url: service.apiPath + '/Summary/DetailTicketSummary',
+        url: service.apiPath + '/Summary/InvoiceSummaryItem',
         type: "POST",
         dataType: 'json',
         contentType: 'application/json',

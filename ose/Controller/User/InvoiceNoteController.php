@@ -121,7 +121,9 @@ class InvoiceNoteController
                 header('Location: ' . FOLDER_NAME . '/InvoiceNote');
             }
 
-            $resRunDoc = $this->BuildDocument($invoiceNoteId);
+            $invoiceBuild = new InvoiceNoteBuild($this->connection);
+            $resRunDoc = $invoiceBuild->BuildDocument($invoiceNoteId, $_SESSION[SESS]);
+
             if ($resRunDoc->success){
                 header('Location: ' . FOLDER_NAME . '/InvoiceNote/View?InvoiceNoteId=' . $invoiceNoteId . '&message=' . 'El documento se guardó y se envió a la SUNAT exitosamente' . '&messageType=success');
             }else{
@@ -130,17 +132,6 @@ class InvoiceNoteController
         } catch (Exception $e) {
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
         }
-    }
-
-    public function JsonSearch(){
-        $search = $_POST['q'] ?? '';
-
-        $data = $this->invoiceNoteModel->searchBySerieCorrelative($search);
-
-        echo json_encode([
-            'success' => true,
-            'data' => $data,
-        ]);
     }
 
     public function NewCreditNote(){
@@ -476,6 +467,23 @@ class InvoiceNoteController
         } catch (Exception $e) {
             echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
         }
+    }
+
+    public function Search(){
+        $res = new Result();
+        try{
+            $q = $_POST['q'] ?? '';
+            $search['search'] = $q;
+
+            $search['localId'] = $_COOKIE['CurrentBusinessLocal'];
+            $response = $this->invoiceNoteModel->searchBySerieCorrelative($search);
+
+            $res->result = $response;
+            $res->success = true;
+        } catch (Exception $e){
+            $res->errorMessage = $e->getMessage();
+        }
+        echo json_encode($res);
     }
 
     private function ValidateInput(array $invoice) {

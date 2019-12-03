@@ -48,19 +48,23 @@ class InvoiceSummary extends BaseModel
     public function Insert(array $invoice, int $localId, int $userId, string $dateOfIssue){
         try {
             $this->db->beginTransaction();
+            $currentDate = date('Y-m-d H:i:s');
 
             if (count($invoice) >= 1){
-                $sql = "INSERT INTO invoice_summary (local_id, date_of_issue, date_of_reference, ticket, pdf_format, sunat_state, creation_user_id)
-                            VALUES (:local_id, :date_of_issue, :date_of_reference, :ticket, :pdf_format, :sunat_state, :creation_user_id)";
+                $sql = "INSERT INTO invoice_summary (updated_at, created_at, created_user_id, updated_user_id, local_id, date_of_issue, date_of_reference, invoice_state_id, send)
+                            VALUES (:updated_at, :created_at, :created_user_id, :updated_user_id, :local_id, :date_of_issue, :date_of_reference, :invoice_state_id, :send)";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([
+                    ':updated_at' => $currentDate,
+                    ':created_at' => $currentDate,
+                    ':created_user_id' => $userId,
+                    ':updated_user_id' => $userId,
+
                     ':local_id' => $localId,
-                    ':date_of_issue' => date('Y-m-d'),
+                    ':date_of_issue' => $currentDate,
                     ':date_of_reference' => $dateOfIssue,
-                    ':ticket' => '',
-                    ':pdf_format' => 'A4',
-                    ':sunat_state' => 0,
-                    ':creation_user_id' => $userId,
+                    ':invoice_state_id' => 1,
+                    ':send' => 0,
                 ]);
                 $ticketSummaryId = (int)$this->db->lastInsertId();
 
@@ -78,14 +82,14 @@ class InvoiceSummary extends BaseModel
                         ':summary_state_code' => $row['summary_state_code'],
                     ]);
 
-                    $sql = "UPDATE invoice SET sunat_state = :sunat_state WHERE invoice_id = :invoice_id";
-                    $stmt = $this->db->prepare($sql);
-                    if(!$stmt->execute([
-                        ':sunat_state' => 3,
-                        ':invoice_id' => $row['invoice_id'],
-                    ])){
-                        throw new Exception("Error al generar el resumen diario");
-                    }
+//                    $sql = "UPDATE invoice_sunat SET invoice_state_id = :invoice_state_id WHERE invoice_id = :invoice_id";
+//                    $stmt = $this->db->prepare($sql);
+//                    if(!$stmt->execute([
+//                        ':invoice_state_id' => 3,
+//                        ':invoice_id' => $row['invoice_id'],
+//                    ])){
+//                        throw new Exception("Error al generar el resumen diario");
+//                    }
                 }
             }
 

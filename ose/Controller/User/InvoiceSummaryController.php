@@ -1,7 +1,7 @@
 <?php
 
 require_once MODEL_PATH . 'User/InvoiceSummary.php';
-require_once MODEL_PATH . 'User/DetailTicketSummary.php';
+require_once MODEL_PATH . 'User/InvoiceSummaryItem.php';
 require_once MODEL_PATH . 'User/Invoice.php';
 require_once MODEL_PATH . 'User/Business.php';
 
@@ -75,7 +75,7 @@ class InvoiceSummaryController
         $body = json_decode($postData, true);
         $ticketSummaryId = $body['ticket_summary_id'];
 
-        $detailTicketSummaryModel = new DetailTicketSummary($this->connection);
+        $detailTicketSummaryModel = new InvoiceSummaryItem($this->connection);
         $data = $detailTicketSummaryModel->GetByTicketSummaryId($ticketSummaryId);
 
         echo json_encode($data);
@@ -87,11 +87,11 @@ class InvoiceSummaryController
             $dateOfIssue = $_POST['dateOfIssue'];
             $localID = $_COOKIE['CurrentBusinessLocal'];
 
-            $customer = $this->invoice->NotDailySummaryByUserReferenceId($dateOfIssue, $localID);
+            $customer = $this->invoice->NotDailySummaryByLocalId($dateOfIssue, $localID);
             if(count($customer) == 0){
                 throw new Exception('No se encontro ningun documento');
             }
-            
+
             $res->result = $customer;
             $res->success = true;
         } catch (Exception $e){
@@ -100,37 +100,40 @@ class InvoiceSummaryController
         echo json_encode($res);
     }
 
-    private function GeneratePdf(int $ticketSummaryID) : array {
-        $ticketSummaryModel = new InvoiceSummary($this->connection);
-        $companyModel = new Business($this->connection);
+    private function GeneratePdf(int $ticketSummaryID) {
+        // $ticketSummaryModel = new InvoiceSummary($this->connection);
+        // $companyModel = new Business($this->connection);
 
-        $ticketSummary = $ticketSummaryModel -> GetById($ticketSummaryID);
-        $company = $companyModel -> GetByUserId();
+        // $ticketSummary = $ticketSummaryModel -> GetById($ticketSummaryID);
+        // $company = $companyModel -> GetByUserId();
 
-        // Datos temporales => deberia consultar del local donde se emite el documento electronico
-        $company = array_merge($company,[
-            'address' => 'AV. HUASCAR NRO. 224 DPTO. 303',
-            'region' => 'CUSCO',
-            'province' => 'CUSCO',
-            'district' => 'WANCHAQ',
-            'email' => 'info@skynetcusco.com',
-            'telephone' => '084601425',
-            'phone' => '979706609',
-            'web_site' => 'www.skynetcusco.com',
-        ]);
+        // // Datos temporales => deberia consultar del local donde se emite el documento electronico
+        // $company = array_merge($company,[
+        //     'address' => 'AV. HUASCAR NRO. 224 DPTO. 303',
+        //     'region' => 'CUSCO',
+        //     'province' => 'CUSCO',
+        //     'district' => 'WANCHAQ',
+        //     'email' => 'info@skynetcusco.com',
+        //     'telephone' => '084601425',
+        //     'phone' => '979706609',
+        //     'web_site' => 'www.skynetcusco.com',
+        // ]);
 
-        $generateTicketPDF = new DocumentManager();
+        // $generateTicketPDF = new DocumentManager();
 //        $directory = $generateTicketPDF->Build();
 //        return $ticketSummaryModel->UpdateById($ticketSummaryID,[
 //            'pdf_url'=> $directory
 //        ]);
+        return [];
     }
 
     private function BuildSummary($lastDay) {
         $res = new Result();
         try{
             $buildSummary = new SummaryManager($this->connection);
-            $resBuildSummary = $buildSummary->ByUserInvoice($_SESSION[SESS],$lastDay);
+
+            $localId = $_COOKIE['CurrentBusinessLocal'];
+            $resBuildSummary = $buildSummary->ByLocalInvoice($localId, $lastDay);
             if(!$resBuildSummary->success){
                 throw new Exception($resBuildSummary->errorMessage);
             }

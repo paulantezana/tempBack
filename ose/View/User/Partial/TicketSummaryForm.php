@@ -13,7 +13,7 @@
                     <div class="form-group">
                         <label for="dateOfReference"><i class="icon-calendar2 mr-2"></i> Selecciona una Fecha:<span class="text-danger">*</span></label>
                         <div class="input-group mb-3">
-                            <input type="date" class="form-control" id="dateOfReference" placeholder="Selecciona una Fecha" aria-label="Selecciona una Fecha" aria-describedby="dateOfReferenceRef">
+                            <input type="date" class="form-control" name="dateOfReference" id="dateOfReference" placeholder="Selecciona una Fecha" aria-label="Selecciona una Fecha" aria-describedby="dateOfReferenceRef">
                             <div class="input-group-append">
                                 <button class="btn btn-primary" type="button" id="dateOfReferenceRef" onclick="GetInvoiceNotSummary()"><i class="icon-search4"></i></button>
                             </div>
@@ -38,7 +38,7 @@
 
                     <div class="text-right">
                         <button type="button" class="btn btn-link" data-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn btn-primary">Crear Resúmen de Boletas</button>
+                        <button type="submit" class="btn btn-primary" name="dateOfReferenceCommit">Crear Resúmen de Boletas</button>
                     </div>
                 </form>
             </div>

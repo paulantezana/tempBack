@@ -27,6 +27,7 @@
     <meta name="theme-color" content="#DC3545">
 
     <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/bootstrap.min.css'?>">
+    <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/daterangepicker.css'?>">
     <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/flexdatalist.min.css'?>">
     <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/select2.min.css'?>">
     <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/sweetalert2.min.css'?>">
@@ -34,6 +35,8 @@
 
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/jquery.min.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/bootstrap.bundle.min.js'?>"></script>
+    <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/moment.min.js'?>"></script>
+    <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/daterangepicker.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/flexdatalist.min.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/select2.min.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/sweetalert2.min.js'?>"></script>
@@ -49,7 +52,7 @@
         <div class="layout-main">
             <?php echo $content ?? '' ?>
         </div>
-        <div class="layout-footer"> 
+        <div class="layout-footer">
             <div class="container">
 
             </div>

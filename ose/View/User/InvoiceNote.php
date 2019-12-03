@@ -32,8 +32,8 @@
                 <form action="<?= FOLDER_NAME . '/InvoiceNote'?>" method="GET" class="mt-4">
                     <div class="form-row">
                         <div class="form-group col-lg-3">
-                            <label for="filterDocumentCode">Tipo de comprobante</label>
-                            <select class="form-control" id="filterDocumentCode" name="filter[documentCode]">
+                            <label for="filterDocumentCode"><i class="icon-file-text mr-2"></i> Tipo de comprobante</label>
+                            <select class="select2" id="filterDocumentCode" name="filter[documentCode]">
                                 <option value="">Filtrar por tipo</option>
                                 <?php foreach ($parameter['documentTypeCode'] ?? [] as $row): ?>
                                     <?php if ( ($parameter['filter']['documentCode'] ?? '') == $row['code'] ) :  ?>
@@ -46,8 +46,8 @@
                         </div>
 
                         <div class="form-group col-lg-3">
-                            <label for="filterCustomer">Entidad</label>
-                            <select class="selectpicker with-ajax searchCustomer" id="filterCustomer" name="filter[customer]" data-live-search="true" data-width="100%">
+                            <label for="filterCustomer"> <i class="icon-users mr-2"></i> Cliente</label>
+                            <select class="selectpicker with-ajax searchCustomer" id="filterCustomer" name="filter[customer]">
                                 <?php if(($parameter['filter']['customer']['customer_id'] ?? false)) :  ?>
                                     <option value="<?= $parameter['filter']['customer']['customer_id'] ?? 0?>" selected><?= $parameter['filter']['customer']['description'] ?? ''?></option>
                                 <?php endif; ?>
@@ -55,18 +55,18 @@
                         </div>
 
                         <div class="form-group col-lg-3">
-                            <label for="filterStartDate">Fecha inicio</label>
+                            <label for="filterStartDate"><i class="icon-calendar mr-2"></i> Fecha inicio</label>
                             <input type="date" class="form-control" name="filter[startDate]" id="filterStartDate" value="<?= $parameter['filter']['startDate'] ?? null ?>">
                         </div>
 
                         <div class="form-group col-lg-3">
-                            <label for="filterEndDate">Fecha final</label>
+                            <label for="filterEndDate"><i class="icon-calendar mr-2"></i> Fecha final</label>
                             <input type="date" class="form-control" name="filter[endDate]" id="filterEndDate" value="<?= $parameter['filter']['endDate'] ?? null ?>">
                         </div>
 
                         <div class="form-group col-lg-12">
-                            <label for="filterInvoiceSearch">Buscar documento por serie / número</label>
-                            <select class="selectpicker with-ajax filterInvoiceNoteSearch" id="filterInvoiceSearch" name="filter[invoiceSearch]" data-live-search="true" data-width="100%">
+                            <label for="filterInvoiceSearch"><i class="icon-barcode2 mr-2"></i> Buscar documento por serie / número</label>
+                            <select class="invoiceNoteSearch" id="filterInvoiceSearch" name="filter[invoiceSearch]">
                                 <?php if($parameter['filter']['invoiceSearch']['invoice_id'] ?? false) :  ?>
                                     <option value="<?= $parameter['filter']['invoiceSearch']['invoice_id'] ?? 0?>" selected><?= $parameter['filter']['invoiceSearch']['description'] ?? ''?></option>
                                 <?php endif; ?>
@@ -158,12 +158,12 @@
                             </td>
                             <td>
                                 <?php if ($row['pdf_url'] != ''): ?>
-                                    <button class="btn btn-sm btn-light" onclick="DocumentPrinter.showModal('<?= $row['pdf_url'] ?? '' ?>', true)">Imprimir</button>
+                                    <button class="btn btn-sm btn-light" onclick="DocumentPrinter.showModal('..<?= $row['pdf_url'] ?? '' ?>', true)">Imprimir</button>
                                 <?php endif; ?>
                             </td>
                             <td>
                                 <?php if ($row['pdf_url'] != ''): ?>
-                                    <button class="btn btn-sm btn-light" onclick="DocumentPrinter.showModal('<?= $row['pdf_url'] ?? '' ?>', false)"><i class="fas fa-file-pdf text-danger"></i></button>
+                                    <button class="btn btn-sm btn-light" onclick="DocumentPrinter.showModal('..<?= $row['pdf_url'] ?? '' ?>', false)"><i class="icon-file-pdf text-danger"></i></button>
                                 <?php endif; ?>
                             </td>
                             <td>
@@ -173,14 +173,14 @@
                                             download="<?php $fileName = explode('/', $row['xml_url'] ?? ''); echo  'XML-'. $fileName[count($fileName) - 1]?>"
                                             class="btn btn-sm btn-light"
                                     >
-                                        <i class="fas fa-file-code text-success"></i>
+                                        <i class="icon-file-xml text-success"></i>
                                     </a>
                                 <?php endif; ?>
                             </td>
                             <td>
                                 <?php if ($row['invoice_document_code'] === '01' && $row['response_code'] == '0' && $row['cdr_url'] != '' ) : ?>
                                     <a
-                                        href="<?= $row['cdr_url'] ?? '' ?>"
+                                        href="..<?= $row['cdr_url'] ?? '' ?>"
                                         download="<?php $fileName = explode('/', $row['cdr_url'] ?? ''); echo  'CDR-'. $fileName[count($fileName) - 1]?>"
                                         class="btn btn-sm btn-light"
                                         title="CDR"
@@ -189,7 +189,7 @@
                                     </a>
                                 <?php elseif ($row["invoice_document_code"] == '03' && $row['invoice_state_id'] == 3): ?>
                                     <a href="<?=  FOLDER_NAME . '/InvoiceSummary' ?>" title="Ver resumen" style="font-size: 0.85rem">
-                                        <i class="fas fa-chevron-circle-right text-primary"></i>
+                                        <i class="icon-spinner4 text-primary mr-2"></i>
                                     </a>
                                 <?php endif; ?>
                             </td>

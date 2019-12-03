@@ -486,7 +486,6 @@ CREATE TABLE invoice_detraction(
 
 CREATE TABLE invoice_summary(
                                 invoice_summary_id INT AUTO_INCREMENT NOT NULL,
-                                invoice_summary_key varchar(32) NOT NULL,
                                 updated_at DATETIME,
                                 created_at DATETIME,
                                 created_user_id INT,
@@ -508,7 +507,6 @@ CREATE TABLE invoice_summary(
                                 cdr_url varchar(255),
 
                                 CONSTRAINT pk_invoice_summary PRIMARY KEY (invoice_summary_id),
-                                CONSTRAINT uk_invoice_summary UNIQUE KEY (invoice_summary_key),
                                 CONSTRAINT fk_invoice_summary_invoice_state FOREIGN KEY (invoice_state_id) REFERENCES invoice_state (invoice_state_id)
                                     ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
@@ -775,31 +773,29 @@ CREATE TABLE invoice_note_detraction(
 );
 
 CREATE TABLE invoice_note_summary(
-                                     invoice_note_summary_id INT AUTO_INCREMENT NOT NULL,
-                                     invoice_note_summary_key varchar(32) NOT NULL,
-                                     updated_at DATETIME,
-                                     created_at DATETIME,
-                                     created_user_id INT,
-                                     updated_user_id INT,
+    invoice_note_summary_id INT AUTO_INCREMENT NOT NULL,
+    updated_at DATETIME,
+    created_at DATETIME,
+    created_user_id INT,
+    updated_user_id INT,
 
-                                     local_id INT,
-                                     correlative INT,
-                                     date_of_issue DATE NOT NULL,
-                                     date_of_reference DATE NOT NULL,
+    local_id INT,
+    correlative INT,
+    date_of_issue DATE NOT NULL,
+    date_of_reference DATE NOT NULL,
 
-                                     invoice_state_id SMALLINT,
-                                     send BOOLEAN,
-                                     ticket VARCHAR(64),
-                                     response_code BOOLEAN,
-                                     response_message VARCHAR(15),
-                                     other_message TEXT,
-                                     pdf_url varchar(255),
-                                     xml_url VARCHAR(255),
-                                     cdr_url varchar(255),
-                                     CONSTRAINT pk_invoice_note_summary PRIMARY KEY (invoice_note_summary_id),
-                                     CONSTRAINT uk_invoice_note_summary UNIQUE KEY (invoice_note_summary_key),
-                                     CONSTRAINT fk_invoice_note_summary_invoice_state FOREIGN KEY (invoice_state_id) REFERENCES invoice_state (invoice_state_id)
-                                         ON UPDATE RESTRICT ON DELETE RESTRICT
+    invoice_state_id SMALLINT,
+    send BOOLEAN,
+    ticket VARCHAR(64),
+    response_code BOOLEAN,
+    response_message VARCHAR(15),
+    other_message TEXT,
+    pdf_url varchar(255),
+    xml_url VARCHAR(255),
+    cdr_url varchar(255),
+    CONSTRAINT pk_invoice_note_summary PRIMARY KEY (invoice_note_summary_id),
+    CONSTRAINT fk_invoice_note_summary_invoice_state FOREIGN KEY (invoice_state_id) REFERENCES invoice_state (invoice_state_id)
+     ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 
 CREATE TABLE invoice_note_summary_item(

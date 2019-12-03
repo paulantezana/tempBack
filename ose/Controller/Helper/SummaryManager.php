@@ -1,6 +1,6 @@
 <?php
     require_once MODEL_PATH . 'User/InvoiceSummary.php';
-    require_once MODEL_PATH . 'User/DetailTicketSummary.php';
+    require_once MODEL_PATH . 'User/InvoiceSummaryItem.php';
     require_once MODEL_PATH . 'User/Invoice.php';
     require_once MODEL_PATH . 'User/Business.php';
     require_once MODEL_PATH . 'User/Customer.php';
@@ -23,7 +23,7 @@
         public function __construct(PDO $connection)
         {
             $this->ticketSummaryModel = new InvoiceSummary($connection);
-            $this->detailTicketSummaryModel = new detailTicketSummary($connection);
+            $this->detailTicketSummaryModel = new InvoiceSummaryItem($connection);
             $this->saleModel = new Invoice($connection);
             $this->connection = $connection;
 
@@ -93,7 +93,7 @@
             return $res;
         }
 
-        public function ByUserInvoice($userReferenceId, $dateOfIssue = null,  $interval = 500){
+        public function ByLocalInvoice($localId, $dateOfIssue = null,  $interval = 500){
             $res = new Result();
             $res->countSuccess = 0;
             $res->countError = 0;
@@ -109,7 +109,7 @@
                     throw new Exception($validate->errorMessage);
                 }
 
-                $notDailySummary = $this->saleModel->NotDailySummaryByUserReferenceId($dateOfIssue, $userReferenceId);
+                $notDailySummary = $this->saleModel->NotDailySummaryByLocalId($dateOfIssue, $localId);
                 if(count($notDailySummary) == 0){
                     throw new Exception('No se encontro ningun documento');
                 }
@@ -120,11 +120,13 @@
                         return array_merge($item,[ 'summary_state_code' => '1' ]);
                     },$invoice);
 
-                    $resInSummary = $this->GenerateSummary($invoice, $userReferenceId, $_SESSION[SESS], $dateOfIssue);
+                    $resInSummary = $this->GenerateSummary($invoice, $localId, $_SESSION[SESS], $dateOfIssue);
+                    var_dump($resInSummary);
                     if ($resInSummary->success){
                         $res->countSuccess += count($invoice);
                     }else{
                         $res->countError += count($invoice);
+                        throw new Exception($resInSummary->errorMessage);
                     }
                     $res->countSummary++;
                 }
@@ -137,7 +139,7 @@
                 $res->success = true;
             } catch (Exception $e){
                 $res->success = false;
-                $res->errorMessage = $e->getMessage();
+                $res->errorMessage = $e->getMessage() . $e->getTraceAsString();
             }
             return $res;
         }
@@ -160,16 +162,12 @@
             $res->summaryId = 0;
             try{
                 // Save In Database
-                $resSummary = $this->ticketSummaryModel->Insert($invoice, $localId, $userId, $dateOfIssue);
-                if(!$resSummary->success){
-                    throw new Exception($resSummary->errorMessage);
-                }
-                $res->summaryId = $resSummary->summaryId;
+                $summaryId = $this->ticketSummaryModel->Insert($invoice, $localId, $userId, $dateOfIssue);
 
                 // Query
                 $business = $this->businessModel->GetByUserId($_SESSION[SESS]);
-                $ticketSummary = $this->ticketSummaryModel->GetById($res->summaryId);
-                $detailTicketSummary = $this->detailTicketSummaryModel->GetByTicketSummaryIdXML($res->summaryId);
+                $ticketSummary = $this->ticketSummaryModel->GetById($summaryId);
+                $detailTicketSummary = $this->detailTicketSummaryModel->GetByTicketSummaryIdXML($summaryId);
 
                 // Summary
                 $perceptionTypeCode = $this->perceptionTypeCodeModel->GetAll();
@@ -194,7 +192,7 @@
                         'perception_base' => $perceptionBase,
                         'total_with_perception' => $totalWithPerception,
                     ]);
-                },$detailTicketSummary);
+                }, $detailTicketSummary);
 
                 $documentData = [
                     'ticketSummary' => $ticketSummary,
@@ -211,7 +209,7 @@
                 $this->GeneratePdf($documentData);
             }catch (Exception $e){
                 $res->success = false;
-                $res->errorMessage = $e->getMessage();
+                $res->errorMessage = $e->getMessage() . $e->getTraceAsString();
             }
             return $res;
         }
@@ -224,7 +222,7 @@
             $summary = array();
             $summary['supplierRuc'] = $business['ruc'];
             $summary['issueDate'] = $ticketSummary['date_of_issue'];;				//fecha de envio
-            $summary['correlative'] = $ticketSummary['number'];
+            $summary['correlative'] = $ticketSummary['correlative'];
             $summary['referenceDate'] = $ticketSummary['date_of_reference'];			//fecha emision documento
             $summary['defaultUrl'] = 'WWW.SKYFACT.COM';
             $summary['supplierName'] = 'SKYNETCUSCO E.I.R.L.';
@@ -247,6 +245,7 @@
                 $invoice['freeAmount'] = $row['total_free'];
                 $invoice['iscAmount'] = $row['total_isc'];
                 $invoice['otherTaxAmount'] = $row['total_other_taxed'];
+                $invoice['codigoMoneda'] = $row['currency_code'];							// CODIGO DE LA MONEDA
 
                 $invoice['referencedInvoiceSerie'] = 'BPP1';			// serie de la boleta a la que hace referencia
                 $invoice['referencedInvoiceNumber'] = '1';				// numero de la boleta a la que hace referencia
@@ -262,15 +261,16 @@
 
             $billingManager = new BillingManager($this->connection);
             $directoryXmlPath = '..' . XML_FOLDER_PATH . date('Ym') . '/' . $business['ruc'] . '/';
-            $fileName = $business['ruc'] . '-RC-' . date('Ymd') . '-' . $ticketSummary['number'] . '.xml';
+            $fileName = $business['ruc'] . '-RC-' . date('Ymd') . '-' . $ticketSummary['correlative'] . '.xml';
 
-            $resSummary = $billingManager->SendDailySummary($ticketSummary['ticket_summary_id'], $summary, $_SESSION[SESS]);
+            $resSummary = $billingManager->SendDailySummary($ticketSummary['invoice_summary_id'], $summary, $_SESSION[SESS]);
+            var_dump($resSummary);
 
             $res = new Result();
             if($resSummary->success){
-                $this->ticketSummaryModel->UpdateById($ticketSummary['ticket_summary_id'],[
+                $this->ticketSummaryModel->UpdateById($ticketSummary['invoice_summary_id'],[
                     'xml_url' => $directoryXmlPath . $fileName,
-                    'sunat_state' => 2,
+                    'invoice_state_id' => 2,
                 ]);
             }else{
                 $res->errorMessage .= $resSummary->errorMessage;
@@ -279,7 +279,7 @@
             }
 
             if ($resSummary->sunatComunicationSuccess){
-                $this->ticketSummaryModel->UpdateById((int)$ticketSummary['ticket_summary_id'],[
+                $this->ticketSummaryModel->UpdateById((int)$ticketSummary['invoice_summary_id'],[
                     'ticket' => $resSummary->ticket,
                 ]);
                 $res->success = true;

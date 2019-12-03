@@ -1,11 +1,10 @@
-
     <div class="container">
-        <?php require_once __DIR__ . '/Partial/AlertMessage.php' ?>
+        <?php require_once __DIR__ . '/Partial/AlertMessage.php'?>
         <div class="mt-5 mb-5">
-            <h5 class="mb-3"><?= $parameter['invoice']['voucher_type_description'] ?? '' ?></h5>
+            <h5 class="mb-3"><?=$parameter['invoice']['voucher_type_description'] ?? ''?></h5>
             <div class="btn btn-group" style="padding: 0">
-                <div class="btn btn-primary JsSaleShowPdf" onclick="DocumentPrinter.showModal('<?= $parameter['invoice']['pdf_url']  ?>', true)" >Imprimir</div>
-                <div class="btn btn-light JsSaleShowPdf" onclick="DocumentPrinter.showModal('<?= $parameter['invoice']['pdf_url']  ?>', false)">VER PDF</div>
+                <div class="btn btn-primary" onclick="DocumentPrinter.showModal('<?php //$parameter['invoice']['pdf_url']  ?>', true)" >Imprimir</div>
+                <div class="btn btn-light" onclick="DocumentPrinter.showModal('<?php //$parameter['invoice']['pdf_url']  ?>', false)">VER PDF</div>
 
                 <div class="btn btn-light">Enviar Email</div>
                 <div class="dropdown">
@@ -31,7 +30,7 @@
 
             <div class="row">
                 <div class="col-auto mr-auto">
-                    <?= $parameter['invoice']['document_type_code_description'] ?? '' ?> - <?= $parameter['invoice']['operation_type_code_description'] ?? '' ?>
+                    <?=$parameter['invoice']['document_type_code_description'] ?? ''?> - <?=$parameter['invoice']['operation_type_code_description'] ?? ''?>
                 </div>
                 <div class="col-auto">
                     <h3>
@@ -45,8 +44,8 @@
 
             <div class="row mb-4">
                 <div class="col-auto mr-auto">
-                    <div><?= $parameter['invoice']['customer_social_reason'] ?? '' ?></div>
-                    <div><?= $parameter['invoice']['customer_document_number'] ?? '' ?></div>
+                    <div><?=$parameter['invoice']['customer_social_reason'] ?? ''?></div>
+                    <div><?=$parameter['invoice']['customer_document_number'] ?? ''?></div>
                 </div>
                 <div class="col-auto">
 
@@ -56,26 +55,26 @@
                                 Fecha de emision
                                 <span class="font-weight-bold">
                                     <?php
-                                    if (isset($parameter['invoice']['broadcast_date'])){
-                                        echo date('d/m/Y',strtotime($parameter['invoice']['broadcast_date']));
-                                    }
-                                    ?>
+if (isset($parameter['invoice']['broadcast_date'])) {
+    echo date('d/m/Y', strtotime($parameter['invoice']['broadcast_date']));
+}
+?>
                                 </span>
                             </li>
                             <li>
                                 Fecha de expiracion
                                 <span class="font-weight-bold">
                                     <?php
-                                    if (isset($parameter['invoice']['broadcast_date'])){
-                                        echo date('d/m/Y',strtotime($parameter['invoice']['expiration_date']));
-                                    }
-                                    ?>
+if (isset($parameter['invoice']['broadcast_date'])) {
+    echo date('d/m/Y', strtotime($parameter['invoice']['expiration_date']));
+}
+?>
                                 </span>
                             </li>
                             <li>
                                 Tipo de operacion
                                 <span class="font-weight-bold">
-                                    <?= $parameter['invoice']['operation_type_code_description'] ?? ''  ?>
+                                    <?=$parameter['invoice']['operation_type_code_description'] ?? ''?>
                                 </span>
                             </li>
                         </ul>
@@ -100,18 +99,18 @@
                     </thead>
                     <tbody>
                     <?php foreach ($parameter['detailSale'] ?? [] as $key => $row): ?>
-                        <tr id="invoiceItem<?= $key ?>" data-uniqueId="<?= $key ?>">
-                            <td><?= $row['product_description'] ?? '' ?></td>
-                            <td><?= $row['description'] ?? ''  ?></td>
-                            <td><?= $row['unit_price'] ?? ''  ?></td>
-                            <td><?= $row['quantity'] ?? ''  ?></td>
-                            <td><?= $row['discount'] ?? ''  ?></td>
-                            <td><?= $row['affectation_code'] ?? '' ?></td>
-                            <td><?= $row['igv'] ?? ''  ?></td>
-                            <td><?= $row['subtotal'] ?? ''  ?></td>
-                            <td><?= $row['total'] ?? ''  ?></td>
+                        <tr id="invoiceItem<?=$key?>" data-uniqueId="<?=$key?>">
+                            <td><?=$row['product_description'] ?? ''?></td>
+                            <td><?=$row['description'] ?? ''?></td>
+                            <td><?=$row['unit_price'] ?? ''?></td>
+                            <td><?=$row['quantity'] ?? ''?></td>
+                            <td><?=$row['discount'] ?? ''?></td>
+                            <td><?=$row['affectation_code'] ?? ''?></td>
+                            <td><?=$row['igv'] ?? ''?></td>
+                            <td><?=$row['subtotal'] ?? ''?></td>
+                            <td><?=$row['total'] ?? ''?></td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php endforeach;?>
                     </tbody>
                 </table>
             </div>
@@ -127,7 +126,7 @@
                         <tbody>
                         <tr>
                             <td>% Descuento Global</td>
-                            <td class="font-weight-bold"><?= $parameter['invoice']['global_discount_percentage'] ?? 0 ?></td>
+                            <td class="font-weight-bold"><?=$parameter['invoice']['global_discount_percentage'] ?? 0?></td>
                         </tr>
                         <!--                            <tr>-->
                         <!--                                <td>Descuento Global (-)</td>-->
@@ -147,11 +146,11 @@
                         <!--                            </tr>-->
                         <tr>
                             <td>Exonerada</td>
-                            <td class="font-weight-bold"><?= $parameter['invoice']['total_exonerated'] ?? 0 ?></td>
+                            <td class="font-weight-bold"><?=$parameter['invoice']['total_exonerated'] ?? 0?></td>
                         </tr>
                         <tr>
                             <td>Inafecta</td>
-                            <td class="font-weight-bold"><?= $parameter['invoice']['total_unaffected'] ?? 0 ?></td>
+                            <td class="font-weight-bold"><?=$parameter['invoice']['total_unaffected'] ?? 0?></td>
                         </tr>
                         <!--                            <tr>-->
                         <!--                                <td>Gravada</td>-->
@@ -163,15 +162,15 @@
                         <!--                                </tr>-->
                         <tr>
                             <td>Total Gratuida</td>
-                            <td class="font-weight-bold"><?= $parameter['invoice']['total_free'] ?? 0 ?></td>
+                            <td class="font-weight-bold"><?=$parameter['invoice']['total_free'] ?? 0?></td>
                         </tr>
                         <tr>
                             <td>Otros Cargos</td>
-                            <td class="font-weight-bold"><?= $parameter['invoice']['other_charges'] ?? 0 ?></td>
+                            <td class="font-weight-bold"><?=$parameter['invoice']['other_charges'] ?? 0?></td>
                         </tr>
                         <tr>
                             <td>Total Onerosa</td>
-                            <td class="font-weight-bold"><?= $parameter['invoice']['total'] ?? 0 ?></td>
+                            <td class="font-weight-bold"><?=$parameter['invoice']['total'] ?? 0?></td>
                         </tr>
                         </tbody>
                     </table>
@@ -182,15 +181,15 @@
 
             <div class="row">
                 <div class="col">
-                    <?= $parameter['invoice']['observation'] ?? '' ?>
+                    <?=$parameter['invoice']['observation'] ?? ''?>
                 </div>
             </div>
 
             <div class="row d-flex justify-content-center">
-                <a href="<?= FOLDER_NAME . '/sale' ?>" class="btn btn-primary ml-4">
+                <a href="<?=FOLDER_NAME . '/sale'?>" class="btn btn-primary ml-4">
                     Realizar Otra Venta!
                 </a>
-                <a href="<?= FOLDER_NAME . '/sale' ?>" class="btn btn-light ml-4">
+                <a href="<?=FOLDER_NAME . '/sale'?>" class="btn btn-light ml-4">
                     Ver Lista Documentos >
                 </a>
             </div>
@@ -202,5 +201,5 @@
 
 <?php
 require_once __DIR__ . '/Partial/DocumentPrinterModal.php';
-require_once __DIR__ . '/Partial/SaleSendEmailModal.php'
+require_once __DIR__ . '/Partial/InvoiceSendEmailModal.php'
 ?>
