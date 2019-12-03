@@ -341,12 +341,15 @@ class InvoiceNoteBuild
 
         try{
             $business = $this->businessModel->GetByUserId($userReferId);
-            $invoiceNote = $this->invoiceNoteModel->summaryById($invoiceNoteId);
+            $invoiceNote = $this->invoiceNoteModel->SummaryById($invoiceNoteId);
             $detailInvoice = $this->detailInvoiceNoteModel->ByInvoiceNoteIdXML($invoiceNoteId);
 
-            if ($invoiceNote['sunat_state'] == '3'){
+            $perceptionTypeCodeModel = new CatPerceptionTypeCode($this->connection);
+            $perceptionTypeCode = $perceptionTypeCodeModel->GetAll();
+
+            if ($invoiceNote['invoice_state_id'] == '3'){
                 throw new Exception('Este documento ya fue informado ante la sunat');
-            } elseif (($invoiceNote['sunat_state'] == '4' && $invoiceNote['document_code'] == '01')){
+            } elseif (($invoiceNote['invoice_state_id'] == '4' && $invoiceNote['document_code'] == '01')){
                 throw new Exception('Este documento esta anulado');
             }
 
@@ -358,6 +361,37 @@ class InvoiceNoteBuild
                 $debitNote = $this->debitNoteTypeCodeModel->GetBy('code',$invoiceNote['reason_update_code']);
                 $invoiceNote['reason_update_code_description'] = $debitNote['description'];
             }
+
+            // PERCEPTION
+            $perceptionCode = $invoiceNote['perception_code'];
+            $perceptionPercentage = 0;
+            $perceptionAmount = 0;
+            $perceptionBase = 0;
+            $totalWithPerception = 0;
+            if ($invoiceNote['perception_code'] != ''){
+                $index = array_search($perceptionCode, array_column($perceptionTypeCode, 'code'));
+                $perceptionPercentage = $perceptionTypeCode[$index]['percentage'] / 100;
+                $perceptionAmount = RoundCurrency($perceptionPercentage  * $invoiceNote['total']);
+                $perceptionBase = $invoiceNote['total'];
+                $totalWithPerception = $invoiceNote['total'] + $perceptionAmount;
+            }
+            $invoiceNote['perception_code'] = '51';
+            $invoiceNote['perception_percentage'] = $perceptionPercentage;
+            $invoiceNote['perception_amount'] = $perceptionAmount;
+            $invoiceNote['perception_base'] = $perceptionBase;
+            $invoiceNote['total_with_perception'] = $totalWithPerception;
+
+            // Itinerant
+//            if ($invoiceNote['itinerant_enable']){
+//                $geographicalLocationCodeModel = new CatGeographicalLocationCode($this->connection);
+//                $itinerantLocation = $geographicalLocationCodeModel->GetBy('code',$invoiceNote['itinerant_location']);
+//                $itinerantProvince = $itinerantLocation['province'];
+//                $itinerantDepartment = $itinerantLocation['department'];
+//                $itinerantDistrict = $itinerantLocation['district'];
+//            }
+//            $invoiceNote['itinerant_province'] = $itinerantProvince ?? '';
+//            $invoiceNote['itinerant_department'] = $itinerantDepartment ?? '';
+//            $invoiceNote['itinerant_district'] = $itinerantDistrict ?? '';
 
             // XML
             $documentData = [

@@ -279,7 +279,6 @@ class InvoiceController
                     }
 
                     $invoiceId = $this->invoiceModel->Insert($invoice, $_SESSION[SESS], $_COOKIE['CurrentBusinessLocal']);
-
                     $invoiceBuild = new InvoiceBuild($this->connection);
                     $resRunDoc = $invoiceBuild->BuildDocument($invoiceId, $_SESSION[SESS]);
 
@@ -290,8 +289,8 @@ class InvoiceController
                    }
                    return;
                 }catch (Exception $exception){
-                    $messageType = 'danger';
                     $message = $exception->getMessage();
+                    $messageType = 'danger';
                 }
             }
 
@@ -391,7 +390,7 @@ class InvoiceController
             </td>
             <td>
                 <label for="serie${uniqueId}"><i class="icon-barcode2 mr-2"></i> Serie - Número</label>
-                <input type="text" class="form-control form-control-sm" id="serie${uniqueId}" name="invoice[guide][${uniqueId}][serie]" required>
+                <input type="text" placeholder="####-######" class="form-control form-control-sm" id="serie${uniqueId}" name="invoice[guide][${uniqueId}][serie]" required>
             </td>
             <td>
                 <div class="btn btn-danger btn-sm mt-4" onclick="ReferralGuidePhysical.removeItem(\'${uniqueId}\')"><i class="icon-cross2 mr-2"></i>Quitar</div>

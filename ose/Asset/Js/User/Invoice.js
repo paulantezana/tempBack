@@ -29,46 +29,6 @@ const SearchPublicDocumentExtractor = () =>{
     });
 };
 
-
-$(document).ready(() => {
-    $('#invoiceCustomerIdentityDocumentNumber').flexdatalist({
-        minLength: 3,
-        selectionRequired: false,
-        visibleProperties: ["social_reason", "document_number"],
-        searchContain: true,
-        searchIn: 'document_number',
-        searchDelay: 200,
-        requestType: 'post',
-        noResultsText: 'No se encuentran resultados para: "{keyword}"',
-        data: service.apiPath + '/Customer/SearchByDocumentNumber',
-    }).on("select:flexdatalist", function(event, data) {
-        $('#invoiceCustomerIdentityDocumentCode').val(data.identity_document_code).trigger('change');
-        $('#invoiceCustomerSocialReason').val(data.social_reason);
-        $('#invoiceCustomerFiscalAddress').val(data.fiscal_address);
-        $('#invoiceCustomerEmail').val(data.main_email);
-    });
-
-    $('.geographicalLocationSearch').select2({
-        ajax: {
-            url: service.apiPath + '/GeographicalLocationCode/Search',
-            dataType: 'json',
-            type: "POST",
-            processResults:  res =>  {
-                if (res.success)
-                    return  { results: res.result.map(item => ({ id: item.code, text: `${item.department} - ${item.province} - ${item.district}` }))};
-                else
-                    return {};
-            }
-        }
-    });
-
-    $('#invoiceCurrencyCode').on('change',() => {
-        $('.jsCurrencySymbol').html($('#invoiceCurrencyCode').find(':selected').data('symbol'));
-    });
-
-    productListStore.data = JSON.parse($('#productListStore').html().trim());
-});
-
 /**
  * Dependencies
  *  - ProductForm                       : class
@@ -565,8 +525,7 @@ const InvoiceScripts = () => {
             }
             calcInvoiceItem();
         });
-        affectationInput.select2({ minimumResultsForSearch: -1 });
-        affectationInput.on('change keyup', calcInvoiceItem);
+        affectationInput.select2({ minimumResultsForSearch: -1 }).on('change',calcInvoiceItem);
         totalItemInput.on('change keyup paste', e => {
             if(ValidateInputIsNumber(e.target)){
                 return false;
@@ -618,7 +577,49 @@ const InvoiceScripts = () => {
         calcTotalInvoice();
     });
 };
-InvoiceScripts();
+
+$(document).ready(() => {
+    $('#invoiceCustomerIdentityDocumentNumber').flexdatalist({
+        minLength: 3,
+        selectionRequired: false,
+        visibleProperties: ["social_reason", "document_number"],
+        searchContain: true,
+        searchIn: 'document_number',
+        searchDelay: 200,
+        requestType: 'post',
+        noResultsText: 'No se encuentran resultados para: "{keyword}"',
+        data: service.apiPath + '/Customer/SearchByDocumentNumber',
+    }).on("select:flexdatalist", function(event, data) {
+        $('#invoiceCustomerIdentityDocumentCode').val(data.identity_document_code).trigger('change');
+        $('#invoiceCustomerSocialReason').val(data.social_reason);
+        $('#invoiceCustomerFiscalAddress').val(data.fiscal_address);
+        $('#invoiceCustomerEmail').val(data.main_email);
+    });
+
+    $('.geographicalLocationSearch').select2({
+        ajax: {
+            url: service.apiPath + '/GeographicalLocationCode/Search',
+            dataType: 'json',
+            type: "POST",
+            processResults:  res =>  {
+                if (res.success)
+                    return  { results: res.result.map(item => ({ id: item.code, text: `${item.department} - ${item.province} - ${item.district}` }))};
+                else
+                    return {};
+            }
+        }
+    });
+
+    $('#invoiceCurrencyCode').on('change',() => {
+        $('.jsCurrencySymbol').html($('#invoiceCurrencyCode').find(':selected').data('symbol'));
+    });
+
+    productListStore.data = JSON.parse($('#productListStore').html().trim());
+
+    InvoiceScripts();
+});
+
+
 
 // Submit Validate
 $('#jsInvoiceFormCommit').on('click', e => {

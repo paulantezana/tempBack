@@ -45,20 +45,17 @@ class InvoiceNote extends BaseModel
             $total_pages = ceil($total_rows / $limit);
 
             $sql = "SELECT invoice_note.*,  cat_document_type_code.description as document_type_code_description, cat_operation_type_code.description as operation_type_code_description,
-                            customer.social_reason, customer.document_number, cat_currency_type_code.symbol as currency_symbol,
+                            inc.social_reason as customer_social_reason, inc.document_number as customer_document_number, inc.sent_to_client as customer_sent_to_client,
+                            cat_currency_type_code.symbol as currency_symbol,
                             invoice.document_code as invoice_document_code,
-                            sunat_comunicate.sunat_response_description, sunat_response_code, creation_date as sunat_creation_date
+                            ins.invoice_state_id,  ins.send, ins.response_code, ins.response_message, ins.other_message, ins.pdf_url, ins.xml_url, ins.cdr_url
                         FROM invoice_note
-                        INNER JOIN customer ON invoice_note.customer_id = customer.customer_id
+                        INNER JOIN invoice_note_customer inc on invoice_note.invoice_note_id = inc.invoice_note_id
+                        INNER JOIN invoice_note_sunat ins on invoice_note.invoice_note_id = ins.invoice_note_id
                         INNER JOIN cat_document_type_code ON invoice_note.document_code = cat_document_type_code.code
                         INNER JOIN cat_currency_type_code ON invoice_note.currency_code = cat_currency_type_code.code
                         INNER JOIN cat_operation_type_code ON invoice_note.operation_code = cat_operation_type_code.code
-                        LEFT JOIN invoice ON invoice_note.invoice_id = invoice.invoice_id
-                        LEFT JOIN (
-                            SELECT sunat_communication.reference_id, sunat_response.sunat_response_description, sunat_response.sunat_response_code, sunat_communication.creation_date FROM sunat_communication
-                            INNER JOIN sunat_response on sunat_communication.sunat_communication_id = sunat_response.sunat_communication_id
-                        ) as sunat_comunicate ON sunat_comunicate.reference_id = invoice_note.invoice_note_id
-                        ";
+                        LEFT JOIN invoice ON invoice_note.invoice_id = invoice.invoice_id";
             $sql .= $sqlFilter;
             $sql .= " ORDER BY invoice_note.invoice_note_id DESC LIMIT $offset, $limit";
 
@@ -72,7 +69,6 @@ class InvoiceNote extends BaseModel
                 'limit' => $limit,
                 'data' => $data,
             ];
-
         } catch (Exception $e) {
             throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
         }
@@ -105,8 +101,12 @@ class InvoiceNote extends BaseModel
                             (invoice_note.total_igv + invoice_note.total_isc + invoice_note.total_other_taxed) as total_tax,
                             invoice.serie as invoice_serie, invoice.correlative as invoice_correlative, invoice.document_code as invoice_document_code, 
                             cat_document_type_code.description as document_type_code_description, 
-                            cat_operation_type_code.description as operation_type_code_description, 
-                            customer.social_reason as customer_social_reason, customer.document_number as customer_document_number, 
+                            cat_operation_type_code.description as operation_type_code_description,
+       
+                            inc.social_reason as customer_social_reason, inc.document_number as customer_document_number, 
+                            inc.identity_document_code as customer_identity_document_code,
+                            inc.fiscal_address as customer_fiscal_address,
+       
                             cat_currency_type_code.symbol as currency_type_code_symbol,
                             cat_currency_type_code.description as currency_type_code_description,
        
@@ -123,14 +123,14 @@ class InvoiceNote extends BaseModel
                             sd.delivery_address as detraction_delivery_address, sd.delivery_date as detraction_delivery_date, sd.quantity as detraction_quantity
                     FROM invoice_note
                     INNER JOIN invoice ON invoice_note.invoice_id = invoice.invoice_id
-                    INNER JOIN customer ON invoice_note.customer_id = customer.customer_id
+                    INNER JOIN invoice_note_customer inc on invoice_note.invoice_note_id = inc.invoice_note_id
+                    INNER JOIN invoice_note_sunat ins on invoice_note.invoice_note_id = ins.invoice_note_id
                     INNER JOIN cat_document_type_code ON invoice_note.document_code = cat_document_type_code.code
                     INNER JOIN cat_currency_type_code ON invoice_note.currency_code = cat_currency_type_code.code
                     INNER JOIN cat_operation_type_code ON invoice_note.operation_code = cat_operation_type_code.code
                     LEFT JOIN invoice_referral_guide srg ON invoice.invoice_id = srg.invoice_id
                     LEFT JOIN invoice_detraction sd on invoice.invoice_id = sd.invoice_id
                     WHERE invoice_note.invoice_note_id = :invoice_note_id LIMIT 1';
-
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':invoice_note_id'=>$invoiceNoteId]);
             return $stmt->fetch();
@@ -156,7 +156,7 @@ class InvoiceNote extends BaseModel
         }
     }
 
-    public function Insert($invoice)
+    public function Insert($invoice, $userReferId, $localId)
     {
         try{
             $currentDate = date('Y-m-d H:i:s');
@@ -164,23 +164,21 @@ class InvoiceNote extends BaseModel
 
             $this->db->beginTransaction();
 
-            $sql = "INSERT INTO invoice_note ( local_id, invoice_note_key,  date_of_issue, time_of_issue, date_of_due, serie, correlative, observation, sunat_state, change_type,
-                                            document_code, currency_code, operation_code, customer_id, total_prepayment, total_free, total_exportation,
+            $sql = "INSERT INTO invoice_note ( local_id, invoice_note_key,  date_of_issue, time_of_issue, date_of_due, serie, correlative, observation, change_type,
+                                            document_code, currency_code, operation_code, total_prepayment, total_free, total_exportation,
                                             total_other_charged, total_discount, total_exonerated, total_unaffected, total_taxed, total_igv, total_base_isc,
                                             total_isc, total_charge, total_base_other_taxed, total_other_taxed, total_value, total,
                                             global_discount_percentage, purchase_order, vehicle_plate, term, perception_code, detraction,
-                                            related, guide, legend, pdf_format, pdf_url, reason_update_code, invoice_id, percentage_igv, percentage_plastic_bag_tax, total_plastic_bag_tax,
+                                            related, guide, legend, pdf_format, reason_update_code, invoice_id, percentage_igv, percentage_plastic_bag_tax, total_plastic_bag_tax,
                                             created_at,updated_at,created_user_id,updated_user_id)
-                    VALUES (:local_id, :invoice_note_key, :date_of_issue, :time_of_issue, :date_of_due, :serie, :correlative, :observation, :sunat_state, :change_type,
-                            :document_code, :currency_code, :operation_code, :customer_id, :total_prepayment, :total_free, :total_exportation,
+                    VALUES (:local_id, :invoice_note_key, :date_of_issue, :time_of_issue, :date_of_due, :serie, :correlative, :observation, :change_type,
+                            :document_code, :currency_code, :operation_code, :total_prepayment, :total_free, :total_exportation,
                             :total_other_charged, :total_discount, :total_exonerated, :total_unaffected, :total_taxed, :total_igv, :total_base_isc,
                             :total_isc, :total_charge, :total_base_other_taxed, :total_other_taxed, :total_value, :total,
                             :global_discount_percentage, :purchase_order, :vehicle_plate, :term, :perception_code, :detraction, 
-                            :related, :guide, :legend, :pdf_format, :pdf_url, :reason_update_code, :invoice_id, :percentage_igv, :percentage_plastic_bag_tax, :total_plastic_bag_tax,
+                            :related, :guide, :legend, :pdf_format, :reason_update_code, :invoice_id, :percentage_igv, :percentage_plastic_bag_tax, :total_plastic_bag_tax,
                             :created_at,:updated_at,:created_user_id,:updated_user_id)";
             $stmt = $this->db->prepare($sql);
-
-            $localId = (int)$_COOKIE['CurrentBusinessLocal'];
 
             if(!$stmt->execute([
                 ':local_id' => $localId,
@@ -191,12 +189,10 @@ class InvoiceNote extends BaseModel
                 ':serie' => $invoice['serie'],
                 ':correlative' => $invoice['correlative'],
                 ':observation' => $invoice['observation'],
-                ':sunat_state' => 1,
                 ':change_type' => $invoice['change_type'],
                 ':document_code' => $invoice['document_code'],
                 ':currency_code' => $invoice['currency_code'],
                 ':operation_code' => $invoice['operation_code'],
-                ':customer_id' => $invoice['customer_id'],
                 ':total_prepayment' => (float)($invoice['total_prepayment'] ?? 0),
                 ':total_free' => (float)($invoice['total_free'] ?? 0),
                 ':total_exportation' => (float)($invoice['total_exportation'] ?? 0),
@@ -223,7 +219,6 @@ class InvoiceNote extends BaseModel
                 ':guide' => json_encode($invoice['guide'] ?? []),
                 ':legend' => json_encode($invoice['legend'] ?? []),
                 ':pdf_format' => $invoice['pdf_format'],
-                ':pdf_url' => $invoice['pdf_url'] ?? '',
                 ':reason_update_code' => $invoice['reason_update_code'] ?? '',
                 ':invoice_id' => $invoice['invoice_id'] ?? '',
                 ':percentage_igv' => (float)($invoice['percentage_igv'] ?? 0),
@@ -232,13 +227,42 @@ class InvoiceNote extends BaseModel
 
                 ":created_at" => $currentDate,
                 ":updated_at" => $currentDate,
-                ":created_user_id" => $_SESSION[SESS],
-                ":updated_user_id" => $_SESSION[SESS],
+                ":created_user_id" => $userReferId,
+                ":updated_user_id" => $userReferId,
             ])){
                 throw new Exception('No se pudo insertar el registro');
             }
             $invoiceNoteId = (int)$this->db->lastInsertId();
 
+            // Insert customer
+            $sql = "INSERT INTO invoice_note_customer (invoice_note_id, document_number, identity_document_code, social_reason, fiscal_address, email, telephone, sent_to_client)
+                    VALUES (:invoice_note_id, :document_number, :identity_document_code, :social_reason, :fiscal_address, :email, :telephone, :sent_to_client)";
+            $stmt = $this->db->prepare($sql);
+            if(!$stmt->execute([
+                ':invoice_note_id' => $invoiceNoteId,
+                ':document_number' => $invoice['customer']['document_number'],
+                ':identity_document_code' => $invoice['customer']['identity_document_code'],
+                ':social_reason' => $invoice['customer']['social_reason'],
+                ':fiscal_address' => $invoice['customer']['fiscal_address'],
+                ':email' => $invoice['customer']['email'],
+                ':telephone' => $invoice['customer']['telephone'] ?? '',
+                ':sent_to_client' => 0,
+            ])){
+                throw new Exception('No se pudo insertar el registro');
+            }
+
+            // Insert sunat states
+            $sql = "INSERT INTO invoice_note_sunat (invoice_note_id, invoice_state_id)
+                    VALUES (:invoice_note_id, :invoice_state_id)";
+            $stmt = $this->db->prepare($sql);
+            if(!$stmt->execute([
+                ':invoice_note_id' => $invoiceNoteId,
+                ':invoice_state_id' => 1,
+            ])){
+                throw new Exception('No se pudo insertar el registro');
+            }
+
+            // Insert items
             foreach ($invoice['item'] as $row){
                 $sql = "INSERT INTO invoice_note_item (invoice_note_id, product_code, unit_measure, description, quantity, unit_value, unit_price, discount,
                                                         affectation_code, total_base_igv, igv, system_isc_code, total_base_isc,
@@ -279,84 +303,6 @@ class InvoiceNote extends BaseModel
                     ':total_value' => (float)($row['total_value'] ?? 0),
                     ':total' => (float)($row['total'] ?? 0),
                 ]);
-            }
-
-            // Insert Detraction
-            if (isset($invoice['detraction_percentage']) && isset($invoice['detraction_enabled']) ){
-                $sql = "INSERT INTO invoice_note_detraction(invoice_note_id, referral_value, effective_load, useful_load, travel_detail, 
-                                                        whit_detraction, detraction_code, percentage, amount,
-                                                        location_starting_code, address_starting_point, location_arrival_code, address_arrival_point,
-                                                        boat_registration, boat_name, species_kind, delivery_address, delivery_date, quantity
-                                                )  
-                                                    VALUES (:invoice_note_id, :referral_value, :effective_load, :useful_load, :travel_detail,
-                                                        :whit_detraction, :detraction_code, :percentage, :amount,
-                                                        :location_starting_code, :address_starting_point, :location_arrival_code, :address_arrival_point,
-                                                        :boat_registration, :boat_name, :species_kind, :delivery_address, :delivery_date, :quantity
-                                                    )";
-                $stmt = $this->db->prepare($sql);
-                $detractionEnabled = $invoice['detraction_enabled'] == 'on' ? 1 : 0;
-
-                if (!$stmt->execute([
-                    ':invoice_note_id' => $invoiceNoteId,
-                    ':referral_value' => $invoice['detraction_referral_value'],
-                    ':effective_load' => $invoice['detraction_effective_load'],
-                    ':useful_load' => $invoice['detraction_useful_load'],
-                    ':travel_detail' => $invoice['detraction_travel_detail'],
-
-                    ':whit_detraction' => $detractionEnabled,
-                    ':detraction_code' => $invoice['subject_detraction_code'],
-                    ':percentage' => $invoice['detraction_percentage'],
-                    ':amount' => $invoice['total'] * ($invoice['detraction_percentage'] / 100),
-                    ':location_starting_code' => $invoice['detraction_location_starting_code'],
-                    ':address_starting_point' => $invoice['detraction_address_starting_point'],
-                    ':location_arrival_code' => $invoice['detraction_location_arrival_code'],
-                    ':address_arrival_point' => $invoice['detraction_address_arrival_point'],
-
-                    ':boat_registration' => $invoice['detraction_boat_registration'],
-                    ':boat_name' => $invoice['detraction_boat_name'],
-                    ':species_kind' => $invoice['detraction_species_kind'],
-                    ':delivery_address' => $invoice['detraction_delivery_address'],
-                    ':delivery_date' => $invoice['detraction_delivery_date'],
-                    ':quantity' => $invoice['detraction_quantity'],
-                ])){
-                    throw new Exception('No se pudo insertar el registro');
-                }
-            }
-
-            // Insert invoice guide
-            if (isset($invoice['referral_guide_enabled'])){
-                $referralGuide = $invoice['referral_guide'];
-                $sql = "INSERT INTO invoice_note_referral_guide(invoice_note_id, whit_guide, document_code, transfer_code, transport_code, transfer_start_date, total_gross_weight,
-                                                        carrier_document_code, carrier_document_number, carrier_denomination, driver_document_code,
-                                                        driver_document_number, driver_full_name, location_starting_code, address_starting_point,
-                                                        location_arrival_code, address_arrival_point)  
-                                                    VALUES (:invoice_note_id, :whit_guide, :document_code, :transfer_code, :transport_code, :transfer_start_date, :total_gross_weight,
-                                                        :carrier_document_code, :carrier_document_number, :carrier_denomination, :driver_document_code,
-                                                        :driver_document_number, :driver_full_name, :location_starting_code, :address_starting_point,
-                                                        :location_arrival_code, :address_arrival_point)";
-                $stmt = $this->db->prepare($sql);
-                $referralGuideEnabled = $invoice['referral_guide_enabled'] == 'on' ? 1 : 0;
-                if (!$stmt->execute([
-                    ':invoice_note_id' => $invoiceNoteId,
-                    ':whit_guide' => $referralGuideEnabled,
-                    ':document_code' => '09',
-                    ':transfer_code' => $referralGuide['transfer_code'],
-                    ':transport_code' => $referralGuide['transport_code'],
-                    ':transfer_start_date' => $referralGuide['transfer_start_date'],
-                    ':total_gross_weight' => $referralGuide['total_gross_weight'],
-                    ':carrier_document_code' => $referralGuide['carrier_document_code'],
-                    ':carrier_document_number' => $referralGuide['carrier_document_number'],
-                    ':carrier_denomination' => $referralGuide['carrier_denomination'],
-                    ':driver_document_code' => $referralGuide['driver_document_code'],
-                    ':driver_document_number' => $referralGuide['driver_document_number'],
-                    ':driver_full_name' => $referralGuide['driver_full_name'],
-                    ':location_starting_code' => $referralGuide['location_starting_code'],
-                    ':address_starting_point' => $referralGuide['address_starting_point'],
-                    ':location_arrival_code' => $referralGuide['location_arrival_code'],
-                    ':address_arrival_point' => $referralGuide['address_arrival_point'],
-                ])){
-                    throw new Exception('No se pudo insertar el registro');
-                }
             }
 
             $this->db->commit();

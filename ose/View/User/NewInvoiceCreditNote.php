@@ -8,6 +8,7 @@
             <h3><?= $parameter['documentTypeCode']['description'] ?? ''?></h3>
             <input type="hidden" class="form-control" name="invoice[document_code]" value="<?= $parameter['documentTypeCode']['code'] ?? '' ?>" id="invoiceDocumentCode">
             <input type="hidden" value="<?= $parameter['business']['include_igv'] ?? ''?>" id="businessIncludeIgv">
+            <div id="productListStore" style="display: none"><?php echo json_encode($parameter['productList'] ?? []); ?></div>
         </div>
 
         <div class="card mb-4">
@@ -18,31 +19,31 @@
                 <div class="form-row">
 
                     <div class="form-group col-md-3">
-                        <label for="invoiceSaleDocumentCode">Tipo Doc.Electrónico:</label>
-                        <select class="form-control" id="invoiceSaleDocumentCode" name="invoice[sale_update][document_code]">
-                            <option value="03" <?= ($parameter['invoice']['sale_update']['document_code'] ?? false) == "03" ? 'selected' : '' ?>>BOLETA</option>
-                            <option value="01" <?= ($parameter['invoice']['sale_update']['document_code'] ?? false) == "01" ? 'selected' : '' ?>>FACTURA</option>
+                        <label for="invoiceInvoiceDocumentCode"><i class="icon-user position-left"></i> Tipo Doc.Electrónico: <span class="text-danger">*</span></label>
+                        <select class="select2" id="invoiceInvoiceDocumentCode" name="invoice[invoice_update][document_code]">
+                            <option value="03" <?= ($parameter['invoice']['invoice_update']['document_code'] ?? false) == "03" ? 'selected' : '' ?>>BOLETA</option>
+                            <option value="01" <?= ($parameter['invoice']['invoice_update']['document_code'] ?? false) == "01" ? 'selected' : '' ?>>FACTURA</option>
                         </select>
                     </div>
 
-                    <!--                    <input type="hidden" name="invoice[sale_update][sale_id]" value="--><?//= $parameter['invoice']['sale_update']['sale_id'] ?? '' ?><!--">-->
+                    <!--                    <input type="hidden" name="invoice[invoice_update][invoice_id]" value="--><?//= $parameter['invoice']['invoice_update']['invoice_id'] ?? '' ?><!--">-->
 
                     <div class="form-group col-md-3">
-                        <label for="invoiceSaleSerie">Serie:</label>
-                        <input type="text" class="form-control" id="invoiceSaleSerie" name="invoice[sale_update][serie]" value="<?= $parameter['invoice']['sale_update']['serie'] ?? '' ?>">
+                        <label for="invoiceInvoiceSerie"><i class="icon-barcode2 mr-2"></i> Serie: <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="invoiceInvoiceSerie" name="invoice[invoice_update][serie]" value="<?= $parameter['invoice']['invoice_update']['serie'] ?? '' ?>">
                     </div>
 
                     <div class="form-group col-md-3">
-                        <label for="invoiceSaleCorrelative">Correlativo:</label>
-                        <input type="text" class="form-control" id="invoiceSaleCorrelative" name="invoice[sale_update][correlative]" value="<?= $parameter['invoice']['sale_update']['correlative'] ?? '' ?>">
+                        <label for="invoiceInvoiceCorrelative"><i class="icon-file-text2 mr-2"></i> Correlativo: <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="invoiceInvoiceCorrelative" name="invoice[invoice_update][correlative]" value="<?= $parameter['invoice']['invoice_update']['correlative'] ?? '' ?>">
                     </div>
 
                     <div class="form-group col-md-3">
-                        <label for="invoiceSaleCreditNoteCode">Motivo</label>
-                        <select class="form-control" id="invoiceSaleCreditNoteCode" name="invoice[sale_update][credit_note_code]" >
+                        <label for="invoiceInvoiceCreditNoteCode"><i class="icon-file-text2 mr-2"></i> Motivo<span class="text-danger">*</span></label>
+                        <select class="select2" id="invoiceInvoiceCreditNoteCode" name="invoice[invoice_update][credit_note_code]" >
                             <option value="">Elegir</option>
                             <?php foreach ($parameter['creditNoteType'] ?? [] as $row): ?>
-                                <option value="<?= $row['code']?>" <?= ($parameter['invoice']['sale_update']['credit_note_code'] ?? '') == $row['code'] ? 'selected' : '' ?> >
+                                <option value="<?= $row['code']?>" <?= ($parameter['invoice']['invoice_update']['credit_note_code'] ?? '') == $row['code'] ? 'selected' : '' ?> >
                                     <?= $row['description']?>
                                 </option>
                             <?php endforeach; ?>
@@ -531,6 +532,8 @@
         </div>
     </form>
 </div>
+
+<script src="<?= FOLDER_NAME . '/Asset/Js/User/Invoice.js'?>"></script>
 
 <?php
 require_once __DIR__ . '/Partial/ProductForm.php';

@@ -2,18 +2,18 @@
 
     <div class="col-auto mr-auto">
         <div class="btn-group btn-group-sm mb-3">
-            <div class="btn btn-light" data-toggle="modal" data-target="#invoiceAdditionalModal">Adicionales</div>
             <div class="btn btn-light" data-toggle="modal" data-target="#invoiceReferralGuide">Guía de remisión Física</div>
             <div class="btn btn-light" data-toggle="modal" data-target="#invoiceAdvancedOptions">Opciones Avanzadas</div>
         </div>
+
         <!-- Invoice Referral guide -->
         <div class="modal fade" id="invoiceReferralGuide" tabindex="-1" role="dialog" aria-labelledby="invoiceReferralGuideLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="invoiceReferralGuideLabel">Guía de Remisión</h5>
+                        <h6 class="modal-title" id="invoiceReferralGuideLabel"><i class="icon-file-plus mr-2"></i> Guía de Remisión</h6>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                            <span aria-hidden="true">×</span>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -55,46 +55,14 @@
             </div>
         </div>
 
-        <!-- Invoice Additional General -->
-        <div class="modal fade" id="invoiceAdditionalModal" tabindex="-1" role="dialog" aria-labelledby="invoiceAdditionalModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="invoiceAdditionalModalLabel">Adicionales</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="invoicePurchaseOrder"><i class="icon-file-text2 mr-2"></i> Órden de Compra/Servicio</label>
-                            <input type="text" class="form-control" id="invoicePurchaseOrder" name="invoice[purchase_order]" value="<?= $parameter['invoice']['purchase_order'] ?? '' ?>">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="invoiceVehiclePlate"><i class="icon-file-text2 mr-2"></i> Placa de vehículo. Venta de combustible o mantenimiento</label>
-                            <input type="text" class="form-control" id="invoiceVehiclePlate" name="invoice[vehicle_plate]" value="<?= $parameter['invoice']['vehicle_plate'] ?? '' ?>">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="invoiceTerm"><i class="icon-file-text2 mr-2"></i> Condiciones de pago (Ejemplo: 15 días)</label>
-                            <input type="text" class="form-control" id="invoiceTerm" name="invoice[term]" value="<?= $parameter['invoice']['term'] ?? '' ?>">
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="Close">Aceptar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Invoice print print modal -->
         <div class="modal fade" id="invoiceAdvancedOptions" tabindex="-1" role="dialog" aria-labelledby="invoiceAdvancedOptionsLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="invoiceAdvancedOptionsLabel">Obciones Avanzadas</h5>
+                        <h6 class="modal-title" id="invoiceAdvancedOptionsLabel"><i class="icon-file-plus mr-2"></i> Obciones Avanzadas</h6>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                            <span aria-hidden="true">×</span>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -173,6 +141,21 @@
                                     <option value="A5" <?= ($parameter['invoice']['pdf_format'] ?? '') === 'A5' ? 'selected' : ''; ?>>TAMAÑO A5 (MITAD DE A4)</option>
                                     <option value="TICKET" <?= ($parameter['invoice']['pdf_format'] ?? '') === 'TICKET' ? 'selected' : ''; ?>>TAMAÑO TICKET</option>
                                 </select>
+                            </div>
+
+                            <div class="col-sm-6 col-md-4 col-lg-3 form-group">
+                                <label for="invoicePurchaseOrder"><i class="icon-file-text2 mr-2"></i> Órden de Compra/Servicio</label>
+                                <input type="text" class="form-control" placeholder="Número de Orden" id="invoicePurchaseOrder" name="invoice[purchase_order]" value="<?= $parameter['invoice']['purchase_order'] ?? '' ?>">
+                            </div>
+
+                            <div class="col-sm-6 col-md-4 col-lg-3 form-group">
+                                <label for="invoiceVehiclePlate"><i class="icon-file-text2 mr-2"></i>  N° Placa Vehículo:</label>
+                                <input type="text" class="form-control" placeholder="Número Placa" id="invoiceVehiclePlate" name="invoice[vehicle_plate]" value="<?= $parameter['invoice']['vehicle_plate'] ?? '' ?>">
+                            </div>
+
+                            <div class="col-sm-6 col-md-4 col-lg-3 form-group">
+                                <label for="invoiceTerm"><i class="icon-file-text2 mr-2"></i> Condiciones de pago</label>
+                                <input type="text" class="form-control" id="invoiceTerm" name="invoice[term]" value="<?= $parameter['invoice']['term'] ?? '' ?>">
                             </div>
 
                         </div>

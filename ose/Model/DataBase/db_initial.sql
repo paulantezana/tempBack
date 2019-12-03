@@ -571,6 +571,8 @@ CREATE TABLE invoice_note (
                               created_at DATETIME,
                               created_user_id INT,
                               updated_user_id INT,
+                              invoice_id INT,
+                              reason_update_code VARCHAR(2),
 
                               local_id INT,
 
@@ -584,7 +586,6 @@ CREATE TABLE invoice_note (
                               document_code VARCHAR(2),               # CODIGO TIPO DE DOCUMENTO
                               currency_code VARCHAR(8),               # CODIGO TIPO DE MONEDA
                               operation_code VARCHAR(8),              # CODIGO TIPO DE OPERACION
-                              customer_id INT NOT NULL,               # ID del cliente
 
                               total_prepayment FLOAT,                 # total_anticipos
                               total_free FLOAT,                       # total_operaciones_gratuitas
@@ -617,24 +618,22 @@ CREATE TABLE invoice_note (
                               guide TEXT,                     # JSON Array de guia de referencia
                               legend TEXT,                    # JSON Array de leyendas // SAVE ONLY LEYEND CODES.
 
-                              pdf_format VARCHAR(16),         # Se se puede quitar
-                              pdf_url varchar(255),
-                              xml_url VARCHAR(255),
-                              cdr_url varchar(255),
-                              sent_to_client BOOLEAN,
-                              reason_update_code VARCHAR(16),
-                              invoice_id INT,
+                              pdf_format VARCHAR(16),
+                              itinerant_enable BOOLEAN,
+                              itinerant_location VARCHAR(6),
+                              itinerant_address varchar(255),
+                              itinerant_urbanization varchar(255),
 
                               CONSTRAINT pk_invoice_note PRIMARY KEY (invoice_note_id),
-                              CONSTRAINT uk_invoice_note UNIQUE KEY (invoice_note_key),
-                              INDEX ix_invoice_note_indexes (serie,correlative,local_id),
-                              CONSTRAINT fk_invoice_note_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id)
-                                  ON UPDATE RESTRICT ON DELETE RESTRICT,
+                              CONSTRAINT uk_invoice_note UNIQUE (invoice_note_key),
+                              INDEX (serie,correlative,local_id),
                               CONSTRAINT fk_invoice_note_currency_type_code FOREIGN KEY (currency_code) REFERENCES cat_currency_type_code (code)
                                   ON UPDATE RESTRICT ON DELETE RESTRICT,
                               CONSTRAINT fk_invoice_note_operation_type_code FOREIGN KEY (operation_code) REFERENCES cat_operation_type_code (code)
                                   ON UPDATE RESTRICT ON DELETE RESTRICT,
                               CONSTRAINT fk_invoice_note_document_type_code FOREIGN KEY (document_code) REFERENCES cat_document_type_code (code)
+                                  ON UPDATE RESTRICT ON DELETE RESTRICT,
+                              CONSTRAINT fk_invoice_note_invoice FOREIGN KEY (invoice_id) REFERENCES invoice (invoice_id)
                                   ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 
@@ -708,7 +707,7 @@ CREATE TABLE invoice_note_customer(
                                       CONSTRAINT pk_invoice_note_customer PRIMARY KEY (invoice_note_customer_id),
                                       CONSTRAINT fk_invoice_note_customer_identity_document_type_code FOREIGN KEY (identity_document_code) REFERENCES cat_identity_document_type_code (code)
                                           ON UPDATE RESTRICT ON DELETE RESTRICT,
-                                      CONSTRAINT fk_invoice_note_customer_invoice FOREIGN KEY (invoice_note_id) REFERENCES invoice (invoice_id)
+                                      CONSTRAINT fk_invoice_note_customer_invoice FOREIGN KEY (invoice_note_id) REFERENCES invoice_note (invoice_note_id)
                                           ON UPDATE RESTRICT ON DELETE RESTRICT
 );
 
@@ -1372,11 +1371,15 @@ VALUES ('cliente','Cliente final que emite los comprobantes electrónicos');
 
 INSERT INTO users(id_rol, names, email, phone, ruc, address, id_document_type, password, state) VALUES
 (1,'cliente','cliente@gmail.com','999999999','20553476462','','','34e422278ea745b5d87ba6592f0ea3fe32a2eb7593f5960ac72d7094fb121f3d',1);
+
 INSERT INTO business(include_igv, continue_payment, total_calculation_item, send_email_company, ruc, social_reason, commercial_reason, email, phone, web_site, logo)
 VALUES (true,false,'amount','abc@gmail.com','99999999999','abc company','abc','abc@gmail.com','966254123','abc.com','');
+
 INSERT INTO business_user (business_id, user_id) VALUES (1,3);
+
 INSERT INTO business_local(updated_at, created_at, created_user_id, updated_user_id, short_name, sunat_code, location_code, department, province, district, address, pdf_invoice_size, pdf_header, description, business_id)
 VALUES (now(),now(),1,1,'Local principal','','080800','cusco','cusco','cusco','','A4','','',1);
+
 INSERT INTO business_serie(updated_at, delete_at, business_local_id, serie, document_code, max_correlative, contingency)
 VALUES (now(),null,1,'F001','01',0,false),
        (now(),null,1,'B001','03',0,false),

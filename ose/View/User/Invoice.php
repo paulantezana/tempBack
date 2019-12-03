@@ -177,7 +177,7 @@
                                         </a>
                                     <?php elseif ($row["document_code"] == '03' && $row['invoice_state_id'] == 3): ?>
                                         <a href="<?=  FOLDER_NAME . '/InvoiceSummary' ?>" title="Ver resumen" style="font-size: 0.85rem">
-                                            <i class="fas fa-chevron-circle-right text-primary"></i>
+                                            <i class="icon-spinner4 text-primary mr-2"></i>
                                         </a>
                                     <?php endif; ?>
                                 </td>
@@ -186,14 +186,14 @@
                                         <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Estado SUNAT">
                                             <?php if ($row['document_code'] == '01'): ?>
                                                 <?php if ($row['invoice_state_id'] == 1 || $row['invoice_state_id'] == 2): ?>
-                                                    <i class="fas fa-sync-alt text-warning"></i>
+                                                    <i class="icon-spinner11 text-warning  mr-2"></i>
                                                     <div class="spinner-border spinner-border-sm text-warning" role="status">
                                                         <span class="sr-only">Loading...</span>
                                                     </div>
                                                 <?php elseif ($row['response_code'] === '0' && $row['invoice_state_id'] == 3): ?>
                                                     <i class="icon-checkmark mr-2 text-success"></i>
                                                 <?php elseif ($row['invoice_state_id'] == 4): ?>
-                                                    <i class="fas fa-times-circle text-danger"></i>
+                                                    <i class="icon-cancel-circle2 text-danger mr-2"></i>
                                                 <?php else: ?>
                                                     <div class="spinner-border spinner-border-sm" role="status">
                                                         <span class="sr-only">Loading...</span>
@@ -201,14 +201,14 @@
                                                 <?php endif;?>
                                             <?php elseif ($row['document_code'] == '03'): ?>
                                                 <?php if ($row['invoice_state_id'] == 1 || $row['invoice_state_id'] == 2): ?>
-                                                    <i class="fas fa-chevron-circle-right text-primary"></i>
+                                                    <i class="icon-spinner4 text-primary mr-2"></i>
                                                     <div class="spinner-border spinner-border-sm text-primary" role="status">
                                                         <span class="sr-only">Loading...</span>
                                                     </div>
                                                 <?php elseif ($row['invoice_state_id'] == 3): ?>
-                                                    <i class="fas fa-chevron-circle-right text-primary"></i>
+                                                    <i class="icon-spinner4 text-primary mr-2"></i>
                                                 <?php elseif ($row['invoice_state_id'] == 4): ?>
-                                                    <i class="fas fa-times-circle text-danger"></i>
+                                                    <i class="icon-cancel-circle2 text-danger mr-2"></i>
                                                 <?php else: ?>
                                                     <div class="spinner-border spinner-border-sm" role="status">
                                                         <span class="sr-only">Loading...</span>

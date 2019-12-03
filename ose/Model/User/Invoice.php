@@ -9,6 +9,26 @@ class Invoice extends BaseModel
         parent::__construct("invoice","invoice_id",$db);
     }
 
+    public function GetById($id)
+    {
+        try {
+            $sql = "SELECT invoice.*,
+                            ic.social_reason as customer_social_reason, ic.document_number as customer_document_number, 
+                            ic.identity_document_code as customer_identity_document_code,       
+                            ic.fiscal_address as customer_fiscal_address,
+                            isn.invoice_sunat_id as invoice_state
+                    FROM invoice
+                    INNER JOIN invoice_customer ic on invoice.invoice_id = ic.invoice_id
+                    INNER JOIN invoice_sunat isn on invoice.invoice_id = isn.invoice_id
+                    WHERE invoice.invoice_id = :invoice_id LIMIT 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([":invoice_id" => $id]);
+            return $stmt->fetch();
+        } catch (Exception $e) {
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+        }
+    }
+
     public function Paginate($page = 1, $limit = 10, $filter = []) {
         try{
             $filterNumber = 0;

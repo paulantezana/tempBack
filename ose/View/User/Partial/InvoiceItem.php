@@ -25,7 +25,10 @@
         <?php foreach ($parameter['invoice']['item'] ?? [] as $key => $row): ?>
             <tr id="invoiceItem<?= $key ?>" data-uniqueId="<?= $key ?>">
                 <td>
-                    <input type="text" id="description<?= $key ?>" name="invoice[item][<?= $key ?>][description]" value="<?= $row['description'] ?>" class="form-control form-control-sm">
+                    <select name="" id="productSearch<?= $key ?>">
+                        <option value="<?= $row['product_code'] ?>"><?= $row['description'] ?></option>
+                    </select>
+                    <input type="hidden" id="description<?= $key ?>" name="invoice[item][<?= $key ?>][description]" value="<?= $row['description'] ?>" class="form-control form-control-sm">
                     <input type="hidden" id="productCode<?= $key ?>" name="invoice[item][<?= $key ?>][product_code]" value="<?= $row['product_code'] ?>">
                     <input type="hidden" id="unitMeasure<?= $key ?>" name="invoice[item][<?= $key ?>][unit_measure]" value="<?= $row['unit_measure'] ?>">
                 </td>
@@ -40,15 +43,13 @@
                            min="0"  name="invoice[item][<?= $key ?>][quantity]" id="quantity<?= $key ?>" value="<?= $row['quantity'] ?? '' ?>">
                 </td>
                 <td>
-                    <select class="form-control form-control-sm JsInvoiceAffectationItem <?= ($parameter['error']['item']['children'][$key] ?? false) ? 'is-invalid' : '' ?>"
+                    <select class="JsInvoiceAffectationItem <?= ($parameter['error']['item']['children'][$key] ?? false) ? 'is-invalid' : '' ?>"
                             name="invoice[item][<?= $key ?>][affectation_code]" id="affectation<?= $key ?>" required>
                         <?php foreach ($parameter['affectationIgvTypeCode'] ?? [] as $values): ?>
                             <option
                                 value="<?= $values['code']?>"
                                 <?php echo $values['code'] == $row['affectation_code'] ? 'selected' : '' ?>
-                            >
-                                <?= $values['description']?>
-                            </option>
+                            ><?= $values['description']?></option>
                         <?php endforeach; ?>
                     </select>
                 </td>
