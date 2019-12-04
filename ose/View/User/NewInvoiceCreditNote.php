@@ -533,7 +533,7 @@
     </form>
 </div>
 
-<script src="<?= FOLDER_NAME . '/Asset/Js/User/Invoice.js'?>"></script>
+<script src="<?= FOLDER_NAME . '/Asset/Js/User/NewInvoice.js'?>"></script>
 
 <?php
 require_once __DIR__ . '/Partial/ProductForm.php';

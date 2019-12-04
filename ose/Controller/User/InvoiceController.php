@@ -114,6 +114,25 @@ class InvoiceController
         }
     }
 
+    public function Table(){
+        try {
+            $page = isset($_GET['page']) ? $_GET['page'] : 1;
+            $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
+            $search = isset($_GET['search']) ? $_GET['search'] : '';
+
+            $filter = isset($_POST) ? $_POST : [];
+            $parameter['invoice'] = $this->invoiceModel->Paginate(
+                $page,
+                $limit,
+                $filter
+            );
+
+            echo requireToVar(VIEW_PATH . "User/Partial/InvoiceTable.php", $parameter);
+        } catch (Exception $e) {
+            echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
+        }
+    }
+
     public function ResendInvoice(){
         try{
             $invoiceId = $_GET['InvoiceId'] ?? 0;

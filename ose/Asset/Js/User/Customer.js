@@ -61,6 +61,11 @@ let  Customer = {
                 backgroundColor: 'none'
             }
         });
+
+        let filter = {
+
+        };
+
         $.ajax({
             url: service.path + `/Customer/Table?limit=${limit}&page=${page}&search=${search}`,
             success: res => {

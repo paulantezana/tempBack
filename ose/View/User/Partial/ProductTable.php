@@ -40,6 +40,7 @@
         </tbody>
     </table>
 </div>
+
 <div class="row">
     <div class="col-auto mr-auto">
         Mostrando <?php echo $parameter['product']['current']; ?> a <?php echo $parameter['product']['limit']; ?> de <?php echo $parameter['product']['pages']; ?> entradas

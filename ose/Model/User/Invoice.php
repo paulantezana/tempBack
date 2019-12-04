@@ -47,9 +47,9 @@ class Invoice extends BaseModel
                 $sqlFilter .= "invoice.date_of_issue >= '{$filter['startDate']}'";
                 $filterNumber++;
             }
-            if (isset($filter['invoiceSearch']) && $filter['invoiceSearch']){
+            if (isset($filter['invoiceId']) && $filter['invoiceId']){
                 $sqlFilter .= $filterNumber >= 1 ? ' AND ' : ' WHERE ';
-                $sqlFilter .= "invoice.invoice_id = '{$filter['invoiceSearch']}'";
+                $sqlFilter .= "invoice.invoice_id = '{$filter['invoiceId']}'";
                 $filterNumber++;
             }
             if (isset($filter['endDate']) && $filter['endDate']){
