@@ -47,7 +47,9 @@
                             </div>
                             <div class="form-group col-lg-3">
                                 <label for="filterCustomerDocumentNumber"><i class="icon-users mr-2"></i> Cliente</label>
-                                <select class="searchCustomer" id="filterCustomerDocumentNumber"></select>
+                                <select class="searchCustomer" id="filterCustomerDocumentNumber">
+                                    <option value="">Filtrar por cliente</option>
+                                </select>
                             </div>
                             <div class="form-group col-lg-6">
                                 <label for="filterRangeDate"><i class="icon-calendar mr-2"></i> Rango de Fechas</label>
@@ -55,9 +57,17 @@
                                 <input type="hidden" id="filterStartDate" name="filter[startDate]">
                                 <input type="hidden" id="filterEndDate" name="filter[endDate]">
                             </div>
-                            <div class="form-group col-lg-12">
+                            <div class="form-group col-lg-10">
                                 <label for="filterInvoiceId"><i class="icon-barcode2 mr-2"></i> Buscar documento por serie / número</label>
-                                <select class="invoiceSearch" id="filterInvoiceId"></select>
+                                <select class="invoiceSearch" id="filterInvoiceId">
+                                    <option value="">Filtrar por documento</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-lg-2">
+                                <label for="filterClear"> </label>
+                                <button type="reset" class="btn btn-light btn-block" id="filterClear" onclick="Invoice.resetFilter()">
+                                    <i class="icon-filter3 mr-2"></i>Borrar filtro
+                                </button>
                             </div>
                         </div>
                     </form>

@@ -122,13 +122,13 @@
 
                             <div class="col-sm-6 col-md-4 col-lg-3 form-group">
                                 <label for="invoiceDateOfIssue"><i class="icon-calendar2 mr-2"></i>Fecha emisión </label>
-                                <input type="date" class="form-control <?= ($parameter['error']['date_of_issue'] ?? false) ? 'is-invalid' : '' ?>"
+                                <input type="text" class="form-control datePiker <?= ($parameter['error']['date_of_issue'] ?? false) ? 'is-invalid' : '' ?>"
                                        id="invoiceDateOfIssue" name="invoice[date_of_issue]" value="<?= date('Y-m-d') ?>">
                             </div>
 
                             <div class="col-sm-6 col-md-4 col-lg-3 form-group">
                                 <label for="invoiceDateOfDue"><i class="icon-calendar2 mr-2"></i>Fecha de Venc.</label>
-                                <input type="date" class="form-control <?= ($parameter['error']['date_of_due'] ?? false) ? 'is-invalid' : '' ?>"
+                                <input type="text" class="form-control datePiker <?= ($parameter['error']['date_of_due'] ?? false) ? 'is-invalid' : '' ?>"
                                        id="invoiceDateOfDue" name="invoice[date_of_due]" value="<?= date('Y-m-d') ?>">
                             </div>
 

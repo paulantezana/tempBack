@@ -1,6 +1,17 @@
 // In your Javascript (external .js resource or <script> tag)
 $(document).ready(function() {
     $('.select2').select2({ minimumResultsForSearch: -1 });
+    $(".datePiker").daterangepicker({
+        singleDatePicker: true,
+        locale: {
+            format: 'YYYY-MM-DD',
+            daysOfWeek: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa" ],
+            monthNames: [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+            ],
+            monthNamesShort: ['Ene','Feb','Mar','Abr','May','Jun','Jul', 'Ago','Sep','Oct','Nov','Dic'],
+            firstDay: 1
+        }
+    });
 
     $('.searchCustomer').select2({
         ajax: {

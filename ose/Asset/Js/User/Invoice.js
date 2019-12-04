@@ -45,9 +45,15 @@ let Invoice = {
                 })
             },
         });
+    },
+
+    resetFilter(){
+        $('#filterDocumentCode').val(null).trigger('change');
+        $('#filterCustomerDocumentNumber').val(null).trigger('change');
+        $('#filterInvoiceId').val(null).trigger('change');
+        this.list();
     }
 };
-
 
 $(document).ready(() => {
     $("#filterRangeDate").daterangepicker(
@@ -72,9 +78,9 @@ $(document).ready(() => {
         }
     );
 
-    $('#filterDocumentCode').on('change',() => Invoice.list() );
-    $('#filterCustomerDocumentNumber').on('change',() => Invoice.list() );
-    $('#filterInvoiceId').on('change',() => Invoice.list() );
+    $('#filterDocumentCode').on('change.select2',() => Invoice.list() );
+    $('#filterCustomerDocumentNumber').on('change.select2',() => Invoice.list() );
+    $('#filterInvoiceId').on('change.select2',() => Invoice.list() );
 
     Invoice.list();
 });
