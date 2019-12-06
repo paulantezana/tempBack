@@ -5,17 +5,19 @@ body{
 
 $bgColor: white;
 
-.SNTour{
+.SkyGuide{
     &-wrapper{
-        position: relative;
-        &::before{
-            position: absolute;
-            content: '';
-            width: 24px;
-            height: 24px;
-            background: $bgColor;
-            top: 100%;
-        }
+        position: fixed;
+        min-width: 320px;
+        z-index: 999999;
+        // &::before{
+        //     position: absolute;
+        //     content: '';
+        //     width: 24px;
+        //     height: 24px;
+        //     background: $bgColor;
+        //     top: 100%;
+        // }
     }
     &-overlay{
         opacity: 0.8;
@@ -24,8 +26,9 @@ $bgColor: white;
         bottom: 0;
         left: 0;
         right: 0;
-        z-index: 999999;
+        z-index: 999998;
         pointer-events: none;
+        background: rgba(0,0,0,.4);
         // filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#66000000',endColorstr='#e6000000',GradientType=1)";
         // -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
         // filter: alpha(opacity=50);
