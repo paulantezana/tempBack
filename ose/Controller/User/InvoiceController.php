@@ -409,10 +409,10 @@ class InvoiceController
             </td>
             <td>
                 <label for="serie${uniqueId}"><i class="icon-barcode2 mr-2"></i> Serie - Número</label>
-                <input type="text" placeholder="####-######" class="form-control form-control-sm" id="serie${uniqueId}" name="invoice[guide][${uniqueId}][serie]" required>
+                <input type="text" placeholder="####-######" class="form-control" id="serie${uniqueId}" name="invoice[guide][${uniqueId}][serie]" required>
             </td>
             <td>
-                <div class="btn btn-danger btn-sm mt-4" onclick="ReferralGuidePhysical.removeItem(\'${uniqueId}\')"><i class="icon-cross2 mr-2"></i>Quitar</div>
+                <div class="btn btn-danger mt-4" onclick="ReferralGuidePhysical.removeItem(\'${uniqueId}\')"><i class="icon-cross2 mr-2"></i>Quitar</div>
             </td>
         </tr>';
     }

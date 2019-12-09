@@ -242,6 +242,15 @@ const InvoiceScripts = () => {
         }
         $('#invoiceTotal').val(RoundCurrency(invoiceTotal));
         $('#invoiceTotalText').html(RoundCurrency(invoiceTotal));
+
+        // Hide And Show Total rows in layout
+        $('#invoiceTotalPrepaymentRow').toggleClass('d-none',!($('#invoiceTotalPrepayment').val() > 0 ));
+        $('#invoiceTotalExoneratedRow').toggleClass('d-none',!($('#invoiceTotalExonerated').val() > 0 ));
+        $('#invoiceTotalUnaffectedRow').toggleClass('d-none',!($('#invoiceTotalUnaffected').val() > 0 ));
+        $('#invoiceTotalExportRow').toggleClass('d-none',!($('#invoiceTotalExport').val() > 0 ));
+        $('#invoiceTotalIscRow').toggleClass('d-none',!($('#invoiceTotalIsc').val() > 0 ));
+        $('#invoiceTotalFreeRow').toggleClass('d-none',!($('#invoiceTotalFree').val() > 0 ));
+        $('#invoiceTotalPlasticBagTaxRow').toggleClass('d-none',!($('#invoiceTotalPlasticBagTax').val() > 0 ));
     };
 
     // Calc item invoice items and search

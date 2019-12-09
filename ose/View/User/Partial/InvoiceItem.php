@@ -14,7 +14,7 @@
         <tfoot>
             <tr>
                 <td colspan="10">
-                    <div class="btn btn-primary btn-sm" id="addItemInvoice" data-itemtemplate="<?php echo htmlspecialchars(($parameter['itemTemplate'] ?? ''),ENT_QUOTES) ?>">
+                    <div class="btn btn-outline-primary btn-block" id="addItemInvoice" data-itemtemplate="<?php echo htmlspecialchars(($parameter['itemTemplate'] ?? ''),ENT_QUOTES) ?>">
                         <i class="icon-plus-circle2 mr-2"></i> Agregar Item
                     </div>
                 </td>

@@ -1,6 +1,6 @@
-<table class="table">
+<table class="table invoiceTableTotal">
     <tbody>
-        <tr>
+        <tr id="invoiceGlobalDiscountRow">
             <th>Descuento Global (-)</th>
             <td class="text-right">
                 <span class="jsCurrencySymbol">S/.</span>
@@ -8,7 +8,7 @@
                 <input type="hidden" readonly class="form-control form-control-sm" id="invoiceGlobalDiscount">
             </td>
         </tr>
-        <tr>
+        <tr id="invoiceItemDiscountRow">
             <th>Descuento por Item (-)</th>
             <td class="text-right">
                 <span class="jsCurrencySymbol">S/.</span>
@@ -16,7 +16,7 @@
                 <input type="hidden" readonly class="form-control form-control-sm" id="invoiceItemDiscount">
             </td>
         </tr>
-        <tr>
+        <tr id="invoiceTotalDiscountRow">
             <th>Descuento Total (-) </th>
             <td class="text-right">
                 <span class="jsCurrencySymbol">S/.</span>
@@ -24,7 +24,7 @@
                 <input type="hidden" readonly class="form-control form-control-sm" id="invoiceTotalDiscount" name="invoice[total_discount]">
             </td>
         </tr>
-        <tr>
+        <tr id="invoiceTotalPrepaymentRow" class="d-none">
             <th>Anticipo (-)</th>
             <td class="text-right">
                 <span class="jsCurrencySymbol">S/.</span>
@@ -32,7 +32,7 @@
                 <input type="hidden" readonly class="form-control form-control-sm" id="invoiceTotalPrepayment" name="invoice[total_prepayment]">
             </td>
         </tr>
-        <tr>
+        <tr id="invoiceTotalExoneratedRow" class="d-none">
             <th>Exonerada</th>
             <td class="text-right">
                 <span class="jsCurrencySymbol">S/.</span>
@@ -41,7 +41,7 @@
                        id="invoiceTotalExonerated" name="invoice[total_exonerated]">
             </td>
         </tr>
-        <tr>
+        <tr id="invoiceTotalUnaffectedRow" class="d-none">
             <th>Inafecta</th>
             <td class="text-right">
                 <span class="jsCurrencySymbol">S/.</span>
@@ -50,7 +50,7 @@
                        id="invoiceTotalUnaffected" name="invoice[total_unaffected]">
             </td>
         </tr>
-        <tr>
+        <tr id="invoiceTotalExportRow" class="d-none">
             <th>Exportación</th>
             <td class="text-right">
                 <span class="jsCurrencySymbol">S/.</span>
@@ -68,7 +68,7 @@
                        id="invoiceTotalTaxed" name="invoice[total_taxed]">
             </td>
         </tr>
-        <tr>
+        <tr id="invoiceTotalIscRow" class="d-none">
             <th>ISC</th>
             <td class="text-right">
                 <span class="jsCurrencySymbol">S/.</span>
@@ -86,7 +86,7 @@
                        id="invoiceTotalIgv" name="invoice[total_igv]">
             </td>
         </tr>
-        <tr>
+        <tr id="invoiceTotalFreeRow" class="d-none">
             <th>Gratuita</th>
             <td class="text-right">
                 <span class="jsCurrencySymbol">S/.</span>
@@ -95,15 +95,16 @@
                        id="invoiceTotalFree" name="invoice[total_free]">
             </td>
         </tr>
-        <tr>
+        <tr id="invoiceTotalPlasticBagTaxRow" class="d-none">
             <th>ICBPER</th>
             <td class="text-right">
                 <span class="jsCurrencySymbol">S/.</span>
                 <span id="invoiceTotalPlasticBagTaxText"></span>
-                <input type="hidden" readonly class="form-control form-control-sm" id="invoiceTotalPlasticBagTax" name="invoice[total_plastic_bag_tax]" value="<?= $parameter['invoice']['total_plastic_bag_tax'] ?? '' ?>">
+                <input type="hidden" readonly class="form-control form-control-sm" value="<?= $parameter['invoice']['total_plastic_bag_tax'] ?? '' ?>"
+                       id="invoiceTotalPlasticBagTax" name="invoice[total_plastic_bag_tax]">
             </td>
         </tr>
-        <tr>
+        <tr id="invoiceTotalRow">
             <th>Total</th>
             <td class="text-right">
                 <span class="jsCurrencySymbol">S/.</span>

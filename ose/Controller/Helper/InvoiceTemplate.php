@@ -21,11 +21,11 @@ class InvoiceTemplate
                 <input type="hidden" id="unitMeasure${uniqueId}" name="invoice[item][${uniqueId}][unit_measure]">
             </td>
             <td>
-                <input type="' . $unitValueType . '" step="any" min="0" class="form-control form-control-sm" name="invoice[item][${uniqueId}][unit_value]" id="unitValue${uniqueId}">
-                <input type="' . $unitPriceType . '" step="any" min="0" class="form-control form-control-sm" name="invoice[item][${uniqueId}][unit_price]" id="unitPrice${uniqueId}">
+                <input type="' . $unitValueType . '" step="any" min="0" class="form-control" name="invoice[item][${uniqueId}][unit_value]" id="unitValue${uniqueId}">
+                <input type="' . $unitPriceType . '" step="any" min="0" class="form-control" name="invoice[item][${uniqueId}][unit_price]" id="unitPrice${uniqueId}">
             </td>
             <td>
-                <input type="number" step="any" class="form-control form-control-sm" value="1" min="0"  name="invoice[item][${uniqueId}][quantity]" id="quantity${uniqueId}">
+                <input type="number" step="any" class="form-control" value="1" min="0"  name="invoice[item][${uniqueId}][quantity]" id="quantity${uniqueId}">
             </td>
             <td>
                 <select class="JsInvoiceAffectationItem" name="invoice[item][${uniqueId}][affectation_code]" id="affectation${uniqueId}" required>
@@ -33,19 +33,19 @@ class InvoiceTemplate
                 </select>
             </td>
             <td>
-                <input type="hidden" readonly class="form-control form-control-sm JsInvoiceSubTotalItem" id="totalValueItemDecimal${uniqueId}">
-                <input type="number" step="any" min="0" readonly class="form-control form-control-sm" id="totalValueItem${uniqueId}" name="invoice[item][${uniqueId}][total_value]" required>
+                <input type="hidden" readonly class="form-control JsInvoiceSubTotalItem" id="totalValueItemDecimal${uniqueId}">
+                <input type="text" readonly class="form-control" id="totalValueItem${uniqueId}" name="invoice[item][${uniqueId}][total_value]" required>
             </td>
             <td>
-                <input type="hidden" class="form-control form-control-sm JsInvoiceTotalItem" min="0" id="totalItemDecimal${uniqueId}">
-                <input type="number" step="any" min="0" readonly class="form-control form-control-sm" min="0" id="totalItem${uniqueId}" name="invoice[item][${uniqueId}][total]" required>
+                <input type="hidden" class="form-control JsInvoiceTotalItem" min="0" id="totalItemDecimal${uniqueId}">
+                <input type="text" readonly class="form-control" min="0" id="totalItem${uniqueId}" name="invoice[item][${uniqueId}][total]" required>
             </td>
             <td>
                 <div style="display: flex;">
-                    <button type="button" class="btn btn-sm btn-light" id="remove${uniqueId}" title="Quitar item">
+                    <button type="button" class="btn btn-light" id="remove${uniqueId}" title="Quitar item">
                         <i class="icon-cross text-danger"></i>
                     </button>
-                    <button type="button" class="btn ml-1 btn-sm btn-light" id="dropdownMenuInvoiceItem" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent" title="Más opciones">
+                    <button type="button" class="btn btn-light ml-1" id="dropdownMenuInvoiceItem" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent" title="Más opciones">
                         <i class="icon-menu9"></i>
                     </button>
                     <div class="dropdown-menu p-4" style="max-width: 350px" aria-labelledby="dropdownMenuInvoiceItem">

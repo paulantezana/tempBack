@@ -1,9 +1,9 @@
 <div class="row">
 
     <div class="col-auto mr-auto">
-        <div class="btn-group btn-group-sm mb-3">
-            <div class="btn btn-light" data-toggle="modal" data-target="#invoiceReferralGuide">Guía de remisión Física</div>
-            <div class="btn btn-light" data-toggle="modal" data-target="#invoiceAdvancedOptions">Opciones Avanzadas</div>
+        <div class="btn-group mb-3">
+            <div class="btn btn-secondary" data-toggle="modal" data-target="#invoiceReferralGuide">Guía de remisión Física</div>
+            <div class="btn btn-secondary" data-toggle="modal" data-target="#invoiceAdvancedOptions">Opciones Avanzadas</div>
         </div>
 
         <!-- Invoice Referral guide -->
@@ -17,39 +17,43 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <table class="table mb-5">
-                            <tbody id="invoiceReferralGuideTableBody">
-                            <?php foreach ($parameter['invoice']['guide'] ?? [] as $key => $row): ?>
-                                <tr id="referralGuideItem<?= $key?>" data-uniqueId="<?= $key?>">
-                                    <td>
-                                        <label for="type<?= $key?>">Tipo</label>
-                                        <select class="form-control select2" id="type<?= $key?>" name="invoice[guide][<?= $key?>][document_code]" required>
-                                            <option value="09">GUÍA DE REMISIÓN REMITENTE</option>
-                                            <option value="31">GUÍA DE REMISIÓN TRANSPORTISTA</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <label for="serie<?= $key ?>">Serie - Número</label>
-                                        <input type="text" class="form-control form-control-sm" id="serie<?= $key ?>" name="invoice[guide][<?= $key ?>][serie]" value="<?= $row['serie'] ?? '' ?>" required>
-                                    </td>
-                                    <td>
-                                        <div class="btn btn-danger btn-sm mt-4" onclick="ReferralGuidePhysical.removeItem('<?= $key ?>')" >Quitar</div>
+                        <div class="table-responsive">
+                            <table class="table" style="min-width: 650px">
+                                <tfoot>
+                                <tr>
+                                    <td colspan="10">
+                                        <div class="btn btn-outline-primary btn-block"
+                                             onclick="ReferralGuidePhysical.addItem()"
+                                             data-itemtemplate="<?php echo htmlspecialchars(($parameter['referralGuideTemplate'] ?? ''),ENT_QUOTES) ?>"
+                                             id="ReferralGuidePhysicalAddItem">Agregar Guía de Remisión</div>
                                     </td>
                                 </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                            <tfoot>
-                            <tr>
-                                <td colspan="10">
-                                    <div class="btn btn-primary btn-sm"
-                                         onclick="ReferralGuidePhysical.addItem()"
-                                         data-itemtemplate="<?php echo htmlspecialchars(($parameter['referralGuideTemplate'] ?? ''),ENT_QUOTES) ?>"
-                                         id="ReferralGuidePhysicalAddItem">Agregar Guía de Remisión</div>
-                                </td>
-                            </tr>
-                            </tfoot>
-                        </table>
-                        <button type="button" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="Close">ACEPTAR</button>
+                                </tfoot>
+                                <tbody id="invoiceReferralGuideTableBody">
+                                <?php foreach ($parameter['invoice']['guide'] ?? [] as $key => $row): ?>
+                                    <tr id="referralGuideItem<?= $key?>" data-uniqueId="<?= $key?>">
+                                        <td>
+                                            <label for="type<?= $key?>">Tipo</label>
+                                            <select class="form-control select2" id="type<?= $key?>" name="invoice[guide][<?= $key?>][document_code]" required>
+                                                <option value="09">GUÍA DE REMISIÓN REMITENTE</option>
+                                                <option value="31">GUÍA DE REMISIÓN TRANSPORTISTA</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <label for="serie<?= $key ?>">Serie - Número</label>
+                                            <input type="text" class="form-control form-control-sm" id="serie<?= $key ?>" name="invoice[guide][<?= $key ?>][serie]" value="<?= $row['serie'] ?? '' ?>" required>
+                                        </td>
+                                        <td>
+                                            <div class="btn btn-danger btn-sm mt-4" onclick="ReferralGuidePhysical.removeItem('<?= $key ?>')" >Quitar</div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-right">
+                            <button type="button" class="btn btn-primary" style="margin-right: .75rem" data-dismiss="modal" aria-label="Close">ACEPTAR</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -157,9 +161,7 @@
                                 <label for="invoiceTerm"><i class="icon-file-text2 mr-2"></i> Condiciones de pago</label>
                                 <input type="text" class="form-control" id="invoiceTerm" name="invoice[term]" value="<?= $parameter['invoice']['term'] ?? '' ?>">
                             </div>
-
                         </div>
-
                         <button type="submit" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="Close">Aceptar</button>
                     </div>
                 </div>
@@ -172,7 +174,7 @@
 </div>
 <div class="font-weight-bold">CLIENTE</div>
 <hr>
-<div class="row mb-3">
+<div class="row mb-3" id="customerFieldset">
     <div class="form-group col-md-4">
         <label for="invoiceCustomerIdentityDocumentNumber"><i class="icon-pencil mr-2"></i>  N° de R.U.C.:<span class="text-danger">*</span> </label>
         <div class="input-group">
