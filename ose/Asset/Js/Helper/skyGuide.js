@@ -3,7 +3,7 @@
             <div class="SkyGuide-cover">{{modal-cover}}</div>
             <div class="SkyGuide-action">
                 <span class="SkyGuide-btn">{{modal-map}}</span>
-                <span class="SkyGuide-btn">{{modal-title}}</span>
+                <span>{{modal-title}}</span>
                 <span class="SkyGuide-btn">{{modal-close}}</span>
             </div>
             <div class="SkyGuide-scroll">
@@ -46,7 +46,7 @@
 
         introDialogBtnStart: 'Start',
         introDialogBtnCancel: 'Cancelar'
-    }
+    };
 
     function getElementByContent(rootElement, text) {
         let filter = {
@@ -56,7 +56,7 @@
                 }
                 return NodeFilter.FILTER_REJECT;
             }
-        }
+        };
         let nodes = [];
         let walker = d.createTreeWalker(rootElement, NodeFilter.SHOW_TEXT, filter, false);
         while (walker.nextNode()) {
@@ -65,7 +65,7 @@
         return nodes;
     }
 
-    const typeDetect = (per) => {
+    function typeDetect(per){
         if(typeof per == 'function'){
             return typeof per;
         }
@@ -85,9 +85,48 @@
                 return 'object';
             }
         }
-    };
+    }
 
-    const getLastStandarElement = (elements, classNames = [], content = '') => {
+    let toStringObjIndex = 0;
+    function toStringObj(obj) {
+        let newIndex = toStringObjIndex++;
+        let objEnter = obj;
+        let tempObj = {};
+        tempObj[newIndex] = {};
+
+        for (let i in objEnter) {
+            if(objEnter.hasOwnProperty(i)){
+                let key1 = i;
+                let val = objEnter[key1];
+                //function
+                if(typeDetect(val) === 'function'){
+                    tempObj[newIndex][key1] = val.toString();
+                }
+                //array
+                if(typeDetect(val) === 'array'){
+                    let valEach = val;
+                    for(let f = 0; f < valEach.length; f++){
+                        if(typeDetect(valEach[f]) === 'object'){
+                            let objMass = valEach[f];
+                            valEach[f] = toStringObj(objMass);
+                        }
+                    }
+                    tempObj[newIndex][key1] = valEach;
+                }
+                //object
+                if(typeDetect(val) === 'object'){
+                    tempObj[newIndex][key1] = toStringObj(val);
+                }
+                //string, number, boolean
+                if(typeDetect(val) === 'string' || typeDetect(val) === 'number' || typeDetect(val) === 'boolean'){
+                    tempObj[newIndex][key1] = objEnter[key1];
+                }
+            }
+        }
+        return tempObj[newIndex];
+    }
+
+    function getLastStandardElement(elements, classNames = [], content = ''){
         let lastElement = elements[elements.length - 1];
         lastElement.innerHTML = content;
         classNames.forEach(item => lastElement.classList.add(item));
@@ -110,16 +149,16 @@
         ctx.restore();
     }
 
-    const saveState = state => {
+    function saveState(state) {
         w.localStorage.setItem('SkyGuide', JSON.stringify(state));
     }
 
-    const getState = () => {
+    function getState(){
         let skyGuideState = w.localStorage.getItem('SkyGuide');
         return skyGuideState != null ? JSON.parse(skyGuideState) : null;
     }
 
-    const destroyState = () => {
+    function destroyState(){
         w.localStorage.removeItem('SkyGuide');
     }
 
@@ -133,6 +172,7 @@
         let savePar = [];
 
         const separator = 15;
+        const sgHighlightClassName = 'SkyGuide-highlight';
         if (getState() == null && options == null) {
             return;
         }
@@ -160,48 +200,111 @@
         const setCanvasSize = () => {
             sgCanvas.height = w.innerHeight;
             sgCanvas.width = w.innerWidth;
-        }
+        };
 
         const clearCanvas = () => {
             ctx.clearRect(0, 0, sgCanvas.width, sgCanvas.height);
             ctx.fillStyle = 'rgba(0,0,0,.5)';
             ctx.fillRect(0, 0, sgCanvas.width, sgCanvas.height);
-        }
+        };
         setCanvasSize();
         clearCanvas();
         d.body.classList.add('SkyGuide-show');
 
         let sgModalPos = d.createElement('div');
         sgModalPos.classList.add('SkyGuide-wrapper');
-
-
         d.body.appendChild(sgModalPos);
 
         sgModalPos.innerHTML = SkyGuideTemplate;
-        let sgModalCover = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-cover}}'), ['sgModal-cover'], '');
-        let sgModalTitle = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-title}}'), ['sgModal-title'], '');
-        let sgModalMap = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-map}}'), ['sgModal-map'], SkyGuideLang.tourMapText);
-        let sgModalClose = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-close}}'), ['sgModal-close'], SkyGuideLang.cancelText);
+        let sgModalCover = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-cover}}'), ['sgModal-cover'], '');
+        let sgModalTitle = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-title}}'), ['sgModal-title'], '');
+        let sgModalMap = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-map}}'), ['sgModal-map'], SkyGuideLang.tourMapText);
+        let sgModalClose = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-close}}'), ['sgModal-close'], SkyGuideLang.cancelText);
 
-        let sgModalHeader = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-header}}'), ['sgModal-header'], '');
-        let sgModalBody = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-body}}'), ['sgModal-body'], '');
+        let sgModalHeader = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-header}}'), ['sgModal-header'], '');
+        let sgModalBody = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-body}}'), ['sgModal-body'], '');
 
-        let sgModalValue = getLastStandarElement(getElementByContent(sgModalPos, '{{step-value}}'), ['sgModal-value'], '');
-        let sgModalTotal = getLastStandarElement(getElementByContent(sgModalPos, '{{step-total}}'), ['sgModal-total'], '');
+        let sgModalValue = getLastStandardElement(getElementByContent(sgModalPos, '{{step-value}}'), ['sgModal-value'], '');
+        let sgModalTotal = getLastStandardElement(getElementByContent(sgModalPos, '{{step-total}}'), ['sgModal-total'], '');
 
-        let sgModalPrev = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-prev}}'), ['sgModal-prev'], SkyGuideLang.prevTextDefault);
-        let sgModalNext = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-next}}'), ['sgModal-next'], SkyGuideLang.nextTextDefault);
+        let sgModalPrev = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-prev}}'), ['sgModal-prev'], SkyGuideLang.prevTextDefault);
+        let sgModalNext = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-next}}'), ['sgModal-next'], SkyGuideLang.nextTextDefault);
 
-        let sgModalCancel = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-cancel}}'), ['sgModal-cancel'], SkyGuideLang.introDialogBtnCancel);
-        let sgModalStart = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-start}}'), ['sgModal-start'], SkyGuideLang.introDialogBtnStart);
+        let sgModalCancel = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-cancel}}'), ['sgModal-cancel'], SkyGuideLang.introDialogBtnCancel);
+        let sgModalStart = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-start}}'), ['sgModal-start'], SkyGuideLang.introDialogBtnStart);
 
-        let sgModalFirst = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-first}}'), ['sgModal-first'], SkyGuideLang.contDialogBtnBegin);
-        let sgModalContinue = getLastStandarElement(getElementByContent(sgModalPos, '{{modal-continue}}'), ['sgModal-continue'], SkyGuideLang.contDialogBtnContinue);
+        let sgModalFirst = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-first}}'), ['sgModal-first'], SkyGuideLang.contDialogBtnBegin);
+        let sgModalContinue = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-continue}}'), ['sgModal-continue'], SkyGuideLang.contDialogBtnContinue);
 
+        let sgErrorMessage = document.createElement('div');
+        sgModalTitle.innerHTML = data.guideTitle || '';
 
-        const drawOverlay = (currentView) => {
+        function showErrorMessage(message) {
+            sgErrorMessage.classList.add('sgModal-errorMessage');
+            sgErrorMessage.innerHTML = message;
+            sgModalPos.firstElementChild.appendChild(sgErrorMessage);
+            setPositionModal(view);
+            setTimeout(()=>{
+                sgErrorMessage.remove();
+                setPositionModal(view);
+            },5000);
+        }
+
+        function checkNextFunc(targetElObj) {
+            let result = true;
+            if (view.checkNext && view.checkNext.func !== undefined){
+                let nextFunc = new Function('return ' + view.checkNext.func)();
+                result = nextFunc(targetElObj);
+                if (!result && view.checkNext.errorMessage !== undefined){
+                    showErrorMessage(view.checkNext.errorMessage)
+                }
+            }
+            return result;
+        }
+
+        function beforeFunc(targetElObj) {
+            if (view.before !== undefined){
+                let nextFunc = new Function('return ' + view.before)();
+                nextFunc(targetElObj);
+            }
+        }
+
+        function setEventListener(currentView) {
+            if (currentView.event !== undefined) {
+                const triggerEvent = e => {
+                    console.log(e,'EVENT');
+                    handleNext(e);
+                };
+
+                const executeListener = (target, event) => {
+                    let targetElement = document.querySelector(target);
+                    console.log(targetElement,'EVENT');
+                    if (targetElement){
+                        targetElement.removeEventListener(event, triggerEvent);
+                        targetElement.addEventListener(event, triggerEvent);
+                    }
+                };
+
+                let eventType = typeDetect(currentView.event);
+                if (eventType === 'string'){
+                    if (currentView.target !== undefined && currentView.event !== undefined){
+                        executeListener(currentView.target,currentView.event);
+                    }
+                } else if (eventType === 'array') {
+                    currentView.event.forEach(item => {
+                        if (item.target !== undefined && item.event !== undefined){
+                            executeListener(item.target,item.event);
+                        }
+                    });
+                }
+            }
+        }
+
+        function drawOverlay(currentView){
             setCanvasSize();
             clearCanvas();
+
+            [...document.querySelectorAll(`.${sgHighlightClassName}`)].forEach(item => item.classList.remove(sgHighlightClassName));
 
             if (currentView.target) {
                 let targets = currentView.target.replace(' ', '').split(',');
@@ -211,7 +314,7 @@
                     let targetElement = d.querySelector(item);
                     if (targetElement) {
 
-                        targetElement.classList.add('SkyGuide-highlight');
+                        targetElement.classList.add(sgHighlightClassName);
                         let positionInfo = targetElement.getBoundingClientRect();
 
                         let newPosX, newPosY, newW, newH;
@@ -220,57 +323,54 @@
                         newW = positionInfo.width + (data.spacing * 2);
                         newH = positionInfo.height + (data.spacing * 2);
                         clearRoundRect(ctx, newPosX, newPosY, newW, newH, 4);
-
-                        if (currentView.event) {
-                            let eventType = typeDetect(currentView.event);
-                            let elementListening = null;
-                            if (eventType === 'string')
-                                elementListening = targetElement;
-                            else if (eventType === 'array')
-                                elementListening = document.querySelector(currentView.event[1]);
-                            const triggerEvent = e => {
-                                console.log('como', e);
-                            };
-                            if (elementListening){
-                                elementListening.removeEventListener(currentView.trigger, triggerEvent);
-                                elementListening.addEventListener(currentView.trigger, triggerEvent);
-                            }
-                        }
                     }
                 })
             }
-        };
+        }
 
-        const setPositionModal = currentView => {
-            let guideInfo = sgModalPos.getBoundingClientRect();
+        function setPositionModal(currentView){
+            let guideModalInfo = sgModalPos.getBoundingClientRect();
 
             const setCenterView = () => {
-                let newPosX = (w.innerWidth / 2) - (guideInfo.width / 2);
-                let newPosY = (w.innerHeight / 2) - (guideInfo.height / 2);
-
+                let newPosX = (w.innerWidth / 2) - (guideModalInfo.width / 2);
+                let newPosY = (w.innerHeight / 2) - (guideModalInfo.height / 2);
                 sgModalPos.style.top = `${newPosY}px`;
                 sgModalPos.style.left = `${newPosX}px`;
-            }
+            };
+
+            const setClassname = position => {
+                sgModalPos.classList.remove('sgT','sgR','sgB','sgL');
+                sgModalPos.classList.add(position);
+            };
 
             if (currentView.target) {
                 let target = currentView.target.replace(' ', '').split(',')[0];
                 let targetElement = d.querySelector(target);
                 if (targetElement) {
-                    let positionInfo = targetElement.getBoundingClientRect();
+                    let targetElementInfo = targetElement.getBoundingClientRect();
 
-                    let newPosX = positionInfo.x + positionInfo.width + data.spacing + separator;
-                    let newPosY = positionInfo.y - data.spacing;
+                    // Set left position
+                    let newPosX = targetElementInfo.x + targetElementInfo.width + data.spacing + separator;
+                    let newPosY = targetElementInfo.y - data.spacing;
+                    setClassname('sgR');
 
-                    if (guideInfo.width > (w.innerWidth - newPosX)) {
-                        newPosX = positionInfo.x - data.spacing;
-                        newPosY = positionInfo.y + positionInfo.height + data.spacing + separator;
-                        if (guideInfo.width > (w.innerWidth - newPosX)) {
-                            newPosX = positionInfo.x - guideInfo.width + positionInfo.width + data.spacing;
+                    if (guideModalInfo.width > (w.innerWidth - newPosX)) {
+                        // Set button position
+                        newPosX = targetElementInfo.x - data.spacing;
+                        newPosY = targetElementInfo.y + targetElementInfo.height + data.spacing + separator;
+                        setClassname('sgB');
+
+                        if (guideModalInfo.width > (w.innerWidth - newPosX)) {
+                            newPosX = targetElementInfo.x - guideModalInfo.width + targetElementInfo.width + data.spacing;
+                            setClassname('sgT');
                         }
                     }
 
-                    if (guideInfo.height > (w.innerHeight - newPosY)) {
-                        newPosY = positionInfo.y - guideInfo.height - data.spacing - separator;
+                    if (guideModalInfo.height > (w.innerHeight - newPosY)) {
+                        // Set top position
+                        newPosY = targetElementInfo.y - guideModalInfo.height - data.spacing - separator;
+                        newPosX = targetElementInfo.x - data.spacing;
+                        setClassname('sgT');
                     }
 
                     sgModalPos.style.top = `${newPosY}px`;
@@ -283,27 +383,33 @@
             }
         }
 
-        const PaintSkyGuideModal = (currentView, step, total) => {
+        function PaintSkyGuideModal(currentView, step, total){
             let targetLoc = location.href;
             if (currentView.loc) {
                 if (targetLoc != currentView.loc) {
                     saveState({
                         step,
                         event,
-                        data,
+                        data: toStringObj(data),
                     });
                     w.location.href = currentView.loc;
                     return;
                 }
             }
-
             view = currentView;
+
+            // execute before event
+            beforeFunc(currentView);
+
+            // Set content modal
             if (step === -1) {
                 sgModalHeader.innerHTML = '';
                 sgModalBody.innerHTML = '';
+                sgModalCover.innerHTML = '';
             } else {
                 sgModalHeader.innerHTML = currentView.title || '';
                 sgModalBody.innerHTML = currentView.content || '';
+                sgModalCover.innerHTML = currentView.cover ? `<img src="${currentView.cover}"/>` : '';
 
                 if (step === 0) {
                     sgModalPrev.classList.add('sgIsHide');
@@ -336,30 +442,39 @@
                     saveState({
                         step,
                         event,
-                        data,
+                        data: toStringObj(data),
                     });
+
+                    setEventListener(currentView);
                 }
             }
 
             drawOverlay(currentView);
             setPositionModal(currentView);
+
+            // Move scroll
+            // [...document.querySelectorAll('.SkyGuide-highlight')].forEach(item=>{
+            //     let targetPositionInfo = item.getBoundingClientRect();
+            //     console.log(targetPositionInfo);
+            //     w.scrollTo(targetPositionInfo.x, targetPositionInfo.y);
+            // })
         }
 
-        const listenerScrollW = () => {
+        function listenerScrollW(){
             if (view) {
                 setPositionModal(view);
                 drawOverlay(view);
             }
         }
 
-        const listenerResizeW = () => {
+        function listenerResizeW(){
             if (view) {
                 setPositionModal(view);
                 drawOverlay(view);
             }
         }
 
-        const destroyGuide = () => {
+        function destroyGuide(){
             d.body.classList.remove('SkyGuide-show');
             d.body.classList.remove('SkyGuide-event');
             sgCanvas.remove();
@@ -372,48 +487,43 @@
             PaintSkyGuideModal({
                 ...data.steps[step - 1],
             }, step, data.steps.length);
-        };
+        }
 
         function handleCancel() {
             destroyGuide();
-        };
+        }
 
         function handleContinue() {
-            //console.log('handleContinue');
-        };
+            console.log('handleContinue');
+        }
 
         function handleFirst() {
             step = 1;
             PaintSkyGuideModal({
                 ...data.steps[step - 1],
             }, step, data.steps.length);
-        };
+        }
 
         function handlePrev() {
             step = step - 1;
             PaintSkyGuideModal({
                 ...data.steps[step - 1],
             }, step, data.steps.length);
-        };
+        }
 
         function handleNext(e = null) {
-            console.log('handleNext');
-            if (data.steps.length == step) {
-                step = 0;
-                destroyGuide();
-            } else {
-                step = step + 1;
-                PaintSkyGuideModal({
-                    ...data.steps[step - 1],
-                }, step, data.steps.length);
+            if (checkNextFunc(e) === true){
+                if (data.steps.length == step) {
+                    step = 0;
+                    destroyGuide();
+                } else {
+                    step = step + 1;
+                    PaintSkyGuideModal({
+                        ...data.steps[step - 1],
+                    }, step, data.steps.length);
+                }
             }
-            if (e && e.target && e.target === sgModalNext) {
-                let skLght = d.querySelectorAll('.SkyGuide-highlight');
-                // skLght.forEach(item => {
-                //     item.dispatchEvent(new Event('click'));
-                // });
-            }
-        };
+        }
 
 
         if (step >= 1) {

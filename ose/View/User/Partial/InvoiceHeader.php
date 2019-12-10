@@ -181,7 +181,7 @@
             <div class="input-group">
                 <input type="text" class="form-control" id="invoiceCustomerIdentityDocumentNumber" name="invoice[customer][document_number]" value="<?= $parameter['invoice']['customer']['document_number'] ?? '' ?>">
                 <div class="input-group-append">
-                    <button class="btn btn-primary" type="button" id="button-addon2" onclick="SearchPublicDocumentExtractor()">
+                    <button class="btn btn-primary" type="button" id="invoiceCustomerSearchDocument" onclick="SearchPublicDocumentExtractor()">
                         <i class="icon-search4"></i>
                     </button>
                 </div>

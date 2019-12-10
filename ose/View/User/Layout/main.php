@@ -33,8 +33,6 @@
     <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/sweetalert2.min.css'?>">
     <link rel="stylesheet" href="<?= FOLDER_NAME ?>/Asset/Css/skyGuide.css"/>
     <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/StyleSheet.css'?>">
-    <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Js/Helper/iGuider.css'?>">
-    <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Js/Helper/iGuider-theme-material.css'?>">
 
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/jquery.min.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/bootstrap.bundle.min.js'?>"></script>
@@ -43,9 +41,7 @@
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/flexdatalist.min.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/select2.min.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/sweetalert2.min.js'?>"></script>
-    <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/jquery.iGuider.js'?>"></script>
-    <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/iGuider-theme-material.js'?>"></script>
-<!--    <script src="--><?//=FOLDER_NAME . '/Asset/Js/Helper/skyGuide.js'?><!--"></script>-->
+    <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/skyGuide.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/blockui.min.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/Common.js'?>"></script>
     <script src="<?=FOLDER_NAME . '/Asset/Js/User/UserCore.js'?>"></script>
@@ -78,15 +74,15 @@
                 </button>
                 <div class="modal-body">
                     <div class="row skyGuidePSEGrid">
-                        <div class="col-md-6 col-lg-3 col-xl-2" id="invoiceWithTaxed">
+                        <div class="col-md-6 col-lg-3 col-xl-2" id="sgInvoiceTaxed">
                             <img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice" width="42px">
                             <div>Factura gravada con IGV</div>
                         </div>
-                        <div class="col-md-6 col-lg-3 col-xl-2" id="invoiceWithUnaffected">
+                        <div class="col-md-6 col-lg-3 col-xl-2" id="sgInvoiceUnaffected">
                             <img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice" width="42px">
                             <div>Factura con venta inafecta</div>
                         </div>
-                        <div class="col-md-6 col-lg-3 col-xl-2" id="invoiceWithFree">
+                        <div class="col-md-6 col-lg-3 col-xl-2" id="sgInvoiceFree">
                             <img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice" width="42px">
                             <div>Factura con venta gratuita</div>
                         </div>

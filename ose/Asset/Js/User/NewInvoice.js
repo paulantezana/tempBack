@@ -20,11 +20,11 @@ const SearchPublicDocumentExtractor = () =>{
         type: "POST",
         dataType: 'json',
         data: { documentNumber: $('#invoiceCustomerIdentityDocumentNumber').val() },
-        success: response => {
-            $('#invoiceCustomerIdentityDocumentCode').val(response.identity_document_code).trigger('change');
-            $('#invoiceCustomerSocialReason').val(response.social_reason);
-            $('#invoiceCustomerFiscalAddress').val(response.fiscal_address);
-            $('#invoiceCustomerEmail').val(response.main_email);
+        success: res => {
+            $('#invoiceCustomerIdentityDocumentCode').val(res.result.identity_document_code).trigger('change');
+            $('#invoiceCustomerSocialReason').val(res.result.social_reason);
+            $('#invoiceCustomerFiscalAddress').val(res.result.fiscal_address);
+            $('#invoiceCustomerEmail').val(res.result.main_email);
         },
     });
 };
