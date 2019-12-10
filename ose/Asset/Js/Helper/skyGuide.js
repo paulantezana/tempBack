@@ -65,6 +65,28 @@
         return nodes;
     }
 
+    const typeDetect = (per) => {
+        if(typeof per == 'function'){
+            return typeof per;
+        }
+        if(typeof per == 'boolean'){
+            return typeof per;
+        }
+        if(typeof per == 'string'){
+            return typeof per;
+        }
+        if(typeof per == 'number'){
+            return typeof per;
+        }
+        if(typeof per == 'object'){
+            if(Array.isArray(per)){
+                return 'array';
+            }else{
+                return 'object';
+            }
+        }
+    };
+
     const getLastStandarElement = (elements, classNames = [], content = '') => {
         let lastElement = elements[elements.length - 1];
         lastElement.innerHTML = content;
@@ -101,7 +123,7 @@
         w.localStorage.removeItem('SkyGuide');
     }
 
-    const SkyGuide = (options = null) => {
+    w.SkyGuide = (options = null) => {
         let step,   // 1 - 2 - 3 - 4
             event,  // create || start
             view,
@@ -199,15 +221,20 @@
                         newH = positionInfo.height + (data.spacing * 2);
                         clearRoundRect(ctx, newPosX, newPosY, newW, newH, 4);
 
-                        if (currentView.trigger) {
+                        if (currentView.event) {
+                            let eventType = typeDetect(currentView.event);
+                            let elementListening = null;
+                            if (eventType === 'string')
+                                elementListening = targetElement;
+                            else if (eventType === 'array')
+                                elementListening = document.querySelector(currentView.event[1]);
                             const triggerEvent = e => {
-                                if (e.target.classList && [...e.target.classList].find(item => item == 'SkyGuide-highlight') !== undefined) {
-                                    console.log('como',e);
-                                    //handleNext();
-                                }
+                                console.log('como', e);
                             };
-                            targetElement.removeEventListener(currentView.trigger, triggerEvent)
-                            targetElement.addEventListener(currentView.trigger, triggerEvent);
+                            if (elementListening){
+                                elementListening.removeEventListener(currentView.trigger, triggerEvent);
+                                elementListening.addEventListener(currentView.trigger, triggerEvent);
+                            }
                         }
                     }
                 })
@@ -414,9 +441,7 @@
         sgModalStart.addEventListener('click', handleStart);
         sgModalFirst.addEventListener('click', handleFirst);
         sgModalContinue.addEventListener('click', handleContinue);
-    }
-
-    w.SkyGuide = SkyGuide;
+    };
 
     d.addEventListener("DOMContentLoaded", () => {
         w.SkyGuide();

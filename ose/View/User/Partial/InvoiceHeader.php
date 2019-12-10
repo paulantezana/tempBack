@@ -172,42 +172,44 @@
     <div class="col-auto">
     </div>
 </div>
-<div class="font-weight-bold">CLIENTE</div>
-<hr>
-<div class="row mb-3" id="customerFieldset">
-    <div class="form-group col-md-4">
-        <label for="invoiceCustomerIdentityDocumentNumber"><i class="icon-pencil mr-2"></i>  N° de R.U.C.:<span class="text-danger">*</span> </label>
-        <div class="input-group">
-            <input type="text" class="form-control" id="invoiceCustomerIdentityDocumentNumber" name="invoice[customer][document_number]" value="<?= $parameter['invoice']['customer']['document_number'] ?? '' ?>">
-            <div class="input-group-append">
-                <button class="btn btn-primary" type="button" id="button-addon2" onclick="SearchPublicDocumentExtractor()">
-                    <i class="icon-search4"></i>
-                </button>
+<div id="fieldsetCustomer">
+    <div class="font-weight-bold">CLIENTE</div>
+    <hr>
+    <div class="row mb-3" id="">
+        <div class="form-group col-md-4">
+            <label for="invoiceCustomerIdentityDocumentNumber"><i class="icon-pencil mr-2"></i>  N° de R.U.C.:<span class="text-danger">*</span> </label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="invoiceCustomerIdentityDocumentNumber" name="invoice[customer][document_number]" value="<?= $parameter['invoice']['customer']['document_number'] ?? '' ?>">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" id="button-addon2" onclick="SearchPublicDocumentExtractor()">
+                        <i class="icon-search4"></i>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="form-group col-md-3">
-        <label for="invoiceCustomerIdentityDocumentCode"><i class="icon-user mr-2"></i> Tipo Doc.Ident<span class="text-danger">*</span></label>
-        <select class="select2" id="invoiceCustomerIdentityDocumentCode" name="invoice[customer][identity_document_code]">
-            <?php foreach ($parameter['identityDocumentTypeCode'] ?? [] as $row): ?>
-                <option
-                    value="<?= $row['code']?>"
-                    <?= $row['code'] == ($parameter['invoice']['customer']['identity_document_code'] ?? false) ? 'selected' : '' ?>
-                ><?= $row['description']?></option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-    <div class="form-group col-md-5">
-        <label for="invoiceCustomerSocialReason"><i class="icon-vcard mr-2"></i> Razón Social: <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" id="invoiceCustomerSocialReason" name="invoice[customer][social_reason]" value="<?= $parameter['invoice']['customer']['social_reason'] ?? '' ?>">
-    </div>
-    <div class="form-group col-md-6">
-        <label for="invoiceCustomerFiscalAddress"><i class="icon-home2 mr-2"></i> Dirección: <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" id="invoiceCustomerFiscalAddress" name="invoice[customer][fiscal_address]" value="<?= $parameter['invoice']['customer']['fiscal_address'] ?? '' ?>">
-    </div>
-    <div class="form-group col-md-6">
-        <label for="invoiceCustomerEmail"><i class="icon-envelop2 mr-2"></i>  Email:</label>
-        <input type="text" class="form-control" id="invoiceCustomerEmail" name="invoice[customer][email]" value="<?= $parameter['invoice']['customer']['email'] ?? '' ?>">
+        <div class="form-group col-md-3">
+            <label for="invoiceCustomerIdentityDocumentCode"><i class="icon-user mr-2"></i> Tipo Doc.Ident<span class="text-danger">*</span></label>
+            <select class="select2" id="invoiceCustomerIdentityDocumentCode" name="invoice[customer][identity_document_code]">
+                <?php foreach ($parameter['identityDocumentTypeCode'] ?? [] as $row): ?>
+                    <option
+                        value="<?= $row['code']?>"
+                        <?= $row['code'] == ($parameter['invoice']['customer']['identity_document_code'] ?? false) ? 'selected' : '' ?>
+                    ><?= $row['description']?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group col-md-5">
+            <label for="invoiceCustomerSocialReason"><i class="icon-vcard mr-2"></i> Razón Social: <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="invoiceCustomerSocialReason" name="invoice[customer][social_reason]" value="<?= $parameter['invoice']['customer']['social_reason'] ?? '' ?>">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="invoiceCustomerFiscalAddress"><i class="icon-home2 mr-2"></i> Dirección: <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="invoiceCustomerFiscalAddress" name="invoice[customer][fiscal_address]" value="<?= $parameter['invoice']['customer']['fiscal_address'] ?? '' ?>">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="invoiceCustomerEmail"><i class="icon-envelop2 mr-2"></i>  Email:</label>
+            <input type="text" class="form-control" id="invoiceCustomerEmail" name="invoice[customer][email]" value="<?= $parameter['invoice']['customer']['email'] ?? '' ?>">
+        </div>
     </div>
 </div>
 
