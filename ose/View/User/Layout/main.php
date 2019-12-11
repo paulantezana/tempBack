@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/flexdatalist.min.css'?>">
     <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/select2.min.css'?>">
     <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/sweetalert2.min.css'?>">
-    <link rel="stylesheet" href="<?= FOLDER_NAME ?>/Asset/Css/skyGuide.css"/>
+    <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/skyGuide.css"'?>"/>
     <link rel="stylesheet" href="<?=FOLDER_NAME . '/Asset/Css/StyleSheet.css'?>">
 
     <script src="<?=FOLDER_NAME . '/Asset/Js/Helper/jquery.min.js'?>"></script>
@@ -62,63 +62,113 @@
         </div>
     </div>
 
-    <div data-toggle="modal" data-target="#skyGuidePSE" id="skyGuidePSEStart">
+    <div data-toggle="modal" data-target="#sgModalPSE" id="sgPSEStart">
         <i class="icon-help"></i>
     </div>
 
-    <div class="modal fade" id="skyGuidePSE" tabindex="-1" role="dialog" aria-labelledby="skyGuidePSELabel" aria-hidden="true">
+    <div class="modal fade" id="sgModalPSE" tabindex="-1" role="dialog" aria-labelledby="sgModalPSELabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <div class="modal-header">
+                    <h6 class="modal-title" id="invoiceAdvancedOptionsLabel"><i class="icon-help mr-2"></i> Modo Guiado</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+
                 <div class="modal-body">
-                    <div class="row skyGuidePSEGrid">
-                        <div class="col-md-6 col-lg-3 col-xl-2" id="sgInvoiceTaxed">
-                            <img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice" width="42px">
-                            <div>Factura gravada con IGV</div>
-                        </div>
-                        <div class="col-md-6 col-lg-3 col-xl-2" id="sgInvoiceUnaffected">
-                            <img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice" width="42px">
-                            <div>Factura con venta inafecta</div>
-                        </div>
-                        <div class="col-md-6 col-lg-3 col-xl-2" id="sgInvoiceFree">
-                            <img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice" width="42px">
-                            <div>Factura con venta gratuita</div>
-                        </div>
-<!--                        <div class="col-md-6 col-lg-3 col-xl-2">-->
-<!--                            <img src="--><?//= FOLDER_NAME ?><!--/Asset/Images/Invoice.svg" alt="invoice" width="42px">-->
-<!--                            <div>Factura con descuento global</div>-->
-<!--                        </div>-->
-<!--                        <div class="col-md-6 col-lg-3 col-xl-2">-->
-<!--                            <img src="--><?//= FOLDER_NAME ?><!--/Asset/Images/Invoice.svg" alt="invoice" width="42px">-->
-<!--                            <div>Factura gravada con ISC</div>-->
-<!--                        </div>-->
-<!--                        <div class="col-md-6 col-lg-3 col-xl-2">-->
-<!--                            <img src="--><?//= FOLDER_NAME ?><!--/Asset/Images/Invoice.svg" alt="invoice" width="42px">-->
-<!--                            <div>Factura en otras monedas</div>-->
-<!--                        </div>-->
-<!--                        <div class="col-md-6 col-lg-3 col-xl-2">-->
-<!--                            <img src="--><?//= FOLDER_NAME ?><!--/Asset/Images/Invoice.svg" alt="invoice" width="42px">-->
-<!--                            <div>Factura sujeta a detraccion</div>-->
-<!--                        </div>-->
-<!--                        <div class="col-md-6 col-lg-3 col-xl-2">-->
-<!--                            <img src="--><?//= FOLDER_NAME ?><!--/Asset/Images/Invoice.svg" alt="invoice" width="42px">-->
-<!--                            <div>Factura comercio exterior</div>-->
-<!--                        </div>-->
-<!--                        <div class="col-md-6 col-lg-3 col-xl-2">-->
-<!--                            <img src="--><?//= FOLDER_NAME ?><!--/Asset/Images/Invoice.svg" alt="invoice" width="42px">-->
-<!--                            <div>Factura guia</div>-->
-<!--                        </div>-->
-<!--                        <div class="col-md-6 col-lg-3 col-xl-2">-->
-<!--                            <img src="--><?//= FOLDER_NAME ?><!--/Asset/Images/Invoice.svg" alt="invoice" width="42px">-->
-<!--                            <div>Factura con pagos anticipados</div>-->
-<!--                        </div>-->
-<!--                        <div class="col-md-6 col-lg-3 col-xl-2">-->
-<!--                            <img src="--><?//= FOLDER_NAME ?><!--/Asset/Images/Invoice.svg" alt="invoice" width="42px">-->
-<!--                            <div>Factura con regulacion de anticipo</div>-->
-<!--                        </div>-->
+                    <div class="form-group">
+                        <input type="text" id="sgSearchInvoice" class="form-control" placeholder="¿Qué tipo de operación desea realizar?">
                     </div>
+                    <table class="table" id="sgTableInvoice">
+                        <tbody>
+                            <tr id="sgInvoiceTaxed">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura gravada con IGV</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura con venta gratuita</td>
+                            </tr>
+                            <tr id="sgInvoiceExonerated">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura con venta exonerada</td>
+                            </tr>
+                            <tr id="sgInvoiceUnaffected">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura con venta inafecta</td>
+                            </tr>
+                            <tr id="sgInvoiceExport">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura comercio exterior o exportación</td>
+                            </tr>
+
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura con descuento global</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura gravada con ISC</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura en otras monedas</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura sujeta a detracción</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura sujeta a percepción</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura guia</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura con pagos anticipados</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Factura con regulacion de anticipo</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/InvoiceTiket.svg" alt="invoice"></td>
+                                <td>Boleta gravada con IGV</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/InvoiceTiket.svg" alt="invoice"></td>
+                                <td>Boleta con descuento global</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/InvoiceTiket.svg" alt="invoice"></td>
+                                <td>Boleta con venta inafecta</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/creditNote.svg" alt="invoice"></td>
+                                <td>Nota de crédito</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/debitNote.svg" alt="invoice"></td>
+                                <td>Nota de debito</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Anular factura</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/InvoiceTiket.svg" alt="invoice"></td>
+                                <td>Anular Boleta</td>
+                            </tr>
+                            <tr id="sgInvoiceFree">
+                                <td><img src="<?= FOLDER_NAME ?>/Asset/Images/Invoice.svg" alt="invoice"></td>
+                                <td>Guia de remisión</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

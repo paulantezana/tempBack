@@ -34,8 +34,8 @@
         hideText: 'Ocultar',
         tourMapText: '≡',
         tourMapTitle: 'Mapa del gira',
-        nextTextDefault: 'Sig',
-        prevTextDefault: 'Ant',
+        nextTextDefault: 'Siguiente',
+        prevTextDefault: 'Anterior',
         endText: 'Fin',
 
         modalIntroType: 'Introducción',
@@ -44,7 +44,7 @@
         contDialogBtnBegin: 'Primero',
         contDialogBtnContinue: 'Continuar',
 
-        introDialogBtnStart: 'Start',
+        introDialogBtnStart: 'Iniciar',
         introDialogBtnCancel: 'Cancelar'
     };
 
@@ -65,23 +65,23 @@
         return nodes;
     }
 
-    function typeDetect(per){
-        if(typeof per == 'function'){
+    function typeDetect(per) {
+        if (typeof per == 'function') {
             return typeof per;
         }
-        if(typeof per == 'boolean'){
+        if (typeof per == 'boolean') {
             return typeof per;
         }
-        if(typeof per == 'string'){
+        if (typeof per == 'string') {
             return typeof per;
         }
-        if(typeof per == 'number'){
+        if (typeof per == 'number') {
             return typeof per;
         }
-        if(typeof per == 'object'){
-            if(Array.isArray(per)){
+        if (typeof per == 'object') {
+            if (Array.isArray(per)) {
                 return 'array';
-            }else{
+            } else {
                 return 'object';
             }
         }
@@ -95,18 +95,18 @@
         tempObj[newIndex] = {};
 
         for (let i in objEnter) {
-            if(objEnter.hasOwnProperty(i)){
+            if (objEnter.hasOwnProperty(i)) {
                 let key1 = i;
                 let val = objEnter[key1];
                 //function
-                if(typeDetect(val) === 'function'){
+                if (typeDetect(val) === 'function') {
                     tempObj[newIndex][key1] = val.toString();
                 }
                 //array
-                if(typeDetect(val) === 'array'){
+                if (typeDetect(val) === 'array') {
                     let valEach = val;
-                    for(let f = 0; f < valEach.length; f++){
-                        if(typeDetect(valEach[f]) === 'object'){
+                    for (let f = 0; f < valEach.length; f++) {
+                        if (typeDetect(valEach[f]) === 'object') {
                             let objMass = valEach[f];
                             valEach[f] = toStringObj(objMass);
                         }
@@ -114,11 +114,11 @@
                     tempObj[newIndex][key1] = valEach;
                 }
                 //object
-                if(typeDetect(val) === 'object'){
+                if (typeDetect(val) === 'object') {
                     tempObj[newIndex][key1] = toStringObj(val);
                 }
                 //string, number, boolean
-                if(typeDetect(val) === 'string' || typeDetect(val) === 'number' || typeDetect(val) === 'boolean'){
+                if (typeDetect(val) === 'string' || typeDetect(val) === 'number' || typeDetect(val) === 'boolean') {
                     tempObj[newIndex][key1] = objEnter[key1];
                 }
             }
@@ -126,7 +126,7 @@
         return tempObj[newIndex];
     }
 
-    function getLastStandardElement(elements, classNames = [], content = ''){
+    function getLastStandardElement(elements, classNames = [], content = '') {
         let lastElement = elements[elements.length - 1];
         lastElement.innerHTML = content;
         classNames.forEach(item => lastElement.classList.add(item));
@@ -153,12 +153,12 @@
         w.localStorage.setItem('SkyGuide', JSON.stringify(state));
     }
 
-    function getState(){
+    function getState() {
         let skyGuideState = w.localStorage.getItem('SkyGuide');
         return skyGuideState != null ? JSON.parse(skyGuideState) : null;
     }
 
-    function destroyState(){
+    function destroyState() {
         w.localStorage.removeItem('SkyGuide');
     }
 
@@ -169,7 +169,7 @@
             data = {};
 
         // Set dinamic variables
-        let savePar = [];
+        let stepHistory = [];
 
         const separator = 15;
         const sgHighlightClassName = 'SkyGuide-highlight';
@@ -244,18 +244,18 @@
             sgErrorMessage.innerHTML = message;
             sgModalPos.firstElementChild.appendChild(sgErrorMessage);
             setPositionModal(view);
-            setTimeout(()=>{
+            setTimeout(() => {
                 sgErrorMessage.remove();
                 setPositionModal(view);
-            },5000);
+            }, 5000);
         }
 
         function checkNextFunc(targetElObj) {
             let result = true;
-            if (view.checkNext && view.checkNext.func !== undefined){
+            if (view.checkNext && view.checkNext.func !== undefined) {
                 let nextFunc = new Function('return ' + view.checkNext.func)();
                 result = nextFunc(targetElObj);
-                if (!result && view.checkNext.errorMessage !== undefined){
+                if (!result && view.checkNext.errorMessage !== undefined) {
                     showErrorMessage(view.checkNext.errorMessage)
                 }
             }
@@ -263,7 +263,7 @@
         }
 
         function beforeFunc(targetElObj) {
-            if (view.before !== undefined){
+            if (view.before !== undefined) {
                 let nextFunc = new Function('return ' + view.before)();
                 nextFunc(targetElObj);
             }
@@ -272,42 +272,36 @@
         function setEventListener(currentView) {
             if (currentView.event !== undefined) {
                 const triggerEvent = e => {
-                    console.log(e,'EVENT');
                     handleNext(e);
                 };
 
                 const executeListener = (target, event) => {
-                    let targetElement = document.querySelector(target);
-                    console.log(targetElement,'EVENT');
-                    if (targetElement){
-                        targetElement.removeEventListener(event, triggerEvent);
-                        targetElement.addEventListener(event, triggerEvent);
-                    }
+                    $(target).one(event, triggerEvent);
                 };
 
                 let eventType = typeDetect(currentView.event);
-                if (eventType === 'string'){
-                    if (currentView.target !== undefined && currentView.event !== undefined){
-                        executeListener(currentView.target,currentView.event);
+                if (eventType === 'string') {
+                    if (currentView.target !== undefined && currentView.event !== undefined) {
+                        executeListener(currentView.target, currentView.event);
                     }
                 } else if (eventType === 'array') {
                     currentView.event.forEach(item => {
-                        if (item.target !== undefined && item.event !== undefined){
-                            executeListener(item.target,item.event);
+                        if (item.target !== undefined && item.event !== undefined) {
+                            executeListener(item.target, item.event);
                         }
                     });
                 }
             }
         }
 
-        function drawOverlay(currentView){
+        function drawOverlay(currentView) {
             setCanvasSize();
             clearCanvas();
 
             [...document.querySelectorAll(`.${sgHighlightClassName}`)].forEach(item => item.classList.remove(sgHighlightClassName));
 
             if (currentView.target) {
-                let targets = currentView.target.replace(' ', '').split(',');
+                let targets = currentView.target.trim().split(',');
                 d.body.classList.add('SkyGuide-event');
 
                 targets.forEach(item => {
@@ -328,7 +322,7 @@
             }
         }
 
-        function setPositionModal(currentView){
+        function setPositionModal(currentView) {
             let guideModalInfo = sgModalPos.getBoundingClientRect();
 
             const setCenterView = () => {
@@ -339,12 +333,12 @@
             };
 
             const setClassname = position => {
-                sgModalPos.classList.remove('sgT','sgR','sgB','sgL');
+                sgModalPos.classList.remove('sgT', 'sgR', 'sgB', 'sgL');
                 sgModalPos.classList.add(position);
             };
 
             if (currentView.target) {
-                let target = currentView.target.replace(' ', '').split(',')[0];
+                let target = currentView.target.trim().split(',')[0];
                 let targetElement = d.querySelector(target);
                 if (targetElement) {
                     let targetElementInfo = targetElement.getBoundingClientRect();
@@ -383,7 +377,7 @@
             }
         }
 
-        function PaintSkyGuideModal(currentView, step, total){
+        function PaintSkyGuideModal(currentView, step, total) {
             let targetLoc = location.href;
             if (currentView.loc) {
                 if (targetLoc != currentView.loc) {
@@ -396,85 +390,95 @@
                     return;
                 }
             }
+
             view = currentView;
+            setTimeout(() => {
+                // execute before event
+                beforeFunc(currentView);
 
-            // execute before event
-            beforeFunc(currentView);
-
-            // Set content modal
-            if (step === -1) {
-                sgModalHeader.innerHTML = '';
-                sgModalBody.innerHTML = '';
-                sgModalCover.innerHTML = '';
-            } else {
-                sgModalHeader.innerHTML = currentView.title || '';
-                sgModalBody.innerHTML = currentView.content || '';
-                sgModalCover.innerHTML = currentView.cover ? `<img src="${currentView.cover}"/>` : '';
-
-                if (step === 0) {
-                    sgModalPrev.classList.add('sgIsHide');
-                    sgModalNext.classList.add('sgIsHide');
-
-                    sgModalCancel.classList.remove('sgIsHide');
-                    sgModalStart.classList.remove('sgIsHide');
-
-                    sgModalFirst.classList.add('sgIsHide');
-                    sgModalContinue.classList.add('sgIsHide');
+                // Set content modal
+                if (step === -1) {
+                    sgModalHeader.innerHTML = '';
+                    sgModalBody.innerHTML = '';
+                    sgModalCover.innerHTML = '';
                 } else {
-                    sgModalValue.textContent = step;
-                    sgModalTotal.textContent = total;
-                    sgModalPrev.textContent = currentView.prevText || SkyGuideLang.prevTextDefault;
-                    sgModalNext.textContent = currentView.nextText || SkyGuideLang.nextTextDefault;
+                    sgModalHeader.innerHTML = currentView.title || '';
+                    sgModalBody.innerHTML = currentView.content || '';
+                    sgModalCover.innerHTML = currentView.cover ? `<img src="${currentView.cover}"/>` : '';
 
-                    if (step >= total) {
-                        sgModalNext.textContent = SkyGuideLang.endText;
+                    if (step === 0) {
+                        sgModalPrev.classList.add('sgIsHide');
+                        sgModalNext.classList.add('sgIsHide');
+
+                        sgModalCancel.classList.remove('sgIsHide');
+                        sgModalStart.classList.remove('sgIsHide');
+
+                        sgModalFirst.classList.add('sgIsHide');
+                        sgModalContinue.classList.add('sgIsHide');
+                    } else {
+                        sgModalValue.textContent = step;
+                        sgModalTotal.textContent = total;
+                        sgModalPrev.textContent = currentView.prevText || SkyGuideLang.prevTextDefault;
+                        sgModalNext.textContent = currentView.nextText || SkyGuideLang.nextTextDefault;
+
+                        if (step >= total) {
+                            sgModalNext.textContent = SkyGuideLang.endText;
+                        }
+                        if (step>1){
+                            sgModalPrev.classList.remove('sgIsHide');
+                        } else {
+                            sgModalPrev.classList.add('sgIsHide');
+                        }
+                        console.log(view.event, 'event');
+                        if (view.event !== undefined) {
+                            sgModalNext.classList.add('sgIsHide');
+                        } else {
+                            sgModalNext.classList.remove('sgIsHide');
+                        }
+
+                        sgModalCancel.classList.add('sgIsHide');
+                        sgModalStart.classList.add('sgIsHide');
+
+                        sgModalFirst.classList.add('sgIsHide');
+                        sgModalContinue.classList.add('sgIsHide');
+
+                        saveState({
+                            step,
+                            event,
+                            data: toStringObj(data),
+                        });
+
+                        setEventListener(currentView);
                     }
-
-                    sgModalPrev.classList.remove('sgIsHide');
-                    sgModalNext.classList.remove('sgIsHide');
-
-                    sgModalCancel.classList.add('sgIsHide');
-                    sgModalStart.classList.add('sgIsHide');
-
-                    sgModalFirst.classList.add('sgIsHide');
-                    sgModalContinue.classList.add('sgIsHide');
-
-                    saveState({
-                        step,
-                        event,
-                        data: toStringObj(data),
-                    });
-
-                    setEventListener(currentView);
                 }
-            }
 
-            drawOverlay(currentView);
-            setPositionModal(currentView);
+                drawOverlay(currentView);
+                setPositionModal(currentView);
 
-            // Move scroll
-            // [...document.querySelectorAll('.SkyGuide-highlight')].forEach(item=>{
-            //     let targetPositionInfo = item.getBoundingClientRect();
-            //     console.log(targetPositionInfo);
-            //     w.scrollTo(targetPositionInfo.x, targetPositionInfo.y);
-            // })
+                // Move scroll
+                [...document.querySelectorAll('.SkyGuide-highlight')].forEach(item => {
+                    let targetPositionInfo = item.getBoundingClientRect();
+                    console.log(targetPositionInfo);
+                    w.scrollTo(targetPositionInfo.x, targetPositionInfo.y);
+                });
+            }, view.delayBefore || 0);
         }
 
-        function listenerScrollW(){
+        function listenerScrollW() {
             if (view) {
                 setPositionModal(view);
                 drawOverlay(view);
             }
         }
 
-        function listenerResizeW(){
+        function listenerResizeW() {
             if (view) {
                 setPositionModal(view);
                 drawOverlay(view);
             }
         }
 
-        function destroyGuide(){
+        function destroyGuide() {
             d.body.classList.remove('SkyGuide-show');
             d.body.classList.remove('SkyGuide-event');
             sgCanvas.remove();
@@ -512,17 +516,19 @@
         }
 
         function handleNext(e = null) {
-            if (checkNextFunc(e) === true){
-                if (data.steps.length == step) {
-                    step = 0;
-                    destroyGuide();
-                } else {
-                    step = step + 1;
-                    PaintSkyGuideModal({
-                        ...data.steps[step - 1],
-                    }, step, data.steps.length);
+            setTimeout(() => {
+                if (checkNextFunc(e) === true) {
+                    if (data.steps.length == step) {
+                        step = 0;
+                        destroyGuide();
+                    } else {
+                        step = step + 1;
+                        PaintSkyGuideModal({
+                            ...data.steps[step - 1],
+                        }, step, data.steps.length);
+                    }
                 }
-            }
+            }, view.delayAfter || 0);
         }
 
 

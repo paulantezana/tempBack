@@ -3,7 +3,7 @@
     <div class="col-auto mr-auto">
         <div class="btn-group mb-3">
             <div class="btn btn-secondary" data-toggle="modal" data-target="#invoiceReferralGuide">Guía de remisión Física</div>
-            <div class="btn btn-secondary" data-toggle="modal" data-target="#invoiceAdvancedOptions">Opciones Avanzadas</div>
+            <div class="btn btn-secondary" data-toggle="modal" data-target="#invoiceAdvancedOptModal">Opciones Avanzadas</div>
         </div>
 
         <!-- Invoice Referral guide -->
@@ -60,11 +60,11 @@
         </div>
 
         <!-- Invoice print print modal -->
-        <div class="modal fade" id="invoiceAdvancedOptions" tabindex="-1" role="dialog" aria-labelledby="invoiceAdvancedOptionsLabel" aria-hidden="true">
+        <div class="modal fade" id="invoiceAdvancedOptModal" tabindex="-1" role="dialog" aria-labelledby="invoiceAdvancedOptModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h6 class="modal-title" id="invoiceAdvancedOptionsLabel"><i class="icon-file-plus mr-2"></i> Obciones Avanzadas</h6>
+                        <h6 class="modal-title" id="invoiceAdvancedOptModalLabel"><i class="icon-file-plus mr-2"></i> Obciones Avanzadas</h6>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -162,7 +162,7 @@
                                 <input type="text" class="form-control" id="invoiceTerm" name="invoice[term]" value="<?= $parameter['invoice']['term'] ?? '' ?>">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block" data-dismiss="modal" aria-label="Close">Aceptar</button>
+                        <div class="btn btn-primary btn-block" id="invoiceAdvancedOptModalConfirm" data-dismiss="modal" aria-label="Close">Aceptar</div>
                     </div>
                 </div>
             </div>
