@@ -29,22 +29,22 @@
                         <select name="" id="productSearch<?= $key ?>">
                             <option value="<?= $row['product_code'] ?>"><?= $row['description'] ?></option>
                         </select>
-                        <input type="hidden" id="description<?= $key ?>" name="invoice[item][<?= $key ?>][description]" value="<?= $row['description'] ?>" class="form-control form-control-sm">
+                        <input type="hidden" id="description<?= $key ?>" name="invoice[item][<?= $key ?>][description]" value="<?= $row['description'] ?>" class="form-control">
                         <input type="hidden" id="productCode<?= $key ?>" name="invoice[item][<?= $key ?>][product_code]" value="<?= $row['product_code'] ?>">
                         <input type="hidden" id="unitMeasure<?= $key ?>" name="invoice[item][<?= $key ?>][unit_measure]" value="<?= $row['unit_measure'] ?>">
                     </td>
                     <td>
-                        <input type="<?php echo ($parameter['business']['include_igv'] ?? false) ? 'hidden' : 'number' ?>" step="any" min="0" class="form-control form-control-sm <?= ($parameter['error']['item']['children'][$key]['unit_value'] ?? false) ? 'is-invalid' : '' ?>"
+                        <input type="<?php echo ($parameter['business']['include_igv'] ?? false) ? 'hidden' : 'number' ?>" step="any" min="0" class="form-control <?= ($parameter['error']['item']['children'][$key]['unit_value'] ?? false) ? 'is-invalid' : '' ?>"
                                name="invoice[item][<?= $key ?>][unit_value]" id="unitValue<?= $key ?>" value="<?= $row['unit_value'] ?? '' ?>">
-                        <input type="<?php echo ($parameter['business']['include_igv'] ?? false) ? 'number' : 'hidden' ?>" step="any" min="0" class="form-control form-control-sm <?= ($parameter['error']['item']['children'][$key]['unit_price'] ?? false) ? 'is-invalid' : '' ?>"
+                        <input type="<?php echo ($parameter['business']['include_igv'] ?? false) ? 'number' : 'hidden' ?>" step="any" min="0" class="form-control <?= ($parameter['error']['item']['children'][$key]['unit_price'] ?? false) ? 'is-invalid' : '' ?>"
                                name="invoice[item][<?= $key ?>][unit_price]" id="unitPrice<?= $key ?>" value="<?= $row['unit_price'] ?? '' ?>">
                     </td>
                     <td>
-                        <input type="number" step="any" class="form-control form-control-sm <?= ($parameter['error']['item']['children'][$key]['quantity'] ?? false) ? 'is-invalid' : '' ?>"
+                        <input type="number" step="any" class="form-control <?= ($parameter['error']['item']['children'][$key]['quantity'] ?? false) ? 'is-invalid' : '' ?>"
                                min="0"  name="invoice[item][<?= $key ?>][quantity]" id="quantity<?= $key ?>" value="<?= $row['quantity'] ?? '' ?>">
                     </td>
                     <td>
-                        <select class="JsInvoiceAffectationItem <?= ($parameter['error']['item']['children'][$key] ?? false) ? 'is-invalid' : '' ?>"
+                        <select class="form-control JsInvoiceAffectationItem <?= ($parameter['error']['item']['children'][$key] ?? false) ? 'is-invalid' : '' ?>"
                                 name="invoice[item][<?= $key ?>][affectation_code]" id="affectation<?= $key ?>" required>
                             <?php foreach ($parameter['affectationIgvTypeCode'] ?? [] as $values): ?>
                                 <option
@@ -55,19 +55,19 @@
                         </select>
                     </td>
                     <td>
-                        <input type="hidden" readonly class="form-control form-control-sm JsInvoiceSubTotalItem" min="0" id="totalValueItemDecimal<?= $key ?>" value="<?= $row['total_value'] ?? '' ?>">
-                        <input type="number" step="any" readonly class="form-control form-control-sm" min="0" id="totalValueItem<?= $key ?>" name="invoice[item][<?= $key ?>][total_value]" required value="<?= $row['total_value'] ?? '' ?>">
+                        <input type="hidden" readonly class="form-control JsInvoiceSubTotalItem" min="0" id="totalValueItemDecimal<?= $key ?>" value="<?= $row['total_value'] ?? '' ?>">
+                        <input type="number" step="any" readonly class="form-control" min="0" id="totalValueItem<?= $key ?>" name="invoice[item][<?= $key ?>][total_value]" required value="<?= $row['total_value'] ?? '' ?>">
                     </td>
                     <td>
-                        <input type="hidden" class="form-control form-control-sm JsInvoiceTotalItem" min="0" id="totalItemDecimal<?= $key ?>" value="<?= $row['total'] ?? '' ?>">
-                        <input type="number" step="any" class="form-control form-control-sm" min="0" id="totalItem<?= $key ?>" name="invoice[item][<?= $key ?>][total]" required value="<?= $row['total'] ?? '' ?>">
+                        <input type="hidden" class="form-control JsInvoiceTotalItem" min="0" id="totalItemDecimal<?= $key ?>" value="<?= $row['total'] ?? '' ?>">
+                        <input type="number" step="any" class="form-control " min="0" id="totalItem<?= $key ?>" name="invoice[item][<?= $key ?>][total]" required value="<?= $row['total'] ?? '' ?>">
                     </td>
                     <td>
                         <div style="display: flex;">
-                            <button type="button" class="btn btn-sm btn-light" id="remove<?= $key ?>" title="Quitar item">
+                            <button type="button" class="btn btn-light" id="remove<?= $key ?>" title="Quitar item">
                                 <i class="icon-cross text-danger"></i>
                             </button>
-                            <button type="button" class="btn ml-1 btn-sm btn-light" id="dropdownMenuInvoiceItem" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent" title="Más opciones">
+                            <button type="button" class="btn ml-1 btn-light" id="dropdownMenuInvoiceItem" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent" title="Más opciones">
                                 <i class="icon-menu9"></i>
                             </button>
                             <div class="dropdown-menu p-4" style="max-width: 350px" aria-labelledby="dropdownMenuInvoiceItem">

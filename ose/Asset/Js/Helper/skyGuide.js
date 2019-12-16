@@ -129,7 +129,7 @@
     function getLastStandardElement(elements, classNames = [], content = '') {
         let lastElement = elements[elements.length - 1];
         lastElement.innerHTML = content;
-        classNames.forEach(item => lastElement.classList.add(item));
+        classNames.forEach(i => lastElement.classList.add(i));
         return lastElement;
     }
 
@@ -158,10 +158,6 @@
         return skyGuideState != null ? JSON.parse(skyGuideState) : null;
     }
 
-    function destroyState() {
-        w.localStorage.removeItem('SkyGuide');
-    }
-
     w.SkyGuide = (options = null) => {
         let step,   // 1 - 2 - 3 - 4
             event,  // create || start
@@ -169,10 +165,12 @@
             data = {};
 
         // Set dinamic variables
-        let stepHistory = [];
+        let stepHistory = [],
+            delayAfterId,
+            errorMessageId,
+            delayBeforeId;
 
         const separator = 15;
-        const sgHighlightClassName = 'SkyGuide-highlight';
         if (getState() == null && options == null) {
             return;
         }
@@ -186,6 +184,8 @@
             step = 0;
             event = 'create';
             data = options;
+            // Set Default values
+            data.spacing = options.spacing || 10;
         }
 
         // Create Canvas
@@ -204,7 +204,7 @@
 
         const clearCanvas = () => {
             ctx.clearRect(0, 0, sgCanvas.width, sgCanvas.height);
-            ctx.fillStyle = 'rgba(0,0,0,.5)';
+            ctx.fillStyle = 'rgba(0,0,0,.4)';
             ctx.fillRect(0, 0, sgCanvas.width, sgCanvas.height);
         };
         setCanvasSize();
@@ -236,7 +236,7 @@
         let sgModalFirst = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-first}}'), ['sgModal-first'], SkyGuideLang.contDialogBtnBegin);
         let sgModalContinue = getLastStandardElement(getElementByContent(sgModalPos, '{{modal-continue}}'), ['sgModal-continue'], SkyGuideLang.contDialogBtnContinue);
 
-        let sgErrorMessage = document.createElement('div');
+        let sgErrorMessage = d.createElement('div');
         sgModalTitle.innerHTML = data.guideTitle || '';
 
         function showErrorMessage(message) {
@@ -244,7 +244,9 @@
             sgErrorMessage.innerHTML = message;
             sgModalPos.firstElementChild.appendChild(sgErrorMessage);
             setPositionModal(view);
-            setTimeout(() => {
+
+            clearTimeout(errorMessageId);
+            errorMessageId = setTimeout(() => {
                 sgErrorMessage.remove();
                 setPositionModal(view);
             }, 5000);
@@ -269,14 +271,20 @@
             }
         }
 
+        function afterFunc(targetElObj) {
+            if (view.after !== undefined) {
+                let nextFunc = new Function('return ' + view.after)();
+                nextFunc(targetElObj);
+            }
+        }
+
         function setEventListener(currentView) {
             if (currentView.event !== undefined) {
-                const triggerEvent = e => {
-                    handleNext(e);
-                };
-
                 const executeListener = (target, event) => {
-                    $(target).one(event, triggerEvent);
+                    $(target).on(event, (e)=>{
+                        $(this).off(e);
+                        handleNext(e);
+                    });
                 };
 
                 let eventType = typeDetect(currentView.event);
@@ -285,9 +293,21 @@
                         executeListener(currentView.target, currentView.event);
                     }
                 } else if (eventType === 'array') {
-                    currentView.event.forEach(item => {
-                        if (item.target !== undefined && item.event !== undefined) {
-                            executeListener(item.target, item.event);
+                    currentView.event.forEach(i => {
+                        if (i.target !== undefined && i.event !== undefined) {
+                            executeListener(i.target, i.event);
+                        }
+                    });
+                }
+            }
+            if (currentView.abort !== undefined) {
+                let eventType = typeDetect(currentView.abort);
+                if (eventType === 'array') {
+                    currentView.abort.forEach(i => {
+                        if (i.target !== undefined && i.event !== undefined) {
+                            $(i.target).on(i.event, e => {
+                                destroyGuide();
+                            });
                         }
                     });
                 }
@@ -298,17 +318,17 @@
             setCanvasSize();
             clearCanvas();
 
-            [...document.querySelectorAll(`.${sgHighlightClassName}`)].forEach(item => item.classList.remove(sgHighlightClassName));
+            [...d.querySelectorAll('.sgHighlight')].forEach(i => i.classList.remove('sgHighlight'));
 
             if (currentView.target) {
                 let targets = currentView.target.trim().split(',');
                 d.body.classList.add('SkyGuide-event');
 
-                targets.forEach(item => {
-                    let targetElement = d.querySelector(item);
+                targets.forEach(i => {
+                    let targetElement = d.querySelector(i);
                     if (targetElement) {
 
-                        targetElement.classList.add(sgHighlightClassName);
+                        targetElement.classList.add('sgHighlight');
                         let positionInfo = targetElement.getBoundingClientRect();
 
                         let newPosX, newPosY, newW, newH;
@@ -392,7 +412,9 @@
             }
 
             view = currentView;
-            setTimeout(() => {
+
+            clearTimeout(delayBeforeId);
+            delayBeforeId = setTimeout(() => {
                 // execute before event
                 beforeFunc(currentView);
 
@@ -424,12 +446,11 @@
                         if (step >= total) {
                             sgModalNext.textContent = SkyGuideLang.endText;
                         }
-                        if (step>1){
-                            sgModalPrev.classList.remove('sgIsHide');
-                        } else {
+                        // if (step>1){
+                        //     sgModalPrev.classList.remove('sgIsHide');
+                        // } else {
                             sgModalPrev.classList.add('sgIsHide');
-                        }
-                        console.log(view.event, 'event');
+                        // }
                         if (view.event !== undefined) {
                             sgModalNext.classList.add('sgIsHide');
                         } else {
@@ -456,9 +477,8 @@
                 setPositionModal(currentView);
 
                 // Move scroll
-                [...document.querySelectorAll('.SkyGuide-highlight')].forEach(item => {
-                    let targetPositionInfo = item.getBoundingClientRect();
-                    console.log(targetPositionInfo);
+                [...d.querySelectorAll('.sgHighlight')].forEach(i => {
+                    let targetPositionInfo = i.getBoundingClientRect();
                     w.scrollTo(targetPositionInfo.x, targetPositionInfo.y);
                 });
             }, view.delayBefore || 0);
@@ -479,11 +499,25 @@
         }
 
         function destroyGuide() {
+            clearTimeout(delayAfterId);
+            clearTimeout(delayBeforeId);
+
+            // sgModalClose.removeListener('click', handleCancel);
+            // sgModalPrev.removeListener('click', handlePrev);
+            // sgModalNext.addEventListener('click', handleNext);
+            // sgModalCancel.addEventListener('click', handleCancel);
+            // sgModalStart.addEventListener('click', handleStart);
+            // sgModalFirst.addEventListener('click', handleFirst);
+            // sgModalContinue.addEventListener('click', handleContinue);
+
+            [...d.querySelectorAll('.sgHighlight')].forEach(i => i.classList.remove('sgHighlight'));
+
             d.body.classList.remove('SkyGuide-show');
             d.body.classList.remove('SkyGuide-event');
+
             sgCanvas.remove();
             sgModalPos.remove();
-            destroyState();
+            w.localStorage.removeItem('SkyGuide');
         }
 
         function handleStart() {
@@ -516,8 +550,10 @@
         }
 
         function handleNext(e = null) {
-            setTimeout(() => {
+            clearTimeout(delayAfterId);
+            delayAfterId = setTimeout(() => {
                 if (checkNextFunc(e) === true) {
+                    afterFunc(e);
                     if (data.steps.length == step) {
                         step = 0;
                         destroyGuide();
@@ -527,6 +563,8 @@
                             ...data.steps[step - 1],
                         }, step, data.steps.length);
                     }
+                }else {
+                    setEventListener(view);
                 }
             }, view.delayAfter || 0);
         }

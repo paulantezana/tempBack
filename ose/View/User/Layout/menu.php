@@ -75,13 +75,12 @@
                             Configuración
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="<?= FOLDER_NAME  . '/User/Profile'?>"><i class="fas fa-user"></i> Mi Perfil</a>
-                            <a class="dropdown-item" href="<?= FOLDER_NAME  . '/BusinessLocal'?>"><i class="fas fa-home"></i> Locales y Series</a>
-                            <a class="dropdown-item" href="<?= FOLDER_NAME  . '/BusinessLocal/Api'?>"><i class="fas fa-home"></i> API</a>
-                            <a class="dropdown-item" href="<?= FOLDER_NAME  . '/User/Profile'?>"><i class="fas fa-cog"></i> Soporte</a>
+                            <a class="dropdown-item" href="<?= FOLDER_NAME  . '/User/Profile'?>"><i class="icon-user-plus mr-2"></i> Mi Perfil</a>
+                            <a class="dropdown-item" href="<?= FOLDER_NAME  . '/BusinessLocal'?>"><i class="icon-home2 mr-2"></i> Locales y Series</a>
+                            <a class="dropdown-item" href="<?= FOLDER_NAME  . '/BusinessLocal/Api'?>"><i class="icon-code mr-2"></i> API</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="<?= FOLDER_NAME . '/Business/update' ?>"> <i class="fas fa-cog"></i> Configurar empresa</a>
-                            <a class="dropdown-item" href="<?= FOLDER_NAME . '/User/CloseSession' ?>"> <i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+                            <a class="dropdown-item" href="<?= FOLDER_NAME . '/Business/update' ?>"> <i class="icon-cog mr-2"></i> Configurar empresa</a>
+                            <a class="dropdown-item" href="<?= FOLDER_NAME . '/User/CloseSession' ?>"> <i class="icon-switch2 mr-2"></i> Cerrar sesión</a>
                         </div>
                     </li>
                 </ul>

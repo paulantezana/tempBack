@@ -1382,3 +1382,9 @@ VALUES (now(),null,1,'F001','01',0,false),
        (now(),null,1,'FP01','07',0,false),
        (now(),null,1,'FP01','08',0,false),
        (now(),null,1,'T001','09',0,false);
+
+-- DATA
+ALTER TABLE users ADD recover_key VARCHAR(64) null;
+ALTER TABLE users ADD recover_key_request_date DATETIME null;
+ALTER TABLE users ADD created_user_id INT null;
+ALTER TABLE users ADD updated_user_id INT null;

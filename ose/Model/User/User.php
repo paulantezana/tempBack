@@ -1,12 +1,12 @@
 <?php
 
+require_once MODEL_PATH . '/Helper/BaseModel.php';
 
-class User
+class User extends BaseModel
 {
-    protected $db;
     public function __construct(PDO $db)
     {
-        $this->db=$db;
+        parent::__construct("users","id_user",$db);
     }
 
     public function Login($Email,$password)

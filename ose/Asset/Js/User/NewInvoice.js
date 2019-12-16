@@ -534,7 +534,7 @@ const InvoiceScripts = () => {
             }
             calcInvoiceItem();
         });
-        affectationInput.select2({ minimumResultsForSearch: -1 }).on('change',calcInvoiceItem);
+        affectationInput.on('change',calcInvoiceItem);
         totalItemInput.on('change keyup paste', e => {
             if(ValidateInputIsNumber(e.target)){
                 return false;

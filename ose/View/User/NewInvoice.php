@@ -18,21 +18,23 @@
 
                 <div class="mb-4">
                     <nav>
-                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                            <a class="nav-item nav-link active" id="nav-productList-tab" data-toggle="tab" href="#nav-productList" role="tab" aria-controls="nav-productList" aria-selected="true">Lista de productos</a>
-                            <a class="nav-item nav-link" id="nav-referralGuide-tab" data-toggle="tab" href="#nav-referralGuide" role="tab" aria-controls="nav-referralGuide" aria-selected="false">Guía</a>
-                            <a class="nav-item nav-link" id="nav-regimeSunat-tab" data-toggle="tab" href="#nav-regimeSunat" role="tab" aria-controls="nav-regimeSunat" aria-selected="false">Régimen</a>
+                        <div class="nav nav-tabs" id="invoiceBodyTab" role="tablist">
+                            <a class="nav-item nav-link active" id="navProductListTab" data-toggle="tab" href="#nav-productList" role="tab" aria-controls="nav-productList" aria-selected="true">Lista de productos</a>
+                            <a class="nav-item nav-link" id="navReferralGuideTab" data-toggle="tab" href="#nav-referralGuide" role="tab" aria-controls="nav-referralGuide" aria-selected="false">Guía</a>
+                            <a class="nav-item nav-link" id="navRegimeSunatTab" data-toggle="tab" href="#nav-regimeSunat" role="tab" aria-controls="nav-regimeSunat" aria-selected="false">Régimen</a>
                         </div>
                     </nav>
-                    <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane fade pt-4 show active" id="nav-productList" role="tabpanel" aria-labelledby="nav-productList-tab">
+                    <div class="tab-content" id="invoiceBodyTabContent">
+                        <div class="tab-pane fade pt-4 show active" id="nav-productList" role="tabpanel" aria-labelledby="navProductListTab">
                             <?php require_once __DIR__ . '/Partial/InvoiceItem.php' ?>
                         </div>
-                        <div class="tab-pane fade pt-4" id="nav-referralGuide" role="tabpanel" aria-labelledby="nav-referralGuide-tab">
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input" name="invoice[referral_guide_enabled]"
-                                       id="invoiceGuideEnable" data-toggle="collapse" data-target="#collapseInvoiceGuide" <?php echo ($parameter['invoice']['referral_guide_enabled'] ?? false) ? 'checked' : ''  ?> aria-expanded="false">
-                                <label class="custom-control-label" for="invoiceGuideEnable">Guia</label>
+                        <div class="tab-pane fade pt-4" id="nav-referralGuide" role="tabpanel" aria-labelledby="navReferralGuideTab">
+                            <div id="InvoiceReferralGuideEnableRow">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" name="invoice[referral_guide_enabled]"
+                                           id="invoiceGuideEnable" data-toggle="collapse" data-target="#collapseInvoiceGuide" <?php echo ($parameter['invoice']['referral_guide_enabled'] ?? false) ? 'checked' : ''  ?> aria-expanded="false">
+                                    <label class="custom-control-label" for="invoiceGuideEnable">Guia</label>
+                                </div>
                             </div>
                             <div class="collapse <?php echo ($parameter['invoice']['referral_guide_enabled'] ?? false) ? 'show' : ''  ?>" id="collapseInvoiceGuide">
                                 <div class="card mb-4">
@@ -212,7 +214,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade p-4" id="nav-regimeSunat" role="tabpanel" aria-labelledby="nav-regimeSunat-tab">
+                        <div class="tab-pane fade p-4" id="nav-regimeSunat" role="tabpanel" aria-labelledby="navRegimeSunatTab">
                             <div class="card mb-4">
                                 <div class="card-body">
                                     <div class="row">
@@ -397,7 +399,7 @@
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label for="invoicePerceptionCode">Tipo de percepcion</label>
-                                            <select class="form-control form-control-sm <?= ($parameter['error']['perception_code'] ?? false) ? 'is-invalid' : ''  ?>" name="invoice[perception_code]" id="invoicePerceptionCode">
+                                            <select class="form-control <?= ($parameter['error']['perception_code'] ?? false) ? 'is-invalid' : ''  ?>" name="invoice[perception_code]" id="invoicePerceptionCode">
                                                 <option value="">Elegir</option>
                                                 <?php foreach ($parameter['perceptionTypeCode'] ?? [] as $row): ?>
                                                     <option value="<?= $row['code'] ?>" data-percentage="<?= $row['percentage'] ?>" <?php echo ($parameter['invoice']['perception_code'] ?? false) == $row['code'] ? 'selected' : '' ?>>

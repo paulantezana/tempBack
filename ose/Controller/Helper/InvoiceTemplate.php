@@ -28,7 +28,7 @@ class InvoiceTemplate
                 <input type="number" step="any" class="form-control" value="1" min="0"  name="invoice[item][${uniqueId}][quantity]" id="quantity${uniqueId}">
             </td>
             <td>
-                <select class="JsInvoiceAffectationItem" name="invoice[item][${uniqueId}][affectation_code]" id="affectation${uniqueId}" required>
+                <select class="form-control JsInvoiceAffectationItem" name="invoice[item][${uniqueId}][affectation_code]" id="affectation${uniqueId}" required>
                     ' . $affectationIgvTemplate . '
                 </select>
             </td>
