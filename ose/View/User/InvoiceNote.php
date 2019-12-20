@@ -87,7 +87,7 @@
         <div class="card-body">
             <div class="breadcrumb-line breadcrumb-line-component mb-2">
                 <ul class="breadcrumb bg-light">
-                    <li><img style="max-width: 30px;" src="<?= FOLDER_NAME . '/Asset/Images/sunat_logo.png'?>" class="position-left"><span class="text-semibold">Estados SUNAT: </span></li>
+                    <li><img style="max-width: 30px;" src="<?= FOLDER_NAME . '/Asset/Images/sunatLogo.png'?>" class="position-left"><span class="text-semibold">Estados SUNAT: </span></li>
                     <li class="ml-3"> <i class="fas fa-check text-success"></i> Aceptado</li>
                     <li class="ml-3"> <i class="fas fa-chevron-circle-right text-primary"></i> Resumen </li>
                     <li class="ml-3"> <i class="fas fa-sync-alt text-warning"></i> Pendiente de Envío</li>

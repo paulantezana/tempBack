@@ -23,7 +23,7 @@ class userClass
           $dataMenu=$queryPermission->fetchAll();
           $this->GenerateMenus($dataMenu);
           $_SESSION[SESS]=$data['id_user'];
-          $_SESSION[USER_TYPE]=$data['id_rol'];
+          $_SESSION[SESS_ROLE]=$data['id_rol'];
           return true;
         }
         else

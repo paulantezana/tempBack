@@ -33,7 +33,7 @@ class BusinessLocalController
             $content = requireToVar(VIEW_PATH . "User/BusinessLocal.php", $parameter);
             require_once(VIEW_PATH. "User/Layout/main.php");
         } catch (Exception $e){
-            echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
+            echo $e->getMessage();
         }
     }
 
@@ -68,7 +68,7 @@ class BusinessLocalController
             $content = requireToVar(VIEW_PATH . "User/BusinessLocalApi.php", $parameter);
             require_once(VIEW_PATH. "User/Layout/main.php");
         } catch (Exception $e){
-            echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
+            echo $e->getMessage();
         }
     }
 
@@ -112,7 +112,7 @@ class BusinessLocalController
             $content = requireToVar(VIEW_PATH . "User/BusinessLocalForm.php", $parameter);
             require_once(VIEW_PATH. "User/Layout/main.php");
         } catch (Exception $e){
-            echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
+            echo $e->getMessage();
         }
     }
 
@@ -124,17 +124,17 @@ class BusinessLocalController
 
         return '<tr id="businessLocalItem${uniqueId}" data-uniqueId="${uniqueId}">
             <td>
-                <select class="form-control form-control-sm" id="documentCode${uniqueId}" name="businessLocal[item][${uniqueId}][document_code]" required>
+                <select class="form-control select2" id="documentCode${uniqueId}" name="businessLocal[item][${uniqueId}][document_code]" required>
                     ' . $documentTypeCodeTemplate . '
                 </select>
                 <input type="hidden" name="businessLocal[item][${uniqueId}][business_serie_id]" value="0">
             </td>
             <td>
-                <input type="text" class="form-control form-control-sm" name="businessLocal[item][${uniqueId}][serie]" id="serie${uniqueId}" required>
+                <input type="text" class="form-control" name="businessLocal[item][${uniqueId}][serie]" id="serie${uniqueId}" required>
             </td>
             <td>
-                <button type="button" class="btn btn-sm btn-light" title="Quitar item" onclick="BusinessLocal.removeItem(${uniqueId})">
-                    <i class="fas fa-times text-danger"></i>
+                <button type="button" class="btn btn-light" title="Quitar item" onclick="BusinessLocalRemoveItem(${uniqueId})">
+                    <i class="icon-trash-alt text-danger"></i>
                 </button>
             </td>
         </tr>';

@@ -18,12 +18,9 @@
 <body>
     <div class="BasicLayout">
         <div class="BasicLayout-header">
-            <div class="branding">
-                <img src="<?= FOLDER_NAME . '/Asset/Images/logo.png' ?>" alt="" height="64px" class="mr-3">
-                <div>
-                    <h1 class="mb-0">SkyFact</h1>
-                    <span class="text-black-50">Facturación electrónica.</span>
-                </div>
+            <div class="text-center">
+                <img src="<?= FOLDER_NAME . '/Asset/Images/logo.png' ?>" alt="" height="42px" class="mb-2">
+                <div class="text-black-50">Facturación electrónica.</div>
             </div>
         </div>
         <div class="BasicLayout-main">

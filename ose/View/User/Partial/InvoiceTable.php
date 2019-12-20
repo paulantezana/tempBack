@@ -189,8 +189,8 @@
                             <?php endif; if (($row['invoice_state_id'] == 3 && $row['document_code'] == '01') || (($row['invoice_state_id'] == 2 || $row['invoice_state_id'] == 3) && $row['document_code'] == '03')): ?>
                                 <a class="dropdown-item text-danger" href="<?= FOLDER_NAME . '/InvoiceVoided/NewInvoiceVoided?InvoiceId=' . $row['invoice_id'] ?>"><i class="icon-cancel-circle2 text-danger mr-2"></i> ANULAR o COMUNICAR DE BAJA</a>
                             <?php endIf;?>
-                            <a class="dropdown-item text-success" href="#" target="_blank"> <img src="<?= FOLDER_NAME . '/Asset/Images/sunat_logo.png'?>" height="16px" class="mr-2"> Verificar en la SUNAT la validéz del CPE</a>
-                            <a class="dropdown-item text-success" href="#" target="_blank"> <img src="<?= FOLDER_NAME . '/Asset/Images/sunat_logo.png'?>" height="16px" class="mr-2"> Verificar XML en la SUNAT</a>
+                            <a class="dropdown-item text-success" href="#" target="_blank"> <img src="<?= FOLDER_NAME . '/Asset/Images/sunatLogo.png'?>" height="16px" class="mr-2"> Verificar en la SUNAT la validéz del CPE</a>
+                            <a class="dropdown-item text-success" href="#" target="_blank"> <img src="<?= FOLDER_NAME . '/Asset/Images/sunatLogo.png'?>" height="16px" class="mr-2"> Verificar XML en la SUNAT</a>
                         </div>
                     </div>
                 </td>

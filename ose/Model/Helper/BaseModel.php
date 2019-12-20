@@ -22,7 +22,7 @@ class BaseModel
             $stmt->execute();
             return $stmt->fetchAll();
         } catch (Exception $e) {
-            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage());
         }
     }
 
@@ -47,7 +47,7 @@ class BaseModel
             ];
             return $paginate;
         } catch (Exception $e) {
-            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage());
         }
     }
 
@@ -59,7 +59,7 @@ class BaseModel
             $stmt->execute([":$this->tableID" => $id]);
             return $stmt->fetch();
         } catch (Exception $e) {
-            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage());
         }
     }
 
@@ -71,7 +71,7 @@ class BaseModel
             $stmt->execute([":$columnName" => $value]);
             return $stmt->fetch();
         } catch (Exception $e) {
-            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage());
         }
     }
 
@@ -87,7 +87,7 @@ class BaseModel
             }
             return $id;
         } catch (Exception $e) {
-            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage());
         }
     }
 
@@ -104,7 +104,7 @@ class BaseModel
             }
             return $value;
         } catch (Exception $e) {
-            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage());
         }
     }
 
@@ -130,7 +130,7 @@ class BaseModel
             }
             return $id;
         } catch (Exception $e) {
-            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage());
         }
     }
 
@@ -156,7 +156,7 @@ class BaseModel
             }
             return $value;
         } catch (Exception $e) {
-            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage());
         }
     }
 
@@ -171,7 +171,7 @@ class BaseModel
 
             return $stmt->fetchAll();
         } catch (Exception $e) {
-            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage());
         }
     }
 }

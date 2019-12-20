@@ -43,17 +43,17 @@
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
-                            <tr style="font-size: 14px">
+                            <tr>
                                 <th>Documento</th>
                                 <th>Serie</th>
-                                <th></th>
+                                <th style="width: 64px"></th>
                             </tr>
                             </thead>
                             <tbody id="businessLocalSeriesTableBody">
                             <?php foreach ($parameter['businessLocal']['item'] as $key => $row): ?>
                                 <tr id="businessLocalItem<?= $key ?>" data-uniqueId="<?= $key ?>">
                                     <td>
-                                        <select class="form-control form-control-sm" id="documentCode<?= $key ?>"
+                                        <select class="form-control select2" id="documentCode<?= $key ?>"
                                                 name="businessLocal[item][<?= $key ?>][document_code]" required>
                                             <?php foreach ($parameter['documentTypeCode'] as $keyOpt => $rowOpt): ?>
                                                 <?php if (($row['document_code'] ?? '') == $rowOpt['code']): ?>
@@ -66,12 +66,12 @@
                                         <input type="hidden" name="businessLocal[item][<?= $key ?>][business_serie_id]" value="<?= isset($row['business_serie_id']) ? $row['business_serie_id'] : 0 ?>">
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm" id="serie<?= $key ?>"
+                                        <input type="text" class="form-control" id="serie<?= $key ?>"
                                                name="businessLocal[item][<?= $key ?>][serie]" value="<?= isset($row['serie']) ? $row['serie'] : '1' ?>"  required>
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-light" title="Quitar item" onclick="BusinessLocal.removeItem(<?= $key ?>)">
-                                            <i class="fas fa-times text-danger"></i>
+                                        <button type="button" class="btn btn-light" title="Quitar item" onclick="BusinessLocalRemoveItem(<?= $key ?>)">
+                                            <i class="icon-trash-alt text-danger"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -79,12 +79,14 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="btn btn-secondary btn-block btn-sm" data-itemtemplate="<?php echo htmlspecialchars(($parameter['itemTemplate'] ?? ''),ENT_QUOTES) ?>" onclick="BusinessLocal.addItem()" id="businessLocalAddItem">Agregar serie</div>
+                    <div class="btn btn-outline-primary btn-block" data-itemtemplate="<?php echo htmlspecialchars(($parameter['itemTemplate'] ?? ''),ENT_QUOTES) ?>" onclick="BusinessLocalAddItem()" id="businessLocalAddItem">
+                        <i class="icon-plus2"></i> Agregar serie
+                    </div>
 
                 </div>
                 <div class="form-group">
                     <label for="businessLocalPdfInvoiceSize">Formato PDF</label>
-                    <select name="businessLocal[pdf_invoice_size]" class="form-control" id="businessLocalPdfInvoiceSize" required>
+                    <select name="businessLocal[pdf_invoice_size]" class="form-control select2" id="businessLocalPdfInvoiceSize" required>
                         <option value="A4" <?= ($parameter['businessLocal']['pdf_invoice_size'] ?? '') === 'A4' ? 'selected' : ''; ?>>TAMAÑO A4</option>
                         <option value="A5" <?= ($parameter['businessLocal']['pdf_invoice_size'] ?? '') === 'A5' ? 'selected' : ''; ?>>TAMAÑO A5 (MITAD DE A4)</option>
                         <option value="TICKET" <?= ($parameter['businessLocal']['pdf_invoice_size'] ?? '') === 'TICKET' ? 'selected' : ''; ?>>TAMAÑO TICKET</option>

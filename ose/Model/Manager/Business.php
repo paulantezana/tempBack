@@ -64,7 +64,6 @@ class Business extends BaseModel
             ])){
                 throw new Exception("Error al insertar el registro");
             }
-
             return $businessId;
         } catch (Exception $e) {
             throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());

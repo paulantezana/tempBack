@@ -7,49 +7,49 @@ USE ose;
 
 # Catalogue 01
 CREATE TABLE cat_document_type_code(
-                                       code VARCHAR(2) NOT NULL,
-                                       description VARCHAR(255) NOT NULL,
-                                       CONSTRAINT pk_document_type_code PRIMARY KEY (code)
+    code VARCHAR(2) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_document_type_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 02
 CREATE TABLE cat_currency_type_code(
-                                       code VARCHAR(6) NOT NULL,
-                                       description VARCHAR(255) NOT NULL,
-                                       entity VARCHAR(510),
-                                       symbol VARCHAR(12),
-                                       CONSTRAINT pk_currency_type_code PRIMARY KEY (code)
+    code VARCHAR(6) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    entity VARCHAR(510),
+    symbol VARCHAR(12),
+    CONSTRAINT pk_currency_type_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 03
 CREATE TABLE cat_unit_measure_type_code(
-                                           code VARCHAR(12) NOT NULL,
-                                           description VARCHAR(255) NOT NULL,
-                                           extend BOOLEAN, # Unit measure extended code
-                                           CONSTRAINT pk_unit_measure_type_code PRIMARY KEY (code)
+    code VARCHAR(12) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    extend BOOLEAN, # Unit measure extended code
+    CONSTRAINT pk_unit_measure_type_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 04
 # Catalogue 05
 CREATE TABLE cat_tribute_type_code(
-                                      code VARCHAR(4) NOT NULL,
-                                      description VARCHAR(255) NOT NULL,
-                                      international_code VARCHAR(3),
-                                      name VARCHAR(6),
-                                      CONSTRAINT pk_unit_measure_type_code PRIMARY KEY (code)
+    code VARCHAR(4) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    international_code VARCHAR(3),
+    name VARCHAR(6),
+    CONSTRAINT pk_unit_measure_type_code PRIMARY KEY (code)
 ) ENGINE = InnoDB;
 # Catalogue 06
 CREATE TABLE cat_identity_document_type_code(
-                                                code VARCHAR(1) NOT NULL,
-                                                description VARCHAR(255) NOT NULL,
-                                                CONSTRAINT pk_identity_document_type_code PRIMARY KEY (code)
+    code VARCHAR(1) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_identity_document_type_code PRIMARY KEY (code)
 )ENGINE = InnoDB;
 # Catalogue 07
 CREATE  TABLE cat_affectation_igv_type_code(
-                                               code VARCHAR(2) NOT NULL,
-                                               description VARCHAR(255) NOT NULL,
-                                               tribute_code VARCHAR(4),
-                                               onerous BOOLEAN,
-                                               CONSTRAINT pk_affectation_igv_type_code PRIMARY KEY (code),
-                                               CONSTRAINT fk_affectation_igv_type_code_tribute_type_code FOREIGN KEY (tribute_code) REFERENCES cat_tribute_type_code (code)
-                                                   ON UPDATE RESTRICT ON DELETE RESTRICT
+    code VARCHAR(2) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    tribute_code VARCHAR(4),
+    onerous BOOLEAN,
+    CONSTRAINT pk_affectation_igv_type_code PRIMARY KEY (code),
+    CONSTRAINT fk_affectation_igv_type_code_tribute_type_code FOREIGN KEY (tribute_code) REFERENCES cat_tribute_type_code (code)
+    ON UPDATE RESTRICT ON DELETE RESTRICT
 )ENGINE = InnoDB;
 # Catalogue 08
 CREATE TABLE cat_system_isc_type_code(
@@ -190,21 +190,20 @@ CREATE TABLE business_local(
 )ENGINE = InnoDB;
 
 CREATE TABLE business_serie(
-                               business_serie_id INT AUTO_INCREMENT NOT NULL,
-                               updated_at DATETIME,
-                               delete_at DATETIME,
-                               business_local_id INT NOT NULL,
-                               serie VARCHAR(4) NOT NULL,
-                               document_code VARCHAR(2) NOT NULL,
-                               max_correlative INT,
-                               contingency BOOLEAN,
-                               detraction_bank_account VARCHAR(64),
-                               hidden BOOLEAN,
-                               CONSTRAINT pk_business_serie PRIMARY KEY (business_serie_id),
-                               CONSTRAINT fk_business_serie_document_code FOREIGN KEY (document_code) REFERENCES cat_document_type_code (code)
-                                   ON UPDATE RESTRICT ON DELETE RESTRICT,
-                               CONSTRAINT fk_business_serie_business_local FOREIGN KEY (business_local_id) REFERENCES business_local (business_local_id)
-                                   ON UPDATE RESTRICT ON DELETE RESTRICT
+    business_serie_id INT AUTO_INCREMENT NOT NULL,
+    updated_at DATETIME,
+    delete_at DATETIME,
+    business_local_id INT NOT NULL,
+    serie VARCHAR(4) NOT NULL,
+    document_code VARCHAR(2) NOT NULL,
+    max_correlative INT,
+    contingency BOOLEAN,
+    hidden BOOLEAN,
+    CONSTRAINT pk_business_serie PRIMARY KEY (business_serie_id),
+    CONSTRAINT fk_business_serie_document_code FOREIGN KEY (document_code) REFERENCES cat_document_type_code (code)
+    ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fk_business_serie_business_local FOREIGN KEY (business_local_id) REFERENCES business_local (business_local_id)
+    ON UPDATE RESTRICT ON DELETE RESTRICT
 );
 
 CREATE TABLE business_user(

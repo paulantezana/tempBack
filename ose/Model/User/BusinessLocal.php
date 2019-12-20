@@ -19,6 +19,60 @@ class BusinessLocal extends BaseModel
             ]);
             return $stmt->fetchAll();
         } catch (Exception $e) {
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage());
+        }
+    }
+
+
+    public function Insert($businessLocal, $userReferId){
+        try{
+            $currentDate = date('Y-m-d H:i:s');
+
+            $sql = "INSERT INTO business_local (updated_at, created_at, created_user_id, updated_user_id, short_name,
+                                                sunat_code, location_code, address,
+                                                pdf_invoice_size, pdf_header, description, business_id)
+                            VALUES (:updated_at, :created_at, :created_user_id, :updated_user_id, :short_name,
+                                    :sunat_code, :location_code, :address, :pdf_invoice_size,
+                                    :pdf_header, :description, :business_id)";
+            $stmt = $this->db->prepare($sql);
+
+            if(!$stmt->execute([
+                ':updated_at' => $currentDate,
+                ':created_at' => $currentDate,
+                ':created_user_id' => $userReferId,
+                ':updated_user_id' => $userReferId,
+
+                ':short_name' => $businessLocal['shortName'],
+                ':sunat_code' => $businessLocal['sunatCode'],
+                ':location_code' => $businessLocal['locationCode'],
+                ':address' => $businessLocal['address'],
+                ':pdf_invoice_size' => $businessLocal['pdfInvoiceSize'],
+                ':pdf_header' => $businessLocal['pdfHeader'],
+                ':description' => $businessLocal['description'],
+                ':business_id' => $businessLocal['businessId'],
+            ])){
+                throw new Exception("Error al insertar el registro");
+            }
+            $businessLocalId = (int)$this->db->lastInsertId();
+
+            foreach ($businessLocal['item'] as $row){
+                $sql = "INSERT INTO business_serie (updated_at, business_local_id, serie, document_code, max_correlative, contingency)
+                    VALUES (:updated_at, :business_local_id, :serie, :document_code, :max_correlative, :contingency)";
+                $stmt = $this->db->prepare($sql);
+
+                if(!$stmt->execute([
+                    ':updated_at' => $currentDate,
+                    ':business_local_id' => $businessLocalId,
+                    ':serie' => $row['serie'],
+                    ':document_code' => $row['documentCode'],
+                    ':max_correlative' => 0,
+                    ':contingency' => $row['contingency'],
+                ])){
+                    throw new Exception("Error al insertar el registro");
+                }
+            }
+            return $businessLocalId;
+        } catch (Exception $e) {
             throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
         }
     }
@@ -28,23 +82,23 @@ class BusinessLocal extends BaseModel
             $this->db->beginTransaction();
             $currentDate = date('Y-m-d H:i:s');
 
-            if (((int)$businessLocal['business_local_id'] ?? 0) >= 1){
-                $businessLocalId = (int)$businessLocal['business_local_id'];
+            if (((int)$businessLocal['businessLocalId'] ?? 0) >= 1){
+                $businessLocalId = (int)$businessLocal['businessLocalId'];
                 $this->UpdateById($businessLocalId,[
                     'updated_at' => $currentDate,
                     'modification_user_id' => $userReferId,
 
-                    'short_name' => $businessLocal['short_name'],
-                    'sunat_code' => $businessLocal['sunat_code'],
-                    'location_code' => $businessLocal['location_code'],
+                    'short_name' => $businessLocal['shortName'],
+                    'sunat_code' => $businessLocal['sunatCode'],
+                    'location_code' => $businessLocal['locationCode'],
                     'department' => $businessLocal['department'],
                     'province' => $businessLocal['province'],
                     'district' => $businessLocal['district'],
                     'address' => $businessLocal['address'],
-                    'pdf_invoice_size' => $businessLocal['pdf_invoice_size'],
-                    'pdf_header' => $businessLocal['pdf_header'],
+                    'pdf_invoice_size' => $businessLocal['pdfInvoiceSize'],
+                    'pdf_header' => $businessLocal['pdfHeader'],
                     'description' => $businessLocal['description'],
-                    'business_id' => $businessLocal['business_id'],
+                    'business_id' => $businessLocal['businessId'],
                 ]);
 
 //                $sql = "DELETE FROM business_serie WHERE business_local_id = :business_local_id";
@@ -64,9 +118,9 @@ class BusinessLocal extends BaseModel
                         if(!$stmt->execute([
                             ':updated_at' => $currentDate,
                             ':serie' => $row['serie'],
-                            ':document_code' => $row['document_code'],
+                            ':document_code' => $row['documentCode'],
                             ':contingency' => 0,
-                            ':business_serie_id' => $row['business_serie_id'],
+                            ':business_serie_id' => $row['businessSerieId'],
                         ])){
                             throw new Exception("Error al actualizar el registro");
                         }
@@ -79,7 +133,7 @@ class BusinessLocal extends BaseModel
                             ':updated_at' => $currentDate,
                             ':business_local_id' => $businessLocalId,
                             ':serie' => $row['serie'],
-                            ':document_code' => $row['document_code'],
+                            ':document_code' => $row['documentCode'],
                             ':max_correlative' => 0,
                             ':contingency' => 0,
                         ])){
@@ -91,8 +145,8 @@ class BusinessLocal extends BaseModel
                 $this->db->commit();
                 return $businessLocalId;
             } else {
-                $sql = "INSERT INTO business_local (updated_at, created_at, creation_user_id, modification_user_id, short_name, 
-                                                    sunat_code, location_code, department, province, district, address, 
+                $sql = "INSERT INTO business_local (updated_at, created_at, created_user_id, updated_user_id, short_name,
+                                                    sunat_code, location_code, department, province, district, address,
                                                     pdf_invoice_size, pdf_header, description, business_id)
                         VALUES (:updated_at, :created_at, :creation_user_id, :modification_user_id, :short_name,
                                 :sunat_code, :location_code, :department, :province, :district, :address, :pdf_invoice_size,
@@ -102,20 +156,20 @@ class BusinessLocal extends BaseModel
                 if(!$stmt->execute([
                     ':updated_at' => $currentDate,
                     ':created_at' => $currentDate,
-                    ':creation_user_id' => $userReferId,
-                    ':modification_user_id' => $userReferId,
+                    ':created_user_id' => $userReferId,
+                    ':updated_user_id' => $userReferId,
 
-                    ':short_name' => $businessLocal['short_name'],
-                    ':sunat_code' => $businessLocal['sunat_code'],
-                    ':location_code' => $businessLocal['location_code'],
+                    ':short_name' => $businessLocal['shortName'],
+                    ':sunat_code' => $businessLocal['sunatCode'],
+                    ':location_code' => $businessLocal['locationCode'],
                     ':department' => $businessLocal['department'],
                     ':province' => $businessLocal['province'],
                     ':district' => $businessLocal['district'],
                     ':address' => $businessLocal['address'],
-                    ':pdf_invoice_size' => $businessLocal['pdf_invoice_size'],
-                    ':pdf_header' => $businessLocal['pdf_header'],
+                    ':pdf_invoice_size' => $businessLocal['pdfInvoiceSize'],
+                    ':pdf_header' => $businessLocal['pdfHeader'],
                     ':description' => $businessLocal['description'],
-                    ':business_id' => $businessLocal['business_id'],
+                    ':business_id' => $businessLocal['businessId'],
                 ])){
                     throw new Exception("Error al insertar el registro");
                 }
@@ -130,7 +184,7 @@ class BusinessLocal extends BaseModel
                         ':updated_at' => $currentDate,
                         ':business_local_id' => $businessLocalId,
                         ':serie' => $row['serie'],
-                        ':document_code' => $row['document_code'],
+                        ':document_code' => $row['documentCode'],
                         ':max_correlative' => 0,
                         ':contingency' => 0,
                     ])){
@@ -143,7 +197,7 @@ class BusinessLocal extends BaseModel
             }
         } catch (Exception $e) {
             $this->db->rollBack();
-            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new Exception("Error in : " . __FUNCTION__ . ' | ' . $e->getMessage());
         }
     }
 }

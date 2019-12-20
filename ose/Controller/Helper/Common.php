@@ -365,7 +365,7 @@
     }
 	function ValidateFunctionRol($Conection,$module,$function,$redirection,$mensajeError){
 		$queryValidate = $Conection->prepare("SELECT count(*) AS res FROM `permission_role` pr INNER JOIN `permissions` p ON pr.`id_permission`=p.`id_permission` WHERE pr.`id_rol`=:idRol AND p.module=:module AND function=:function");
-		$queryValidate->bindParam(':idRol',$_SESSION[USER_TYPE]);
+		$queryValidate->bindParam(':idRol',$_SESSION[SESS_ROLE]);
 		$queryValidate->bindParam(':module',$module);
 		$queryValidate->bindParam(':function',$function);
         $queryValidate->execute();

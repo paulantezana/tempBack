@@ -7,11 +7,12 @@
 
 	set_error_handler('exceptions_error_handler');
 
-	define('SESS',"SkySess");
+	define('SESS',"UserId");
+	define('SESS_ROLE',"UserRoleId");
+	define('CURRENT_LOCAL','CurrentLocalId');
+
 	define('CONTROLLER_GROUP',"ControllerGroup");
-	define('USER_TYPE',"SkySessType");
 	define('REQUEST_METHOD', $_SERVER['REQUEST_METHOD']);
-	define('ENVIRONMENT','SkyEnvironment');
 
 	/*  Valores de rutas   */
 	define('FOLDER_NAME', '/OSE-skynet/ose');

@@ -27,8 +27,8 @@ class BusinessLocal extends BaseModel
         try{
             $currentDate = date('Y-m-d H:i:s');
 
-            $sql = "INSERT INTO business_local (updated_at, created_at, creation_user_id, modification_user_id, short_name, 
-                                                sunat_code, location_code, department, province, district, address, 
+            $sql = "INSERT INTO business_local (updated_at, created_at, created_user_id, updated_user_id, short_name,
+                                                sunat_code, location_code, department, province, district, address,
                                                 pdf_invoice_size, pdf_header, description, business_id)
                     VALUES (:updated_at, :created_at, :creation_user_id, :modification_user_id, :short_name,
                             :sunat_code, :location_code, :department, :province, :district, :address, :pdf_invoice_size,
@@ -38,20 +38,20 @@ class BusinessLocal extends BaseModel
             if(!$stmt->execute([
                 ':updated_at' => $currentDate,
                 ':created_at' => $currentDate,
-                ':creation_user_id' => $userReferId,
-                ':modification_user_id' => $userReferId,
+                ':created_user_id' => $userReferId,
+                ':updated_user_id' => $userReferId,
 
-                ':short_name' => $businessLocal['short_name'],
-                ':sunat_code' => $businessLocal['sunat_code'],
-                ':location_code' => $businessLocal['location_code'],
+                ':short_name' => $businessLocal['shortName'],
+                ':sunat_code' => $businessLocal['sunatCode'],
+                ':location_code' => $businessLocal['locationCode'],
                 ':department' => $businessLocal['department'],
                 ':province' => $businessLocal['province'],
                 ':district' => $businessLocal['district'],
                 ':address' => $businessLocal['address'],
-                ':pdf_invoice_size' => $businessLocal['pdf_invoice_size'],
-                ':pdf_header' => $businessLocal['pdf_header'],
+                ':pdf_invoice_size' => $businessLocal['pdfInvoiceSize'],
+                ':pdf_header' => $businessLocal['pdfHeader'],
                 ':description' => $businessLocal['description'],
-                ':business_id' => $businessLocal['business_id'],
+                ':business_id' => $businessLocal['businessId'],
             ])){
                 throw new Exception("Error al insertar el registro");
             }
@@ -66,7 +66,7 @@ class BusinessLocal extends BaseModel
                     ':updated_at' => $currentDate,
                     ':business_local_id' => $businessLocalId,
                     ':serie' => $row['serie'],
-                    ':document_code' => $row['document_code'],
+                    ':document_code' => $row['documentCode'],
                     ':max_correlative' => 0,
                     ':contingency' => 0,
                 ])){

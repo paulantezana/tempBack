@@ -1,4 +1,3 @@
-// In your Javascript (external .js resource or <script> tag)
 $(document).ready(function() {
     $('.select2').select2({ minimumResultsForSearch: -1 });
     $(".datePiker").daterangepicker({
@@ -54,6 +53,59 @@ $(document).ready(function() {
             }
         }
     });
+
+    // Layout
+    $(".UserSidebar-dropdown > a").on('click',function(){
+        $(".UserSidebar-submenu").slideUp(200);
+        if (
+            $(this).parent().hasClass("active")
+        ) {
+            $(".UserSidebar-dropdown").removeClass("active");
+            $(this).parent().removeClass("active");
+        } else {
+            $(".UserSidebar-dropdown").removeClass("active");
+            $(this).next(".UserSidebar-submenu").slideDown(200);
+            $(this).parent().addClass("active");
+        }
+    });
+
+    $("#UserSidebar-toggle").on('click',function(e){
+        $('#UserLayout').toggleClass('UserSidebar-show');
+    });
+    $('.UserSidebar-wrapper').on('click',function (e) {
+        if (e.target === this){
+            $('#UserLayout').removeClass('UserSidebar-show');
+        }
+    });
+
+    $.ajax({
+        url: service.apiPath + '/Business/GetBusinessInfo',
+        dataType: 'json',
+        success: res => {
+            if (res.success){
+                if (res.result.business !== undefined){
+                    if (res.result.business.environment == '1'){
+                        $('#businessEnvironmentInfo').addClass('production').html('<i class="icon-check mr-2"></i> Produción');
+                    }else {
+                        $('#businessEnvironmentInfo').addClass('demo').html('<i class="icon-check mr-2"></i> Demo');
+                    }
+                }
+
+                if (res.result.businessLocals){
+                    let businessLocalsOptions = '<option value="">Seleccionar local</option>';
+                    [...res.result.businessLocals].forEach(item => {
+                        let defaultLocal = parseInt(item.businessLocalId) === parseInt(res.result.currentLocal) ? 'selected' :'';
+                        businessLocalsOptions += `<option value="${item.businessLocalId}" ${defaultLocal}>${item.shortName}</option>`;
+                    });
+                    $('#businessCurrentLocalInfo').html(businessLocalsOptions).trigger('change').on('change',function (e) {
+                        console.log(this);
+                    });
+                }
+            }else {
+
+            }
+        },
+    })
 });
 
 let DocumentPrinter = {
@@ -77,4 +129,3 @@ let DocumentPrinter = {
         }
     }
 };
-

@@ -179,7 +179,8 @@
         <div class="form-group col-md-4">
             <label for="invoiceCustomerIdentityDocumentNumber"><i class="icon-pencil mr-2"></i>  N° de R.U.C.:<span class="text-danger">*</span> </label>
             <div class="input-group">
-                <input type="text" class="form-control" id="invoiceCustomerIdentityDocumentNumber" name="invoice[customer][document_number]" value="<?= $parameter['invoice']['customer']['document_number'] ?? '' ?>">
+                <input type="text" class="form-control" id="invoiceCustomerIdentityDocumentNumber" name="invoice[customer][document_number]"
+                       value="<?= $parameter['invoice']['customer']['document_number'] ?? '' ?>" placeholder="Número de documento Aquí!">
                 <div class="input-group-append">
                     <button class="btn btn-primary" type="button" id="invoiceCustomerSearchDocument" onclick="SearchPublicDocumentExtractor()">
                         <i class="icon-search4"></i>
@@ -200,15 +201,18 @@
         </div>
         <div class="form-group col-md-5">
             <label for="invoiceCustomerSocialReason"><i class="icon-vcard mr-2"></i> Razón Social: <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="invoiceCustomerSocialReason" name="invoice[customer][social_reason]" value="<?= $parameter['invoice']['customer']['social_reason'] ?? '' ?>">
+            <input type="text" class="form-control" id="invoiceCustomerSocialReason" name="invoice[customer][social_reason]"
+                   value="<?= $parameter['invoice']['customer']['social_reason'] ?? '' ?>" placeholder="Nombre o Razón Social Aquí">
         </div>
         <div class="form-group col-md-6">
             <label for="invoiceCustomerFiscalAddress"><i class="icon-home2 mr-2"></i> Dirección: <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="invoiceCustomerFiscalAddress" name="invoice[customer][fiscal_address]" value="<?= $parameter['invoice']['customer']['fiscal_address'] ?? '' ?>">
+            <input type="text" class="form-control" id="invoiceCustomerFiscalAddress" name="invoice[customer][fiscal_address]"
+                   value="<?= $parameter['invoice']['customer']['fiscal_address'] ?? '' ?>" placeholder="Escribe aquí la dirección completa">
         </div>
         <div class="form-group col-md-6">
             <label for="invoiceCustomerEmail"><i class="icon-envelop2 mr-2"></i>  Email:</label>
-            <input type="text" class="form-control" id="invoiceCustomerEmail" name="invoice[customer][email]" value="<?= $parameter['invoice']['customer']['email'] ?? '' ?>">
+            <input type="text" class="form-control" id="invoiceCustomerEmail" name="invoice[customer][email]"
+                   value="<?= $parameter['invoice']['customer']['email'] ?? '' ?>" placeholder="Escribe aquí el email del cliente">
         </div>
     </div>
 </div>

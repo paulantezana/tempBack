@@ -98,7 +98,7 @@ class UserController
   }
   public function CloseSession(){
     unset($_SESSION[SESS]);
-    unset($_SESSION[USER_TYPE]);
+    unset($_SESSION[SESS_ROLE]);
     session_destroy();
     setcookie('MainMenu', "",  time() - 10, "/");
     header("Location: http://localhost/OSE-skynet/ose/ManagerLogin");

@@ -1,17 +1,21 @@
 <?php
     require_once MODEL_PATH . 'User/Business.php';
+    require_once MODEL_PATH . 'User/BusinessLocal.php';
+    require_once MODEL_PATH . 'User/User.php';
 
     class BusinessController
     {
         private $connection;
-        private $param;
         private $businessModel;
+        private $userModel;
+        private $businessLocalModel;
 
-        public function __construct($connection, $param)
+        public function __construct($connection)
         {
             $this->connection = $connection;
-            $this->param = $param;
-            $this->businessModel = new Business($this->connection);;
+            $this->businessModel = new Business($connection);;
+            $this->businessLocalModel = new BusinessLocal($connection);
+            $this->userModel = new User($connection);
         }
 
         public function Update(){
@@ -40,26 +44,26 @@
                                     $parameter['error'] = $validate->error;
                                     throw new Exception($validate->errorMessage);
                                 }
-    
+
                                 if(!($businessLogo['tmp_name'] ?? '') == ''){
                                     $rootPath = dirname(getcwd());
                                     $folderName = '/Assets/Images/';
                                     if (!file_exists($rootPath . $folderName)) {
                                         mkdir($rootPath . $folderName);
                                     }
-    
+
                                     $filesName = 'L' . $business['ruc'] . '-' . $business['business_id'] . '.' . pathinfo($businessLogo['name'])['extension'];
                                     if(!copy($businessLogo['tmp_name'], $rootPath . $folderName . $filesName)){
                                         throw new Exception("Error al subir el logo", 1);
                                     }
-    
+
                                     $this->businessModel->UpdateById($business['business_id'],[
                                         'logo' => '..' . $folderName . $filesName,
                                     ]);
                                 }
                             }
                         }
-                        
+
                         $parameter['message'] = 'El registro se actualizo exitosamente';
                         $parameter['messageType'] = 'success';
                     }
@@ -74,6 +78,35 @@
             } catch (Exception $e) {
                 echo $e->getMessage() . "\n\n" . $e->getTraceAsString();
             }
+        }
+
+        public function GetBusinessInfo(){
+            $res = new Result();
+            try {
+                $business = $this->businessModel->GetByUserId($_SESSION[SESS]);
+                $businessLocals = $this->businessLocalModel->GetAllByBusinessId($business['business_id']);
+                $user = $this->userModel->GetById($_SESSION[SESS]);
+                $res->result = [
+                    'business' => $business,
+                    'businessLocals' => array_map(function ($item){
+                        return [
+                            'businessLocalId' => $item['business_local_id'],
+                            'shortName' => $item['short_name'],
+                        ];
+                    },$businessLocals),
+                    'currentLocal' => $_SESSION[CURRENT_LOCAL],
+                    'user' => [
+                        'userId' => $user['id_user'],
+                        'email' => $user['email'],
+                        'userName' => $user['names'],
+                        'userRoleId' => $user['id_rol'],
+                    ],
+                ];
+                $res->success = true;
+            } catch (Exception $e) {
+                $res->errorMessage = $e->getMessage();
+            }
+            echo json_encode($res);
         }
 
         public function BusinessValidate($business){

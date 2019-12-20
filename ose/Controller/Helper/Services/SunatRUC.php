@@ -51,7 +51,6 @@
 
         public function Query(string $ruc){
             $res = new Result();
-
             try{
                 if( (strlen($ruc)!=8 && strlen($ruc)!=11) || !is_numeric($ruc) )
                 {
@@ -69,37 +68,33 @@
                 }
 
                 $dataResult = $this->GeneralData($ruc);
-                if (!$dataResult->success){
-                    $res->success = $dataResult->success;
-                    $res->result = $dataResult->result;
-
-                    if ($this->config->workers){
-                        $workerResult = $this->NumWorkers($ruc);
-                        if ($workerResult->success){
-                            $res->result['worker'] = $workerResult->result;
-                        }
-                    }
-
-                    if ($this->config->establishments){
-                        $establishmentResult = $this->Establishment($ruc);
-                        if ($establishmentResult->success){
-                            $res->result['establishment'] = $establishmentResult->result;
-                        }
-                    }
-
-                    if ($this->config->representatives){
-                        $legalReprecentantResult = $this->LegalReprecentant($ruc);
-                        if ($legalReprecentantResult->success){
-                            $res->result['reprecentant'] = $legalReprecentantResult->result;
-                        }
-                    }
-                }else{
-                    return $dataResult;
+                if (!$dataResult->success) {
+                    throw new Exception($dataResult->errorMessage);
                 }
+
+//                if ($this->config->workers){
+//                    $workerResult = $this->NumWorkers($ruc);
+//                    if ($workerResult->success){
+//                        $res->result['worker'] = $workerResult->result;
+//                    }
+//                }
+//
+//                if ($this->config->establishments){
+//                    $establishmentResult = $this->Establishment($ruc);
+//                    if ($establishmentResult->success){
+//                        $res->result['establishment'] = $establishmentResult->result;
+//                    }
+//                }
+//
+//                if ($this->config->representatives){
+//                    $legalRepresentativeResult = $this->LegalRepresentative($ruc);
+//                    if ($legalRepresentativeResult->success){
+//                        $res->result['reprecentant'] = $legalRepresentativeResult->result;
+//                    }
+//                }
             }catch (Exception $e){
                 $res->errorMessage = $e->getMessage();
             }
-
             return $res;
         }
 
@@ -151,8 +146,8 @@
             if(isset($matches[0]))
             {
                 $RS = utf8_encode(str_replace('"','', ($matches[0][1])));
-                $data['ruc'] = $ruc;
-                $data['razon_social'] = trim($RS);
+                $data['documentNumber'] = $ruc;
+                $data['socialReason'] = trim($RS);
             }
 
             //Telefono
@@ -160,7 +155,7 @@
             $output = preg_match_all($patron, $response, $matches, PREG_SET_ORDER);
             if( isset($matches[0]) )
             {
-                $data["telefono"] = trim($matches[0][1]);
+                $data["telephone"] = trim($matches[0][1]);
             }
 
             // Condicion Contribuyente
@@ -168,68 +163,68 @@
             $output = preg_match_all($patron, $response, $matches, PREG_SET_ORDER);
             if( isset($matches[0]) )
             {
-                $data["condicion"] = strip_tags(trim($matches[0][1]));
+                $data["condition"] = strip_tags(trim($matches[0][1]));
             }
-            $busca=array(
-                "nombre_comercial" 			=> "Nombre Comercial",
-                "tipo" 						=> "Tipo Contribuyente",
-                "fecha_inscripcion" 		=> "Fecha de Inscripci&oacute;n",
-                "estado" 					=> "Estado del Contribuyente",
-                "direccion" 				=> "Direcci&oacute;n del Domicilio Fiscal",
-                "sistema_emision" 			=> "Sistema de Emisi&oacute;n de Comprobante",
-                "actividad_exterior"		=> "Actividad de Comercio Exterior",
-                "sistema_contabilidad" 		=> "Sistema de Contabilidad",
-                "oficio" 					=> "Profesi&oacute;n u Oficio",
-                "actividad_economica" 		=> "Actividad\(es\) Econ&oacute;mica\(s\)",
-                "emision_electronica" 		=> "Emisor electr&oacute;nico desde",
-                "comprobante_electronico" 	=> "Comprobantes Electr&oacute;nicos",
-                "ple" 						=> "Afiliado al PLE desde"
-            );
-            foreach($busca as $i=>$v)
-            {
-                $patron='/<td class="bgn"[ ]*colspan=1[ ]*>'.$v.':[ ]*<\/td>[ ]*\r\n[\t]*[ ]+<td class="bg" colspan=[1|3]+>(.*)<\/td>/';
-                $output = preg_match_all($patron, $response, $matches, PREG_SET_ORDER);
-                if(isset($matches[0]))
-                {
-                    $data[$i] = trim(utf8_encode( preg_replace( "[\s+]"," ", ($matches[0][1]) ) ) );
-                }
-            }
-            if( isset($data["comprobante_electronico"]) )
-            {
-                $nuevo = explode(',', $data["comprobante_electronico"]);
-                if( is_array($nuevo))
-                {
-                    $data["comprobante_electronico"] = $nuevo;
-                }
-                else
-                {
-                    $data["comprobante_electronico"] = array( $data["comprobante_electronico"]);
-                }
-            }
-
-            // Condicion Contribuyente
-            $patron = '/<td width="(\d{2})%" colspan=1 class="bgn">Fecha de Inicio de Actividades:<\/td>\r\n[\t]*[ ]+<td class="bg" colspan=1> (.*)<\/td>/';
-            $output = preg_match_all($patron, $response, $matches, PREG_SET_ORDER);
-            if( isset($matches[0][2]) )
-            {
-                $data["inicio_actividades"] = strip_tags(trim($matches[0][2]));
-            }
-
-            // Actividad Economica
-            $patron='/<option value="00" > (.*) - (.*) <\/option>\r\n/';
-            $rpta = preg_match_all($patron, $response, $matches, PREG_SET_ORDER);
-            if( !empty($matches) )
-            {
-                $ae = array();
-                foreach ($matches as $key => $value)
-                {
-                    $ae[] = array(
-                        'ciiu' 	=> utf8_encode(trim($value[1])),
-                        'descripcion' 	=> utf8_encode(trim($value[2]))
-                    );
-                }
-                $data["actividad_economica"] = $ae;
-            }
+//            $busca=array(
+//                "nombre_comercial" 			=> "Nombre Comercial",
+//                "tipo" 						=> "Tipo Contribuyente",
+//                "fecha_inscripcion" 		=> "Fecha de Inscripci&oacute;n",
+//                "estado" 					=> "Estado del Contribuyente",
+//                "direccion" 				=> "Direcci&oacute;n del Domicilio Fiscal",
+//                "sistema_emision" 			=> "Sistema de Emisi&oacute;n de Comprobante",
+//                "actividad_exterior"		=> "Actividad de Comercio Exterior",
+//                "sistema_contabilidad" 		=> "Sistema de Contabilidad",
+//                "oficio" 					=> "Profesi&oacute;n u Oficio",
+//                "actividad_economica" 		=> "Actividad\(es\) Econ&oacute;mica\(s\)",
+//                "emision_electronica" 		=> "Emisor electr&oacute;nico desde",
+//                "comprobante_electronico" 	=> "Comprobantes Electr&oacute;nicos",
+//                "ple" 						=> "Afiliado al PLE desde"
+//            );
+//            foreach($busca as $i=>$v)
+//            {
+//                $patron='/<td class="bgn"[ ]*colspan=1[ ]*>'.$v.':[ ]*<\/td>[ ]*\r\n[\t]*[ ]+<td class="bg" colspan=[1|3]+>(.*)<\/td>/';
+//                $output = preg_match_all($patron, $response, $matches, PREG_SET_ORDER);
+//                if(isset($matches[0]))
+//                {
+//                    $data[$i] = trim(utf8_encode( preg_replace( "[\s+]"," ", ($matches[0][1]) ) ) );
+//                }
+//            }
+//            if( isset($data["comprobante_electronico"]) )
+//            {
+//                $nuevo = explode(',', $data["comprobante_electronico"]);
+//                if( is_array($nuevo))
+//                {
+//                    $data["comprobante_electronico"] = $nuevo;
+//                }
+//                else
+//                {
+//                    $data["comprobante_electronico"] = array( $data["comprobante_electronico"]);
+//                }
+//            }
+//
+//            // Condicion Contribuyente
+//            $patron = '/<td width="(\d{2})%" colspan=1 class="bgn">Fecha de Inicio de Actividades:<\/td>\r\n[\t]*[ ]+<td class="bg" colspan=1> (.*)<\/td>/';
+//            $output = preg_match_all($patron, $response, $matches, PREG_SET_ORDER);
+//            if( isset($matches[0][2]) )
+//            {
+//                $data["inicio_actividades"] = strip_tags(trim($matches[0][2]));
+//            }
+//
+//            // Actividad Economica
+//            $patron='/<option value="00" > (.*) - (.*) <\/option>\r\n/';
+//            $rpta = preg_match_all($patron, $response, $matches, PREG_SET_ORDER);
+//            if( !empty($matches) )
+//            {
+//                $ae = array();
+//                foreach ($matches as $key => $value)
+//                {
+//                    $ae[] = array(
+//                        'ciiu' 	=> utf8_encode(trim($value[1])),
+//                        'descripcion' 	=> utf8_encode(trim($value[2]))
+//                    );
+//                }
+//                $data["actividad_economica"] = $ae;
+//            }
 
             $res->success = true;
             $res->result = $data;
@@ -350,7 +345,7 @@
             return $res;
         }
 
-        private function LegalReprecentant( $ruc )
+        private function LegalRepresentative( $ruc )
         {
             $res = new Result();
             $url = "http://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/jcrS00Alias";
