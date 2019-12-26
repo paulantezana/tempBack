@@ -28,28 +28,28 @@ $(window).on('load',function(){
 	var Alm=$("#AlmRNP").html();$("#IdLabelTitleAlmacen").html("Almacen: "+Alm);
 	var IdAlm=$("#IdAlmRNP").html();
 
+	inst.Genera_Codigo_Unico();
+
 	//inst.getList_combo_VentaNP([IdAlm]);
 		
 	
-	$("#cboEmpresa_ProcVentaNP").chosen({width: "100%"});
-	$("#cboComprobante_ProcVentaNP").chosen({width: "100%"});
-	$("#cboTipoDoc_ProcVentaNP").chosen({width: "100%"});
-	$("#txtFechaEmis_ProcVentaNP").datepicker({defaultDate: +1,changeMonth: true,numberOfMonths: 1,changeYear: true,disableTextInput:true,onClose: function(selectedDate){}});
-	$("#txtFechaEmis_ProcVentaNP").datepicker( "option", "dateFormat", "dd/mm/yy" );
+	// $("#cboEmpresa_ProcVentaNP").chosen({width: "100%"});
+	// $("#cboComprobante_ProcVentaNP").chosen({width: "100%"});
+	// $("#cboTipoDoc_ProcVentaNP").chosen({width: "100%"});
+	// $("#txtFechaEmis_ProcVentaNP").datepicker({defaultDate: +1,changeMonth: true,numberOfMonths: 1,changeYear: true,disableTextInput:true,onClose: function(selectedDate){}});
+	// $("#txtFechaEmis_ProcVentaNP").datepicker( "option", "dateFormat", "dd/mm/yy" );
 	$("#txtFechaEntrega_PVNP").datepicker({defaultDate: +1,changeMonth: true,numberOfMonths: 1,changeYear: true,disableTextInput:true,onClose: function(selectedDate){}});
 	$("#txtFechaEntrega_PVNP").datepicker( "option", "dateFormat", "dd/mm/yy" );
 	var FeH=current_date();
-	$("#txtFechaEmis_ProcVentaNP").prop("value",FeH);
+	// $("#txtFechaEmis_ProcVentaNP").prop("value",FeH);
 	$("#txtFechaEntrega_PVNP").prop("value",FeH);
 	$("#txtFechaEntrega_PVNP").datepicker( "option", "minDate",FeH);
 	
-	$("#IdNumeroHabFBNP").on('click',function(e){var idss=$(this)[0].checked;if(idss){$("#txtNumero_ProcVentaNP").prop("readonly",false);}else{$("#txtNumero_ProcVentaNP").prop("readonly",true);}});
-	$("#btnSearchRUC_ProcVentaNP").on('click',function(e){var Nro=$("#txtRuc_ProcVentaNP").val();
-		if(Nro!="" && Nro.length===11){inst.getList_RecuperarRS_NroRuc_NP([Nro]);}else{(function(){vex.defaultOptions.className = 'vex-theme-os';})();vex.dialog.alert("Ingrese Nro RUC.");}
-	});
-	$("#cboComprobante_ProcVentaNP").on('change',function(e){inst.Verificar_Serie_Nro_AlmCompro()});
-	$("#cboEmpresa_ProcVentaNP").on('change',function(e){inst.Verificar_Serie_Nro_AlmCompro()});
-	
+	// $("#IdNumeroHabFBNP").on('click',function(e){var idss=$(this)[0].checked;if(idss){$("#txtNumero_ProcVentaNP").prop("readonly",false);}else{$("#txtNumero_ProcVentaNP").prop("readonly",true);}});
+	// $("#btnSearchRUC_ProcVentaNP").on('click',function(e){var Nro=$("#txtRuc_ProcVentaNP").val();
+	// 	if(Nro!="" && Nro.length===11){inst.getList_RecuperarRS_NroRuc_NP([Nro]);}else{(function(){vex.defaultOptions.className = 'vex-theme-os';})();vex.dialog.alert("Ingrese Nro RUC.");}
+	// });
+
 	$("#txtCodigo_PVNP").keyup(function (e){if(e.which == 13){$("#txtCantidad_PVNP").focus();var CP=$("#txtCodigo_PVNP").val();if(IdAlm!="-1" && CP!="" && CP.length>3){inst.getList_Producto_Codigo_PVNP([IdAlm,CP]);}}});
 	$("#txtCantidad_PVNP").focusout(function(){inst.Calcular_Importe_VentaNP();});
 	$("#txtCantidad_PVNP").keyup(function (e){if(e.which == 13){$("#btnAdd_PVNP").focus();inst.Calcular_Importe_VentaNP();}});
@@ -102,14 +102,14 @@ $(window).on('load',function(){
 		var IdEmpresa=1;
 		var IdComprob=15;
 
-		var Serie=$("#txtSerie_ProcVentaNP").val();
-		var Numero=$("#txtNumero_ProcVentaNP").val();
-		var FechaEm=$("#txtFechaEmis_ProcVentaNP").val();
-		var IdTipoDoc=$("select#cboTipoDoc_ProcVentaNP option:selected").val();
-		var Ruc=$("#txtRuc_ProcVentaNP").val();
-		var RS=$("#txtRS_ProcVentaNP").val();
-		var Direc=$("#txtDireccion_ProcVenta").val();
-		var Email=$("#txtEmail_ProcVenta").val();
+		// var Serie=$("#txtSerie_ProcVentaNP").val();
+		// var Numero=$("#txtNumero_ProcVentaNP").val();
+		// var FechaEm=$("#txtFechaEmis_ProcVentaNP").val();
+		// var IdTipoDoc=$("select#cboTipoDoc_ProcVentaNP option:selected").val();
+		// var Ruc=$("#txtRuc_ProcVentaNP").val();
+		// var RS=$("#txtRS_ProcVentaNP").val();
+		// var Direc=$("#txtDireccion_ProcVenta").val();
+		// var Email=$("#txtEmail_ProcVenta").val();
 
 		var NroGui=$("#txtNroGuia_ProcVenta").val();
 		
@@ -158,53 +158,24 @@ $(window).on('load',function(){
 	//$("#btnAdd_PVNP").keyup(function (e){if(e.which == 13){}}}});
 });
 function ClassRNotaPedido(){
-	this.getList_combo_VentaNP=function(params){
-		// $.blockUI();
-		// $.ajax({type:"POST",url:url_ajax_request,data:{object:"objProceso",action:"getList_combo_VentaNP",array:params},
-		// 	async:true,dataType:"json",success:function(e){$.unblockUI();var Compro=e["Compro"],TipoDoc=e["TipoDoc"],Empresa=e["Empresa"];var inst=new ClassRNotaPedido();
-		// 		if(Compro.length>0){
-		// 			$("#cboComprobante_ProcVentaNP").empty();
-		// 			for(var i=0;i<Compro.length;i++){$("#cboComprobante_ProcVentaNP").append('<option value="'+Compro[i]["Id"]+'">'+Compro[i]["Nombre"]+'</option>');}
-		// 			$("#cboComprobante_ProcVentaNP").chosen({width: "100%"});
-		// 			$('#cboComprobante_ProcVentaNP').val(Compro[0]["Id"]).trigger('chosen:updated');
-		// 		}
-		// 		if(TipoDoc.length>0){
-		// 			$("#cboTipoDoc_ProcVentaNP").empty();
-		// 			for(var i=0;i<TipoDoc.length;i++){$("#cboTipoDoc_ProcVentaNP").append('<option value="'+TipoDoc[i]["Id"]+'">'+TipoDoc[i]["Nombre"]+'</option>');}
-		// 			$("#cboTipoDoc_ProcVentaNP").chosen({width: "100%"});
-		// 			$('#cboTipoDoc_ProcVentaNP').val(TipoDoc[0]["Id"]).trigger('chosen:updated');
-		// 		}
-		// 		if(Empresa.length>0){
-		// 			$("#cboEmpresa_ProcVentaNP").empty();
-		// 			for(var i=0;i<Empresa.length;i++){$("#cboEmpresa_ProcVentaNP").append('<option value="'+Empresa[i]["Id"]+'">'+Empresa[i]["Nombre"]+'</option>');}
-		// 			$("#cboEmpresa_ProcVentaNP").chosen({width: "100%"});
-		// 			$('#cboEmpresa_ProcVentaNP').val(Empresa[0]["Id"]).trigger('chosen:updated');
-		// 		}
-		// 		inst.Verificar_Serie_Nro_AlmCompro();
-		// 	},error:function(jqXHR,textStatus,errorMessage){console.log(jqXHR.responseText);}
-		// });
-	}
-	this.Verificar_Serie_Nro_AlmCompro=function(){var inst=new ClassRNotaPedido();
-		var IdEmp=$("select#cboEmpresa_ProcVentaNP option:selected").val();
-		var IdComprob=$("select#cboComprobante_ProcVentaNP option:selected").val();
-		var IdAlm=$("#IdAlmRNP").html();
-		if(IdAlm!="-1" && IdEmp!="-1" && IdComprob!="-1"){inst.getList_Serie_Numero_VentaNP([IdEmp,IdComprob]);}
-		if(IdEmp!="-1"){
-			var Emp=$("select#cboEmpresa_ProcVentaNP option:selected").text();
-			$("#lblNameEmpresaSelc").html(Emp);
-		}else{$("#lblNameEmpresaSelc").html("");}
-	}
-	this.getList_Serie_Numero_VentaNP=function(params){
-		$.blockUI();
-		$.ajax({type:"POST",url:url_ajax_request,data:{object:"objProceso",action:"getList_Serie_Numero_VentaNP",array:params},
-			async:true,dataType:"json",success:function(e){$.unblockUI();var inst=new ClassRNotaPedido();
-				var Serie=e["Serie"];
-				var NroC=e["Numero"][0]["Numero"];
-				$("#txtNumero_ProcVentaNP").prop("value",NroC);
-				$("#txtSerie_ProcVentaNP").prop("value",Serie);
-				$("#IdNumeroHabFBNP").prop("checked",false);
-			},error:function(jqXHR,textStatus,errorMessage){console.log(jqXHR.responseText);}
-		});
+	this.Genera_Codigo_Unico = function(){
+		const generateUniqueId = (length = 6) => {
+			let timestamp = + new Date;
+		
+			let _getRandomInt = function (min, max) {
+				return Math.floor(Math.random() * (max - min + 1)) + min;
+			};
+		
+			let ts = timestamp.toString();
+			let parts = ts.split("").reverse();
+			let id = "";
+			for (let i = 0; i < length; ++i) {
+				let index = _getRandomInt(0, parts.length - 1);
+				id += parts[index];
+			}
+			return id;
+		};
+		console.log(generateUniqueId(5));
 	}
 	this.Calcular_Importe_VentaNP=function(){
 		var TipoPrecio=$('input:radio[name=rbtTipoprecioPVNP]:checked').val();
@@ -331,11 +302,11 @@ function ClassRNotaPedido(){
 		$.ajax({type:"POST",url:url_ajax_request,data:{object:"objProceso",action:"Save_Datos_Venta_NP",array:params},
 			async:true,dataType:"json",success:function(e){$.unblockUI();var inst=new ClassRNotaPedido();
 				if(e["Val"]){
-					alertify.success("PROCESO CORRECTO.");
-					inst.Clear_Detail_VentaAdd_NP();inst.Clear_Grnal_Venta_NP();
-					inst.Verificar_Serie_Nro_AlmCompro();
-					var inst2=new ClassImpresion();
-					//inst2.getList_Datos_ReportVentta_Print([e["IdVenta"],IdAlm]);
+					// alertify.success("PROCESO CORRECTO.");
+					inst.Clear_Detail_VentaAdd_NP();
+					inst.Clear_Grnal_Venta_NP();
+					inst.Genera_Codigo_Unico();
+					vex.dialog.alert('PROCESO CORRECTO. </br> Número de pedido: </br> </br> <b style="font-size: 64px">'+e["IdVenta"]+'</b>');
 				}else{
 					alertify.error("Error, Proceso Incorrecto.");
 				}				

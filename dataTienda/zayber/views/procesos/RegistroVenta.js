@@ -160,6 +160,15 @@ $(window).on('load',function(){var inst=new ClassRsvaVenta();
 				break;
 		}
 	});
+	$('#txtDescripNP_ProcCompra').keyup(function(e){
+		let tecla=e.which;
+		if(tecla == 13){
+			let Idss = $('#txtDescripNP_ProcCompra').val();
+			let IdAlm=$("#IdAlmRVenta").html();
+			let IdEmpresa=$("select#cboEmpresa_ProcVenta option:selected").val();
+			inst.getList_RecuperarDetail_VentaNP([IdAlm,Idss,IdEmpresa]);
+		}
+	});
 });
 function ClassRsvaVenta(){
 	this.ver_empresa_venta=function(){
@@ -661,12 +670,12 @@ function ClassRsvaVenta(){
 		$.ajax({type:"POST",url:url_ajax_request,data:{object:"objProceso",action:"getList_RecuperarDetail_VentaNP",array:params},
 			async:true,dataType:"json",success:function(e){$.unblockUI();var inst=new ClassRsvaVenta();
 				var Cabe=e["Cabe"];
-				var Detail=e["Detail"];console.log(Detail)
+				var Detail=e["Detail"];
 				if(Cabe.length>0){
 					$("#txtRuc_ProcVenta").prop("value",Cabe[0]["Ruc"]);
 					$("#txtRS_ProcVenta").prop("value",Cabe[0]["RS"]);
 					$("#txtDireccion_ProcVenta").prop("value",Cabe[0]["Direccion"]);
-					$("#txtDescripNP_ProcCompra").prop("value",'NP '+Cabe[0]["Serie"]+' - '+Cabe[0]["Numero"]);
+					$("#txtDescripNP_ProcCompra").prop("value",Cabe[0]['IdVenta']);
 				}
 				if(Detail.length>0){
 					$("#IdTable_DetalleC_ProcVenta tbody").html("");

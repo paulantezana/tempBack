@@ -212,7 +212,7 @@ class ClaProceso{
 		$query="SELECT IdEmpresa,IdVenta,IdNotaPedido,Serie,Numero,fn_RecuperarNombre_ns('COMPROBANTE',IdNotaPedido) AS Comprobante,
 			Total,SubTotal,IGV,Obs,FechaReg,DATE_FORMAT(FechaE,'%d/%m/%Y') AS Fec,Ruc,RS,Direccion,Estado,
 			fn_RecuperarNombre_ns('USER_AP',IdUsuario) AS Userr
-			from `mante_registro_nota_pedido` where IdAlmacen='$Datos[0]' AND Estado=1 AND IdEmpresa='$Datos[1]';";
+			from `mante_registro_nota_pedido` where IdAlmacen='$Datos[0]' AND Estado=1 AND IdEmpresa='$Datos[1]'";
 		//echo $query;	
 		return Class_Run::Select_Query($query);
  	}
@@ -230,8 +230,9 @@ class ClaProceso{
 		return Class_Run::Select_Query($query);
  	}
 	public static function getList_Cab_IdNP_ALM($pIdAlm,$IdNP){
- 	 	$query="select IdVenta,IdNotaPedido,Serie,Numero,Total,Ruc,RS,Direccion,Estado
-			from `mante_registro_nota_pedido` where IdAlmacen='$pIdAlm' AND Estado=1 AND IdVenta='$IdNP';";
+ 	 	$query="select mrnp.IdVenta,mrnp.IdNotaPedido,mrnp.Total,mrnp.Estado,ma.Almacen,ma.IdAlmacen from `mante_registro_nota_pedido` as mrnp
+		  INNER JOIN mante_almacen AS ma ON mrnp.IdAlmacen = ma.IdAlmacen
+		  where mrnp.IdAlmacen='$pIdAlm' AND mrnp.Estado=1 AND mrnp.IdVenta='$IdNP';";
 		return Class_Run::Select_Query($query);
  	}
 	public static function getList_Producto_Codigo($Datos){
@@ -763,14 +764,14 @@ class ClaProceso{
 		$valido=true;
 		$aIdEmpresa=$Datos[0]["aIdEmpresa"];
 		$aIdComprob=$Datos[0]["aIdComprob"];
-		$aSerie=$Datos[0]["aSerie"];
-		$aNumero=$Datos[0]["aNumero"];
-		$aFechaEm=$Datos[0]["aFechaEm"];
-		$aIdTipoDoc=$Datos[0]["aIdTipoDoc"];
-		$aRuc=$Datos[0]["aRuc"];
-		$aRS=$Datos[0]["aRS"];
-		$aDireccion=$Datos[0]["aDireccion"];
-		$aEmail=$Datos[0]["aEmail"];
+		// $aSerie=$Datos[0]["aSerie"];
+		// $aNumero=$Datos[0]["aNumero"];
+		$aFechaEm= date('Y-m-d H:i:s');
+		// $aIdTipoDoc=$Datos[0]["aIdTipoDoc"];
+		// $aRuc=$Datos[0]["aRuc"];
+		// $aRS=$Datos[0]["aRS"];
+		// $aDireccion=$Datos[0]["aDireccion"];
+		// $aEmail=$Datos[0]["aEmail"];
 		$aObs=$Datos[0]["aNroGuia"];
 		
 		$aTotaal=$Datos[0]["aTotaal"];
@@ -778,8 +779,8 @@ class ClaProceso{
 		$aIGV=$Datos[0]["aIGV"];
 		$aSon=$Datos[0]["aSon"];
 		$aIdIGV=$Datos[0]["aIdIGV"];
-		$aFechaEnt=$Datos[0]["aFechaEnt"];
-		$aTelefono=$Datos[0]["aTelefono"];
+		// $aFechaEnt=$Datos[0]["aFechaEnt"];
+		// $aTelefono=$Datos[0]["aTelefono"];
 
 		$aAlm=$Datos[0]["aAlm"];
 		$aIdAlm=$Datos[0]["aIdAlm"];
@@ -787,7 +788,7 @@ class ClaProceso{
 		$aDetail=array();
 		$aDetail=$Datos[0]["aDetail"];
 		$IdVenta=1;
-		$aFechaE=date("Y-m-d", (strtotime ("-5 Hours")));
+		// $aFechaE=date("Y-m-d", (strtotime ("-5 Hours")));
 		$FechaHr=date("Y-m-d H:i:s", (strtotime ("-5 Hours")));
 		
 		$queryRes="SELECT IFNULL(MAX(IdVenta+1),1) AS Com FROM mante_registro_nota_pedido where IdEmpresa=$aIdEmpresa;";
@@ -795,12 +796,22 @@ class ClaProceso{
 		if($sql->execute()){
 			$fila1=$sql->fetchAll();
 			$IdVenta=$fila1[0]["Com"];
-			$queryInsR="INSERT INTO mante_registro_nota_pedido VALUES(".$aIdEmpresa.",".$aIdAlm.",".$IdVenta.",".$aIdComprob.",'".$aSerie."','".$aNumero."',
-					'".$FechaHr."',".$IdUser.",'".$aFechaEm."','".$aTotaal."','".$aSubTotal."','".$aIGV."','".$aIdIGV."','".$aSon."','".$aIdTipoDoc."',
-					'".addslashes($aRuc)."','".$aFechaEnt."','".$aTelefono."',1,'".addslashes($aRS)."','".addslashes($aDireccion)."','".addslashes($aEmail)."',
-					'".addslashes($aObs)."');";
+			$sql = "INSERT INTO `mante_registro_nota_pedido`(`IdEmpresa`, `IdAlmacen`, `IdVenta`, `IdNotaPedido`, `Serie`, `Numero`, `FechaReg`,
+															`IdUsuario`, `FechaE`, `Total`, `SubTotal`, `IGV`, `IdChkIGV`, `Son`, `IdTipoDoc`,
+															`Ruc`, `FechaEntrega`, `Telefono`, `Estado`, `RS`, `Direccion`, `Email`, `Obs`) 
+													VALUES ('{$aIdEmpresa}','{$aIdAlm}','{$IdVenta}','{$aIdComprob}','','','{$FechaHr}',
+															'{$IdUser}','{$aFechaEm}','{$aTotaal}','{$aSubTotal}','{$aIGV}','{$aIdIGV}','{$aSon}','',
+															'','','',1,'','','','{$aObs}')";
+			// $sql = "INSERT INTO mante_registro_nota_pedido(`IdEmpresa`,`IdAlmacen`,`IdVenta`,`IdNotaPedido`,`FechaReg`,`IdUsuario`,`FechaE`,
+			// 												`Total`,`SubTotal`,`IGV`,`IdChkIGV`,`Son`,`Obs`) 
+			// 											VALUES ('{$aIdEmpresa}','{$aIdAlm}','{$IdVenta}','{$aIdComprob}','{$FechaHr}','{$IdUser}','{$aFechaEm}',
+			// 													'{$aTotaal}','{$aSubTotal}','{$aIGV}','{$aIdIGV}','{$aSon}','{$aObs}')";
+			// $queryInsR="INSERT INTO mante_registro_nota_pedido VALUES(".$aIdEmpresa.",".$aIdAlm.",".$IdVenta.",".$aIdComprob.",'".$aSerie."','".$aNumero."',
+			// 		'".$FechaHr."',".$IdUser.",'".$aFechaEm."','".$aTotaal."','".$aSubTotal."','".$aIGV."','".$aIdIGV."','".$aSon."','".$aIdTipoDoc."',
+			// 		'".addslashes($aRuc)."','".$aFechaEnt."','".$aTelefono."',1,'".addslashes($aRS)."','".addslashes($aDireccion)."','".addslashes($aEmail)."',
+			// 		'".addslashes($aObs)."');";
 			//echo $queryInsR;
-			$sql1 = $pdo->prepare($queryInsR);
+			$sql1 = $pdo->prepare($sql);
 			if($sql1->execute()){
 				for($i=0;$i<count($aDetail);$i++)
 				{		

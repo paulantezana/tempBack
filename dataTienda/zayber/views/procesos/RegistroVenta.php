@@ -94,7 +94,7 @@
 							<div class="row">
 								<div class="col-md-6 col-sm-6 col-xs-6 p-2">
 									<span class="claTexto">Nota Pedido</span></br>
-									<input type="text" class="form_input claReadonly" id="txtDescripNP_ProcCompra" readonly>
+									<input type="text" class="form_input" id="txtDescripNP_ProcCompra">
 								</div>
 								<div class="col-md-6 col-sm-6 col-xs-6 center p-2 m-t-10">
 									<button class="btnProceso" id="btnNPVenta_ProcVenta"><i class="fas fa-search-plus"></i> Buscar</button>
