@@ -13,22 +13,24 @@
         <label id="AlmRVenta" style="display:none"><?php  echo $Almacen ?></label>
 <div class="col-md-8 ">
     <div class="row barraTotal">
-        <div class="col-md-1">
+        <div class="form-group col-md-6">
+            <label for="codigo_buscar">Buscar Nota de pedido</label>
+            <input type="text" class="form-control" id="buscar_nota_pedido" placeholder="Codigo" autofocus/>
+        </div>
+        <!-- <div class="col-md-1">
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalNuevo"><i class="fas fa-plus"></i></button>
+        </div> -->
+        <div class="form-group col-md-4">
+            <label for="codigo_buscar">Buscar por Codigo (F1)</label>
+            <input type="text" class="form-control" id="codigo_buscar" placeholder="Codigo"/>
         </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="codigo_buscar">Buscar por Codigo (F1)</label>
-                <input type="text" class="form-control" id="codigo_buscar" placeholder="Codigo" autofocus/>
-            </div>
-        </div>
-        <div class="col-md-4">
+        <!-- <div class="col-md-4">
             <div class="form-group ui-widget">
                 <label for="nombre_marca">Buscar por Nombre/Marca (F2)</label>
                 <input type="text" class="form-control" id="nombre_marca" placeholder="Nombre / Marca">
                 
             </div>
-        </div>
+        </div> -->
     </div>
     <div class="row barraTotal m-t-10 table-responsive">
         <table class="table table-hover table-bordered claTableProceso" id="tablaCarritoProductos">

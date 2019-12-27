@@ -11,6 +11,17 @@ $(window).on('load',function(){
 	
 	var FeH=current_date();
 	RecuperarProductos(IdAlmacen);
+
+	$('#buscar_nota_pedido').keyup(function(e){
+		console.log(e.which,'ssssss');
+		if(e.which == 13){
+			let codigoNota = e.target.value;
+			if (codigoNota.length>1) {
+				BuscarNotaPedido(codigoNota);
+			}
+		}
+	});
+
 	$("#codigo_buscar").keyup(function (e){
 		//console.log(e.target.value);
 		if(e.which == 13){
@@ -126,11 +137,58 @@ function RecuperarProductos(IdAlm){
 		}
 	});
 }
+
+function BuscarNotaPedido(codigoNota){
+	let IdEmpresa=$("#comboEmpresa").val();
+	$.blockUI();
+	$.ajax({
+		type:"POST",
+		url:url_ajax_request,
+		data:{object:"objProceso",action:"getList_RecuperarDetail_VentaNP", array:[codigoNota,IdEmpresa]},
+		async:true,
+		dataType:"json",
+		success:function(e){
+			console.log(e);
+			$.unblockUI();
+			var Cabe=e["Cabe"];
+			var Detail=e["Detail"];
+			if(Cabe.length > 0){
+				$("#nroDocumento").prop("value",Cabe[0]["Ruc"]);
+				$("#razonSocial").prop("value",Cabe[0]["RS"]);
+				$("#direccion").prop("value",Cabe[0]["Direccion"]);
+				$('#IdAlmRVenta').html(Cabe[0]['IdAlmacen']);
+				$('#IdLabelTitleAlmacen').html(Cabe[0]['Almacen']);
+				$('#AlmRVenta').html(Cabe[0]['Almacen']);
+			}
+			if(Detail.length>0){
+				for(var i=0;i<Detail.length;i++){
+					AgregarFila({
+						label: "SHAMPOO SUPER CONCENTRADO VISTONY",
+						IdProducto: Detail[i]["IdProducto"],
+						Codigo: Detail[i]["Codigo"],
+						Producto: "SHAMPOO SUPER CONCENTRADO",
+						IdMarca: "5",
+						Marca: "VISTONY",
+						IdCategoria: "5",
+						Categoria: "LITRO",
+						IdUnidad: "1",
+						Unidad: Detail[i]["Unidad"],
+						Stock: "94.00",
+						PrecioPublico: "10.00",
+						PrecioCompra: "6.43",
+						PrecioDistribuido: "8.50",
+					});
+				}
+			}
+		},
+	});
+}
+
 function BuscarPorCodigo(codigo){
 	const resultado = ListaProductos.find( Producto => Producto.Codigo === codigo );
 	if (resultado==null) {
 		alertify.error("No existe ");
-		return; 
+		return;
 	}
 	AgregarFila(resultado);
 }

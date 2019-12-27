@@ -1,34 +1,46 @@
 $(window).on('load',function(){
-	var inst=new ClassRNotaPedido();
+	var inst = new ClassRNotaPedido();
 
 	$("#IdAlmacenPri").css("display","none");
-	let empresaAlmacenes = [];
-	$("#IdAlmacenPri option").each(function(){
-		empresaAlmacenes.push({IdAlm: this.value, Alm: this.text, colorFondo: this.dataset.colorfondo, colorTexto: this.dataset.colortexto});
-	});
-	$("#headerEmpresaDatos").css('display','none');
-	$("#headerEmpresaAlmacenes").css('display','none');
-	$("#headerEmpresaUsuarioDatos").css('display','none');
+	$('#txtCodigo_PVNP').focus();
 
-	let empresaAlmacenesHTML = '';
-	empresaAlmacenes.forEach(item=>{
-		empresaAlmacenesHTML += `<div data-idalmacen="${item.IdAlm}" class='headerEmpresaAlmacenes-item' style="background: ${item.colorFondo}; color: ${item.colorTexto}">${item.Alm}</div>`;
-	});
-	let headerEmpresaUsuarioTypo = $("#headerEmpresaUsuarioTypo");
-	headerEmpresaUsuarioTypo.html(empresaAlmacenesHTML).removeAttr('class').addClass('col-xl-10 col-md-10 col-sm-10 col-xs-12 headerEmpresaAlmacenes');
-	headerEmpresaUsuarioTypo.on('click',function(e){
-		$('.headerEmpresaAlmacenes-item').each(function () {
-			$(this).removeClass('esta-activo');
+	const pintarAlmacenes = ()=>{
+		let empresaAlmacenes = [];
+		$("#IdAlmacenPri option").each(function(){
+			empresaAlmacenes.push({IdAlm: this.value, Alm: this.text, colorFondo: this.dataset.colorfondo, colorTexto: this.dataset.colortexto});
 		});
-		$(e.target).addClass('esta-activo');
-		$("#IdAlmRNP").html(e.target.dataset.idalmacen);
-	});
-
+		$("#headerEmpresaDatos").css('display','none');
+		$("#headerEmpresaAlmacenes").css('display','none');
+		$("#headerEmpresaUsuarioDatos").css('display','none');
 	
-	var Alm=$("#AlmRNP").html();$("#IdLabelTitleAlmacen").html("Almacen: "+Alm);
-	var IdAlm=$("#IdAlmRNP").html();
+		let empresaAlmacenesHTML = '';
+		empresaAlmacenes.forEach(item=>{
+			let almacenPorDefecto = $("#IdAlmRNP").html() == item.IdAlm ? 'esta-activo' : '';
+			empresaAlmacenesHTML += `<div data-idalmacen="${item.IdAlm}" class='headerEmpresaAlmacenes-item ${almacenPorDefecto}' style="background: ${item.colorFondo}; color: ${item.colorTexto}">${item.Alm}</div>`;
+			if(almacenPorDefecto==='esta-activo'){
+				$('.claTitleProceso').css('background',item.colorFondo).css('color',item.colorTexto);
+			}
+		});
+		let headerEmpresaUsuarioTypo = $("#headerEmpresaUsuarioTypo");
+		headerEmpresaUsuarioTypo.html(empresaAlmacenesHTML).removeAttr('class').addClass('col-xl-10 col-md-10 col-sm-10 col-xs-12 headerEmpresaAlmacenes');
+		headerEmpresaUsuarioTypo.on('click',function(e){
+			if(e.target.dataset.idalmacen != undefined){
+				$('.headerEmpresaAlmacenes-item').each(function () {
+					$(this).removeClass('esta-activo');
+				});
+				$(e.target).addClass('esta-activo');
+				$("#IdAlmRNP").html(e.target.dataset.idalmacen);
+				let almacen = empresaAlmacenes.find(item=>item.IdAlm == e.target.dataset.idalmacen);
+				$('.claTitleProceso').css('background',almacen.colorFondo).css('color',almacen.colorTexto);
+				$('#txtCodigo_PVNP').focus();
+			}
+		});
+	}
+	pintarAlmacenes();
 
-	inst.Genera_Codigo_Unico();
+
+	// $("#IdLabelTitleAlmacen").html("Almacen: "+Alm);
+	
 
 	//inst.getList_combo_VentaNP([IdAlm]);
 		
@@ -56,7 +68,7 @@ $(window).on('load',function(){
 	$('input:radio[name=rbtTipoprecioPVNP]').on('click',function(e){inst.Calcular_Importe_VentaNP();});
 	$("#IdChkIGVPVeNP").on('click',function(){inst.TotalMonto_Table_DetailVentaFi_NP();});
 	$("#btnAdd_PVNP").on('click',function(e){
-		if(IdAlm!="-1"){
+		if($("#IdAlmRNP").html()!="-1"){
 			var valido=true;
 			var IdProd=$("#lblIdProductoPVNP").html();
 			var Cod=$("#txtCodigo_PVNP").val();
@@ -80,6 +92,7 @@ $(window).on('load',function(){
 				if(EP){
 					inst.Build_Detail_VentaAdd_NP([IdProd,Cod,producto+' '+Marca+' '+Modelo,Unidad,Cant,PU,Importe,TipoPrecio,TipPrecio]);
 					inst.Clear_Detail_VentaAdd_NP();
+					$('#txtCodigo_PVNP').focus();
 				}else{
 					(function(){vex.defaultOptions.className = 'vex-theme-os';})();vex.dialog.alert("Producto ya existe en detalle.");
 				}
@@ -101,6 +114,7 @@ $(window).on('load',function(){
 	$("#btnComprar_PVNP").on('click',function(e){
 		var IdEmpresa=1;
 		var IdComprob=15;
+		let IdAlm = $("#IdAlmRNP").html();
 
 		// var Serie=$("#txtSerie_ProcVentaNP").val();
 		// var Numero=$("#txtNumero_ProcVentaNP").val();
@@ -158,25 +172,6 @@ $(window).on('load',function(){
 	//$("#btnAdd_PVNP").keyup(function (e){if(e.which == 13){}}}});
 });
 function ClassRNotaPedido(){
-	this.Genera_Codigo_Unico = function(){
-		const generateUniqueId = (length = 6) => {
-			let timestamp = + new Date;
-		
-			let _getRandomInt = function (min, max) {
-				return Math.floor(Math.random() * (max - min + 1)) + min;
-			};
-		
-			let ts = timestamp.toString();
-			let parts = ts.split("").reverse();
-			let id = "";
-			for (let i = 0; i < length; ++i) {
-				let index = _getRandomInt(0, parts.length - 1);
-				id += parts[index];
-			}
-			return id;
-		};
-		console.log(generateUniqueId(5));
-	}
 	this.Calcular_Importe_VentaNP=function(){
 		var TipoPrecio=$('input:radio[name=rbtTipoprecioPVNP]:checked').val();
 		var Cantid=$("#txtCantidad_PVNP").val();
@@ -305,7 +300,6 @@ function ClassRNotaPedido(){
 					// alertify.success("PROCESO CORRECTO.");
 					inst.Clear_Detail_VentaAdd_NP();
 					inst.Clear_Grnal_Venta_NP();
-					inst.Genera_Codigo_Unico();
 					vex.dialog.alert('PROCESO CORRECTO. </br> Número de pedido: </br> </br> <b style="font-size: 64px">'+e["IdVenta"]+'</b>');
 				}else{
 					alertify.error("Error, Proceso Incorrecto.");

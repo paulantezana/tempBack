@@ -1,7 +1,7 @@
 $(window).on('load',function(){var inst=new ClassRsvaVenta();
 	$("#IdAlmacenPri").css("display","none");
 	var Alm=$("#AlmRVenta").html();$("#IdLabelTitleAlmacen").html("Almacen: "+Alm);
-	var IdAlm=$("#IdAlmRVenta").html();
+	var IdAlmLabel=$("#IdAlmRVenta");
 	
 	var FeH=current_date();
 	$("#txtFechaPago_ProcVenta").datepicker({defaultDate: +1,changeMonth: true,numberOfMonths: 1,changeYear: true,disableTextInput:true,onClose: function(selectedDate){}});
@@ -13,7 +13,8 @@ $(window).on('load',function(){var inst=new ClassRsvaVenta();
 	$("#cboTipoDoc_ProcVenta").chosen({width: "100%"});
 	$("#comboMetodoPago").chosen({width: "100%"});
 	
-	inst.ver_empresa_venta();$("#cboEmpresa_ProcVenta").on('change',function(e){inst.ver_empresa_venta();});
+	inst.ver_empresa_venta();
+	$("#cboEmpresa_ProcVenta").on('change',function(e){inst.ver_empresa_venta();});
 
 	$("#cboComprobante_ProcVenta").on('change',function(e){inst.Verificar_DocumentoVenta();});
 	$("#cboTipoDoc_ProcVenta").on('change',function(e){$("#lblIdCliente").html("-1");$("#txtRuc_ProcVenta").prop("value","");$("#txtRS_ProcVenta").prop("value","");$("#txtDireccion_ProcVenta").prop("value","");});
@@ -28,13 +29,12 @@ $(window).on('load',function(){var inst=new ClassRsvaVenta();
 	if(e.which == 13){
 		var CP=$("#txtCodigo_ProcVenta").val();
 		if (CP!='') {
-			if(IdAlm!="-1" && CP!="" && CP.length>3){
-				inst.getList_Producto_Codigo([IdAlm,CP]);
+			if(IdAlmLabel.html()!="-1" && CP!="" && CP.length>3){
+				inst.getList_Producto_Codigo([IdAlmLabel.html(),CP]);
 			}
 		}else{
 			$("#btnComprar_ProcVenta").focus();
 		}
-		
 	}});
 	$("#txtPPublico_ProcVenta").focusout(function(){inst.Calcular_Importe_Venta();});
 	$("#txtPPublico_ProcVenta").keyup(function (e){if(e.which == 13){$("#btnAdd_ProcVenta").focus();inst.Calcular_Importe_Venta();}});
@@ -67,6 +67,7 @@ $(window).on('load',function(){var inst=new ClassRsvaVenta();
 	});
 	$("#btnComprar_ProcVenta").on('click',function(e){
 		aIdCliente=$("#lblIdCliente").html();
+		var IdAlm = IdAlmLabel.html();
 		var IdEmpresa=$("select#cboEmpresa_ProcVenta option:selected").val();
 		var IdComprob=parseInt($("select#cboComprobante_ProcVenta option:selected").val());
 		var IdTipoDoc=parseInt($("select#cboTipoDoc_ProcVenta option:selected").val());
@@ -137,7 +138,6 @@ $(window).on('load',function(){var inst=new ClassRsvaVenta();
 	//setTimeout(function() { $('input[name="codigo"]').focus();console.log('entra'); }, 3000);
 	//$('input[name="codigo"]').get(0).focus();
     $(document).keyup(function (e) {
-		console.log(e.shiftKey);
 		let tecla=e.which;
 		switch (tecla) {
 			case 70:
@@ -164,9 +164,12 @@ $(window).on('load',function(){var inst=new ClassRsvaVenta();
 		let tecla=e.which;
 		if(tecla == 13){
 			let Idss = $('#txtDescripNP_ProcCompra').val();
-			let IdAlm=$("#IdAlmRVenta").html();
 			let IdEmpresa=$("select#cboEmpresa_ProcVenta option:selected").val();
-			inst.getList_RecuperarDetail_VentaNP([IdAlm,Idss,IdEmpresa]);
+			if(Idss != ''){
+				inst.getList_RecuperarDetail_VentaNP([Idss,IdEmpresa]);
+			}else{
+				$("#txtDescripNP_ProcCompra").focus();
+			}
 		}
 	});
 });
@@ -185,7 +188,8 @@ function ClassRsvaVenta(){
 			$('#cboFormato_ProcVenta').val('TICKET').trigger('chosen:updated');
 			$("#cboComprobante_ProcVenta").chosen({width: "100%"});
 		}
-	   $("#txtCodigo_ProcVenta").focus();
+	//    $("#txtCodigo_ProcVenta").focus();
+	   $("#txtDescripNP_ProcCompra").focus();
 	}
 	this.AgregarProductoCarrito=function(){
 		var inst=new ClassRsvaVenta();
@@ -407,6 +411,7 @@ function ClassRsvaVenta(){
 		return vald;
 	}
 	this.Save_Datos_Venta=function(params,pIdEmpresa,IdComprob){
+		console.log(params);
 		$.blockUI();
 		$.ajax({type:"POST",url:url_ajax_request,data:{object:"objProceso",action:"Save_Datos_Venta",array:params},
 			async:true,dataType:"json",success:function(e){$.unblockUI();var inst=new ClassRsvaVenta();
@@ -589,16 +594,18 @@ function ClassRsvaVenta(){
 	}
 	this.getRecuperarRS=function(doc){
 		$.ajax({
-            url:'http://www.turismotisoc.com/consultas/api.php',
+            url:'https://buscaruc.com/consultas/api.php',
             method:'get',
             dataType: 'JSON',
             async:false,
-            data: {
-              id : doc,
-            },
-            success: function(res) {console.log(res);
-              $('#txtRS_ProcVenta').val(res['nombre']);
-              $('#txtDireccion_ProcVenta').val(res['direccion']);
+            data: { ruc : doc },
+            success: function(res) {
+				if(res.success){
+					$('#txtRS_ProcVenta').val(res.socialReason || '');
+					$('#txtDireccion_ProcVenta').val(res.fiscalAddress || '');
+				} else {
+					alertify.error(res.errorMessage);
+				}
             },
         });
 	}
@@ -630,7 +637,7 @@ function ClassRsvaVenta(){
 		$("#btnAddNP_VentaNP").on('click',function(e){
 			var Idss=$('input:radio[name=idnpVNP]:checked').val();
 			if(Idss!=undefined){
-				inst.getList_RecuperarDetail_VentaNP([IdAlm,Idss,IdEmpresa]);
+				inst.getList_RecuperarDetail_VentaNP([Idss,IdEmpresa]);
 			}else{
 				alertify.error("Seleccione Nota Pedido.");
 			}
@@ -676,6 +683,8 @@ function ClassRsvaVenta(){
 					$("#txtRS_ProcVenta").prop("value",Cabe[0]["RS"]);
 					$("#txtDireccion_ProcVenta").prop("value",Cabe[0]["Direccion"]);
 					$("#txtDescripNP_ProcCompra").prop("value",Cabe[0]['IdVenta']);
+					$('#IdAlmRVenta').html(Cabe[0]['IdAlmacen']);
+					$('#IdLabelTitleAlmacen').html(Cabe[0]['Almacen']);
 				}
 				if(Detail.length>0){
 					$("#IdTable_DetalleC_ProcVenta tbody").html("");

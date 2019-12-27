@@ -217,22 +217,25 @@ class ClaProceso{
 		return Class_Run::Select_Query($query);
  	}
 	public static function getList_RecuperarDetail_VentaNP($Datos){
-		$Detail=ClaProceso::getList_Detail_IdNP_ALM($Datos[0],$Datos[1],$Datos[2]);
-		$Cabe=ClaProceso::getList_Cab_IdNP_ALM($Datos[0],$Datos[1]);
-		//echo $query;	
+		$Detail=ClaProceso::getList_Detail_IdNP_ALM($Datos[0],$Datos[1]);
+		$Cabe=ClaProceso::getList_Cab_IdNP_ALM($Datos[0]);
+		if(count($Cabe) == 0){
+			$Detail = [];
+			$Cabe = [];
+		}
 		return array("Cabe"=>$Cabe,"Detail"=>$Detail);
  	}
-	public static function getList_Detail_IdNP_ALM($pIdAlm,$IdNP,$IdEmp){
+	public static function getList_Detail_IdNP_ALM($IdNP,$IdEmp){
  	 	$query="SELECT IdVenta,Cantidad,Codigo,Descripcion,Precio,Importe,IdProducto,IdTipoPrecio,Unidad,IdTipoPrecio,
 				fn_RecuperarNombre_ns('PRECIO_TIPO',IdTipoPrecio) as TipPrecio
-			FROM `mante_registro_nota_pedido_detalle` WHERE IdAlmacen='$pIdAlm' AND IdVenta='$IdNP' AND IdEmpresa='$IdEmp';";
+			FROM `mante_registro_nota_pedido_detalle` WHERE IdVenta='$IdNP' AND IdEmpresa='$IdEmp';";
 		//echo $query;
 		return Class_Run::Select_Query($query);
  	}
-	public static function getList_Cab_IdNP_ALM($pIdAlm,$IdNP){
+	public static function getList_Cab_IdNP_ALM($IdNP){
  	 	$query="select mrnp.IdVenta,mrnp.IdNotaPedido,mrnp.Total,mrnp.Estado,ma.Almacen,ma.IdAlmacen from `mante_registro_nota_pedido` as mrnp
 		  INNER JOIN mante_almacen AS ma ON mrnp.IdAlmacen = ma.IdAlmacen
-		  where mrnp.IdAlmacen='$pIdAlm' AND mrnp.Estado=1 AND mrnp.IdVenta='$IdNP';";
+		  where mrnp.Estado=1 AND mrnp.IdVenta='$IdNP';";
 		return Class_Run::Select_Query($query);
  	}
 	public static function getList_Producto_Codigo($Datos){
@@ -454,16 +457,16 @@ class ClaProceso{
 				$tipoIgv=$item['aIdTipoIgv'];
 				$valorUnitario=0;
 				$subTotal=0;
-				$igv=$item['aImporte'] - $subTotal;
+				$igv = 0;
 				if ($tipoIgv==1) {
 					$valorUnitario = round(floatval($item['aPU'] / 1.18), 2);
 					$subTotal = $valorUnitario * $item['aCantidad'];
+					$igv = $item['aImporte'] - $subTotal;
 				}else{
 					$valorUnitario=$item['aPU'];
 					$subTotal = $valorUnitario * $item['aCantidad'];
 					$igv='0.00';
 				}
-				
 
 				$nuevoItem = array(
                     "unidad_de_medida"          => "NIU",
