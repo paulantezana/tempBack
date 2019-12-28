@@ -61,7 +61,7 @@
                     <div class="UserSidebar-brand">
                         <a href="<?= FOLDER_NAME ?>">
                             <img src="<?= FOLDER_NAME . '/Asset/Images/logo.png' ?>" alt="logo" width="48px" class="mr-2">
-                            <span>Sky Fact</span>
+                            <span class="UserSidebar-brandName">Sky Facts <span>Facturación electrónica</span></span>
                         </a>
                     </div>
                     <div class="UserSidebar-header">
@@ -164,7 +164,6 @@
                                 <i class="icon-office mr-2"></i>
                                 <span>
                                     <span>Empresa</span>
-                                    <span class="badge badge-pill badge-primary">Beta</span>
                                 </span>
                             </a>
                         </li>

@@ -10,20 +10,20 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <table class="table table-striped table-sm">
+                <table class="table table-striped">
                     <thead>
-                    <tr style="font-size: 14px">
-                        <th>Código Único</th>
-                        <th>Descripción</th>
-                        <th>Ubigero (INEI)</th>
-                        <th>Dirección exacta</th>
-                        <th>Departamento</th>
-                        <th>Provincia</th>
-                        <th>Distrito</th>
-                        <th>Tipos de comprobantes y series asignados</th>
-                        <th>Formato de PDF</th>
-                        <th></th>
-                    </tr>
+                        <tr>
+                            <th>Código Único</th>
+                            <th>Descripción</th>
+                            <th>Ubigero (INEI)</th>
+                            <th>Dirección exacta</th>
+                            <th>Departamento</th>
+                            <th>Provincia</th>
+                            <th>Distrito</th>
+                            <th>Tipos de comprobantes y series asignados</th>
+                            <th>Formato de PDF</th>
+                            <th></th>
+                        </tr>
                     </thead>
                     <tbody>
                     <?php foreach ($parameter['businessLocal'] as $row): ?>
